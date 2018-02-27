@@ -1,10 +1,12 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
+
+#Modifizierte Version (NextTicketState), 04.12.2017, D. Marx
 
 package Kernel::Modules::AgentTicketCompose;
 
@@ -1662,8 +1664,43 @@ sub _Mask {
     if ( $Param{GetParam}->{StateID} ) {
         $State{SelectedID} = $Param{GetParam}->{StateID};
     }
-    else {
-        $State{SelectedValue} = $Config->{StateDefault};
+    else {        
+		#Nachfolgender Part definiert den Default_Status beim verwenden einer Antwortvorlage
+		#Dieser wurde ergänzt um eine Standarddefinition bei der Vorlage Ticket_Schliessen
+		#Februar 2017, D. Marx, Pelipal-IT		
+		
+		#$State{SelectedValue} = $Config->{StateDefault}; #Originalzeile. Im Original war dies alles was im else {} stand.
+		
+		#Mod Start
+		##########	
+		#Haessliche -kann man so machen, aber dann ist es halt schlecht- very Quick and really Dirty-Loesung:		
+		#if ( $Param{GetParam}->{ResponseID} == 5) { #5 = Ticket schließen
+			
+		#	$State{SelectedID} = 2; #2 = closed successful
+		#}
+		#else {		
+		#	$State{SelectedValue} = $Config->{StateDefault}; #Originalzeile: OTRS-Defaultwert setzen
+		#}
+		
+		#Saubere, eines IT-Profi's wuerdige, ordentliche Loesung
+		#Vorraussetzung: Der Tabelle standard_template ein Feld hinzufügen mit welcher der nächste status für jedes template (fremdschlüssel ticket_state.id) definiert werden kann
+		
+		#Ermittelt den Namen des nächsten Status anhand der gegebenen ID der Antwortvorlage
+		my $DBObject = $Kernel::OM->Get('Kernel::System::DB'); #Datenbankobjekt definieren		
+		my $SQL = "SELECT ticket_state.name FROM standard_template LEFT JOIN ticket_state ON standard_template.fk_tickstateIDnextDefault=ticket_state.id WHERE standard_template.id= ?"; #Statement: '?' wird durch Bind im nachfolgenden Befehl befüllt
+		my $responseid=$Param{GetParam}->{ResponseID}; #ID des Antworttemplates ermitteln		
+		$DBObject->Prepare(
+		SQL => $SQL, 
+		Limit => 1,
+		Bind => [\$responseid] #Bind füllt die '?' im Query mit Werten. Es handelt sich um ein Array mit SCALAR-Werten [\$wert1, \$wert2,... \$wertn] '\' ist wichtig um anzugeben, dass es sich um eine SCALAR-Variable handelt. Wert entspricht der ID der Antwortvorlage in Tabelle standard_template
+		);		
+		my $nextstate=$Config->{StateDefault}; #zunächst auf defaultwert setzen, damit die variable nicht leer ist
+		while (my @Row = $DBObject->FetchrowArray()) {
+			$nextstate = $Row[0];		
+		}		
+		$State{SelectedValue} = $nextstate; #Name des gewählten, nächsten Status als Vorauswahl setzen.		
+		#Mod Ende
+		#########
     }
     $Param{NextStatesStrg} = $LayoutObject->BuildSelection(
         Data         => $Param{NextStates},
