@@ -1,11 +1,14 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
 # Copyright (C) 2010 Thomas Kaltenbrunner <tkaltenbrunner at opc.de>
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
+
+#Modifizierte Version (NextTicketState), 04.12.2017, D. Marx
+
 package Kernel::Language::de;
 
 use strict;
@@ -32,6 +35,7 @@ sub Data {
     $Self->{Translation} = {
 
         # Template: AAABase
+		'fk_tickstateIDnextDefault' => 'Nächster Ticketstatus',
         'Yes' => 'Ja',
         'No' => 'Nein',
         'yes' => 'ja',
