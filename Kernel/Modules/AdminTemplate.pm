@@ -78,7 +78,7 @@ sub Run {
         my @NewIDs = $ParamObject->GetArray( Param => 'IDs' );
         my ( %GetParam, %Errors );
 		#Needed for MOD
-        # for my $Parameter (qw(ID Name Comment ValidID TemplateType)) { #Originalzeile
+        # for my $Parameter (qw(ID Name Comment ValidID TemplateType)) { #Original line
 		for my $Parameter (qw(ID Name Comment ValidID TemplateType fk_tickstateIDnextDefault)) {
 		#END - Needed for MOD
             $GetParam{$Parameter} = $ParamObject->GetParam( Param => $Parameter ) || '';
@@ -207,7 +207,7 @@ sub Run {
         my ( %GetParam, %Errors );
 
 		#NEEDED FOR MOD
-        #for my $Parameter (qw(ID Name Comment ValidID TemplateType )) {#Originalzeile
+        #for my $Parameter (qw(ID Name Comment ValidID TemplateType )) {#Original line
         for my $Parameter (qw(ID Name Comment ValidID TemplateType fk_tickstateIDnextDefault)) {
 		#END - NEEDED FOR MOD
             $GetParam{$Parameter} = $ParamObject->GetParam( Param => $Parameter ) || '';
@@ -352,7 +352,7 @@ sub _Edit {
 	
 	#Mod start:
 	###########
-	#Der Vorlagenverwaltung eine Option zum Einstellen hinzufügen
+	#Add an option to set next state to templateconfiguration	
 	# get nextTicketState-list
 	my $DBObject = $Kernel::OM->Get('Kernel::System::DB'); #Datenbankobjekt definieren		
 		my $SQL = "SELECT id, name FROM ticket_state ORDER BY name"; #Statement 			
@@ -377,7 +377,6 @@ sub _Edit {
         Class      => 'Modernize' . ( $Param{Errors}->{'fk_tickstateIDnextDefaultInvalid'} || '' ),
     ); 
 	
-		
 	#Mod Ende:
 	##########
 
