@@ -1,10 +1,12 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
+
+#Modifizierte Version (NextTicketState), 04.12.2017, D. Marx
 
 package Kernel::System::StandardTemplate;
 
@@ -71,7 +73,7 @@ sub StandardTemplateAdd {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(Name ValidID Template ContentType UserID TemplateType)) {
+    for (qw(Name ValidID Template ContentType UserID TemplateType fk_tickstateIDnextDefault)) {
         if ( !defined( $Param{$_} ) ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -97,11 +99,11 @@ sub StandardTemplateAdd {
     return if !$DBObject->Do(
         SQL => '
             INSERT INTO standard_template (name, valid_id, comments, text,
-                content_type, create_time, create_by, change_time, change_by, template_type)
-            VALUES (?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?, ?)',
+                content_type, create_time, create_by, change_time, change_by, template_type, fk_tickstateIDnextDefault)
+            VALUES (?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?, ?, ?)',
         Bind => [
             \$Param{Name},        \$Param{ValidID}, \$Param{Comment}, \$Param{Template},
-            \$Param{ContentType}, \$Param{UserID},  \$Param{UserID},  \$Param{TemplateType},
+            \$Param{ContentType}, \$Param{UserID},  \$Param{UserID},  \$Param{TemplateType}, \$Param{fk_tickstateIDnextDefault},
         ],
     );
 
@@ -168,7 +170,7 @@ sub StandardTemplateGet {
     return if !$DBObject->Prepare(
         SQL => '
             SELECT name, valid_id, comments, text, content_type, create_time, create_by,
-                change_time, change_by ,template_type
+                change_time, change_by ,template_type, fk_tickstateIDnextDefault
             FROM standard_template
             WHERE id = ?',
         Bind => [ \$Param{ID} ],
@@ -188,6 +190,7 @@ sub StandardTemplateGet {
             ChangeTime   => $Data[7],
             ChangeBy     => $Data[8],
             TemplateType => $Data[9],
+			fk_tickstateIDnextDefault => $Data[10],
         );
     }
 
@@ -265,7 +268,7 @@ sub StandardTemplateUpdate {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(ID Name ValidID TemplateType ContentType UserID TemplateType)) {
+    for (qw(ID Name ValidID TemplateType ContentType UserID TemplateType fk_tickstateIDnextDefault)) {
         if ( !defined( $Param{$_} ) ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -295,11 +298,11 @@ sub StandardTemplateUpdate {
         SQL => '
             UPDATE standard_template
             SET name = ?, text = ?, content_type = ?, comments = ?, valid_id = ?,
-                change_time = current_timestamp, change_by = ? ,template_type = ?
+                change_time = current_timestamp, change_by = ? ,template_type = ?, fk_tickstateIDnextDefault = ?
             WHERE id = ?',
         Bind => [
             \$Param{Name},    \$Param{Template}, \$Param{ContentType},  \$Param{Comment},
-            \$Param{ValidID}, \$Param{UserID},   \$Param{TemplateType}, \$Param{ID},
+            \$Param{ValidID}, \$Param{UserID},   \$Param{TemplateType}, \$Param{fk_tickstateIDnextDefault}, \$Param{ID},
         ],
     );
 
