@@ -1,10 +1,12 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
+
+#Modifizierte Version (NextTicketState), 04.12.2017, D. Marx
 
 package Kernel::Modules::AdminTemplate;
 
@@ -75,7 +77,10 @@ sub Run {
 
         my @NewIDs = $ParamObject->GetArray( Param => 'IDs' );
         my ( %GetParam, %Errors );
-        for my $Parameter (qw(ID Name Comment ValidID TemplateType)) {
+		#Needed for MOD
+        # for my $Parameter (qw(ID Name Comment ValidID TemplateType)) { #Originalzeile
+		for my $Parameter (qw(ID Name Comment ValidID TemplateType fk_tickstateIDnextDefault)) {
+		#END - Needed for MOD
             $GetParam{$Parameter} = $ParamObject->GetParam( Param => $Parameter ) || '';
         }
 
@@ -201,7 +206,10 @@ sub Run {
         my @NewIDs = $ParamObject->GetArray( Param => 'IDs' );
         my ( %GetParam, %Errors );
 
-        for my $Parameter (qw(ID Name Comment ValidID TemplateType)) {
+		#NEEDED FOR MOD
+        #for my $Parameter (qw(ID Name Comment ValidID TemplateType )) {#Originalzeile
+        for my $Parameter (qw(ID Name Comment ValidID TemplateType fk_tickstateIDnextDefault)) {
+		#END - NEEDED FOR MOD
             $GetParam{$Parameter} = $ParamObject->GetParam( Param => $Parameter ) || '';
         }
 
@@ -215,9 +223,11 @@ sub Run {
         if ( $LayoutObject->{BrowserRichText} ) {
             $GetParam{ContentType} = 'text/html';
         }
-
-        # check needed data
-        for my $Needed (qw(Name ValidID TemplateType)) {
+		
+		#NEEDED FOR MOD
+        #for my $Needed (qw(Name ValidID TemplateType)) {#Originalzeile
+		for my $Needed (qw(Name ValidID TemplateType fk_tickstateIDnextDefault)) {
+		#END - NEEDED FOR MOD
             if ( !$GetParam{$Needed} ) {
                 $Errors{ $Needed . 'Invalid' } = 'ServerError';
             }
@@ -339,6 +349,37 @@ sub _Edit {
 
     $LayoutObject->Block( Name => 'ActionList' );
     $LayoutObject->Block( Name => 'ActionOverview' );
+	
+	#Mod start:
+	###########
+	#Der Vorlagenverwaltung eine Option zum Einstellen hinzufügen
+	# get nextTicketState-list
+	my $DBObject = $Kernel::OM->Get('Kernel::System::DB'); #Datenbankobjekt definieren		
+		my $SQL = "SELECT id, name FROM ticket_state ORDER BY name"; #Statement 			
+		$DBObject->Prepare(
+		SQL => $SQL, 
+		Limit => 100
+		);
+		
+	my %NextStateList;
+	my $counter=0;
+	while (my @Row = $DBObject->FetchrowArray()) {
+			$NextStateList{ $Row[0] } = $Row[1]; #Daten für Dropdown aufbereiten			
+		}
+	
+	my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+	my $TicketConfig = $ConfigObject->Get("Ticket::Frontend::$Self->{Action}");	
+	
+	$Param{fk_tickstateIDnextDefault} = $LayoutObject->BuildSelection(
+        Data       => \%NextStateList,
+        Name       => 'fk_tickstateIDnextDefault',
+        SelectedID => $Param{fk_tickstateIDnextDefault} || 4,
+        Class      => 'Modernize' . ( $Param{Errors}->{'fk_tickstateIDnextDefaultInvalid'} || '' ),
+    ); 
+	
+		
+	#Mod Ende:
+	##########
 
     # get valid list
     my %ValidList        = $Kernel::OM->Get('Kernel::System::Valid')->ValidList();
