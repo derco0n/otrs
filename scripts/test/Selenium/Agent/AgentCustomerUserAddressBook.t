@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -630,8 +630,9 @@ $Selenium->RunTest(
 
                         $Selenium->find_element( "input[name='$FieldName'] + .RemoveButton", 'css' )->click();
 
+                        sleep 1;
                         $Self->False(
-                            $Selenium->find_element( $FieldName, 'name' )->is_displayed(),
+                            $Selenium->execute_script("return \$('#SearchForm input[name=\"$FieldName\"]').length;"),
                             "Field '$FieldName' is not displayed'"
                         );
                     }
@@ -641,10 +642,10 @@ $Selenium->RunTest(
 
                     for my $FieldName ( @{ $SubTest->{SearchFieldsAdd} } ) {
 
-                        $Selenium->execute_script(
-                            "\$('#Attribute').val('$FieldName').trigger('redraw.InputField').trigger('change');",
+                        $Selenium->InputFieldValueSet(
+                            Element => '#Attribute',
+                            Value   => $FieldName,
                         );
-                        $Selenium->find_element( '.AddButton', 'css' )->click();
 
                         my $Element = $Selenium->find_element( $FieldName, 'name' );
                         $Element->is_enabled();
@@ -667,13 +668,15 @@ $Selenium->RunTest(
                                 Data => $SubTest->{SearchParameter}->{Selection}->{$FieldName},
                             );
 
-                            $Selenium->execute_script(
-                                "\$('select[name=\"$FieldName\"]').val($ValuesString).trigger('redraw.InputField').trigger('change');",
+                            $Selenium->InputFieldValueSet(
+                                Element => "select[name=\"$FieldName\"]",
+                                Value   => $ValuesString,
                             );
                         }
                         else {
-                            $Selenium->execute_script(
-                                "\$('select[name=\"$FieldName\"]').val('$SubTest->{SearchParameter}->{Selection}->{$FieldName}').trigger('redraw.InputField').trigger('change');",
+                            $Selenium->InputFieldValueSet(
+                                Element => "select[name=\"$FieldName\"]",
+                                Value   => $SubTest->{SearchParameter}->{Selection}->{$FieldName},
                             );
                         }
                     }
@@ -798,15 +801,15 @@ $Selenium->RunTest(
                     sleep 1;
 
                     $Selenium->WaitFor(
-                        JavaScript => 'return $("#Attribute").length == 1 && $(".AddButton").length == 1'
+                        JavaScript => 'return $("#Attribute").length == 1'
                     );
 
                     for my $FieldName ( @{ $SubTest->{SearchFieldsChange} } ) {
 
-                        $Selenium->execute_script(
-                            "\$('#Attribute').val('$FieldName').trigger('redraw.InputField').trigger('change');",
+                        $Selenium->InputFieldValueSet(
+                            Element => '#Attribute',
+                            Value   => $FieldName,
                         );
-                        $Selenium->find_element( '.AddButton', 'css' )->click();
 
                         my $Element = $Selenium->find_element( $FieldName, 'name' );
                         $Element->is_enabled();
@@ -829,13 +832,15 @@ $Selenium->RunTest(
                                 Data => $SubTest->{SearchParameterChange}->{Selection}->{$FieldName},
                             );
 
-                            $Selenium->execute_script(
-                                "\$('select[name=\"$FieldName\"]').val($ValuesString).trigger('redraw.InputField').trigger('change');",
+                            $Selenium->InputFieldValueSet(
+                                Element => "select[name=\"$FieldName\"]",
+                                Value   => $ValuesString,
                             );
                         }
                         else {
-                            $Selenium->execute_script(
-                                "\$('select[name=\"$FieldName\"]').val('$SubTest->{SearchParameterChange}->{Selection}->{$FieldName}').trigger('redraw.InputField').trigger('change');",
+                            $Selenium->InputFieldValueSet(
+                                Element => "select[name=\"$FieldName\"]",
+                                Value   => $SubTest->{SearchParameterChange}->{Selection}->{$FieldName},
                             );
                         }
                     }

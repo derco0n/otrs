@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -106,7 +106,7 @@ my $CheckProcess = sub {
     # check process start activity and start activity dialog
     for my $PartName (qw(Activity ActivityDialog)) {
         my $OriginalPartEntityID = $ProcessData->{Process}->{Config}->{"Start$PartName"} || '';
-        my $PartObject = $ActivityObject;
+        my $PartObject           = $ActivityObject;
         if ( $PartName eq 'ActivityDialog' ) {
             $PartObject = $ActivityDialogObject;
         }
@@ -529,7 +529,7 @@ for my $Test (@Tests) {
             UserID => 1,
         );
 
-        my @ProcessTest = grep { $_->{Name} eq $ProcessData->{Process}->{Name} } @{$CurrentProcessList};
+        my @ProcessTest      = grep { $_->{Name} eq $ProcessData->{Process}->{Name} } @{$CurrentProcessList};
         my $CurrentProcessID = $ProcessTest[0]->{ID};
 
         $Self->IsNot(

@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::Console::Command::Maint::Config::Rebuild;
@@ -15,6 +15,7 @@ use parent qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
     'Kernel::System::Cache',
+    'Kernel::System::PID',
     'Kernel::System::SysConfig',
 );
 
@@ -29,6 +30,61 @@ sub Configure {
         Required    => 0,
         HasValue    => 0,
     );
+
+    return;
+}
+
+sub PreRun {
+    my ( $Self, %Param ) = @_;
+
+    my $PIDObject = $Kernel::OM->Get('Kernel::System::PID');
+
+    my $Locked;
+    my $WaitedSeconds = 0;
+    my $Interval      = 0.1;
+    my $ShowMessage   = 1;
+
+    # Make sure that only one rebuild config command is running at the same time. Wait up to 2 minutes
+    #    until other instances are done (see https://bugs.otrs.org/show_bug.cgi?id=14259).
+    PID:
+    while ( $WaitedSeconds <= 120 ) {
+        my %PID = $PIDObject->PIDGet(
+            Name => 'RebuildConfig',
+        );
+
+        if ( !%PID ) {
+            my $Success = $PIDObject->PIDCreate(
+                Name => 'RebuildConfig',
+            );
+
+            my %PID = $PIDObject->PIDGet(
+                Name => 'RebuildConfig',
+            );
+            $PID{PID} || 0;
+
+            # PID created successfully.
+            if ( $Success && $PID{PID} eq $$ ) {
+                $Locked = 1;
+                last PID;
+            }
+        }
+        Time::HiRes::sleep($Interval);
+        $WaitedSeconds += $Interval;
+
+        # Increase waiting interval up to 3 seconds.
+        if ( $Interval < 3 ) {
+            $Interval += 0.1;
+        }
+
+        if ($ShowMessage) {
+            $Self->Print("\nThere is another system configuration rebuild in progress, waiting...\n\n");
+            $ShowMessage = 0;
+        }
+    }
+
+    if ( !$Locked ) {
+        die "System was unable to create PID for RebuildConfig!\n";
+    }
 
     return;
 }
@@ -90,6 +146,22 @@ sub Run {
 
     $Self->Print("<green>Done.</green>\n");
     return $Self->ExitCodeOk();
+}
+
+sub PostRun {
+    my ($Self) = @_;
+
+    my $PIDObject = $Kernel::OM->Get('Kernel::System::PID');
+
+    my %PID = $PIDObject->PIDGet(
+        Name => 'RebuildConfig',
+    );
+
+    if (%PID) {
+        return $PIDObject->PIDDelete( Name => 'RebuildConfig' );
+    }
+
+    return 1;
 }
 
 1;

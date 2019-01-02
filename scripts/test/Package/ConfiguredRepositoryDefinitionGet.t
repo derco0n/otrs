@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 ## no critic (Modules::RequireExplicitPackage)
@@ -32,7 +32,7 @@ $Helper->ConfigSettingChange(
 );
 
 my @FrameworkVersionParts = split /\./, $Kernel::OM->Get('Kernel::Config')->Get('Version');
-my $FrameworkVersion = $FrameworkVersionParts[0];
+my $FrameworkVersion      = $FrameworkVersionParts[0];
 
 my @Tests = (
     {
@@ -40,7 +40,7 @@ my @Tests = (
         ConfigSet      => {},
         Success        => 1,
         ExpectedResult => {
-            'http://ftp.otrs.org/pub/otrs/packages/' => 'OTRS Free Features'
+            'http://ftp.otrs.org/pub/otrs/packages/' => 'OTRS Freebie Features'
         },
     },
     {
@@ -50,7 +50,7 @@ my @Tests = (
         },
         Success        => 1,
         ExpectedResult => {
-            'http://ftp.otrs.org/pub/otrs/packages/' => 'OTRS Free Features',
+            'http://ftp.otrs.org/pub/otrs/packages/' => 'OTRS Freebie Features',
             'http://otrs.com'                        => 'Test Repository',
         },
     },
@@ -62,7 +62,7 @@ my @Tests = (
         },
         Success        => 1,
         ExpectedResult => {
-            'http://ftp.otrs.org/pub/otrs/packages/'                       => 'OTRS Free Features',
+            'http://ftp.otrs.org/pub/otrs/packages/'                       => 'OTRS Freebie Features',
             'http://otrs.com'                                              => 'Test Repository',
             "http://ftp.otrs.org/pub/otrs/itsm/packages$FrameworkVersion/" => "OTRS::ITSM $FrameworkVersion Master",
         },
@@ -76,7 +76,7 @@ my @Tests = (
         },
         Success        => 1,
         ExpectedResult => {
-            'http://ftp.otrs.org/pub/otrs/packages/'                       => 'OTRS Free Features',
+            'http://ftp.otrs.org/pub/otrs/packages/'                       => 'OTRS Freebie Features',
             'http://otrs.com'                                              => 'Test Repository',
             "http://ftp.otrs.org/pub/otrs/itsm/packages$FrameworkVersion/" => "OTRS::ITSM $FrameworkVersion Master",
         },
@@ -91,7 +91,7 @@ my @Tests = (
         },
         Success        => 1,
         ExpectedResult => {
-            'http://ftp.otrs.org/pub/otrs/packages/'                       => 'OTRS Free Features',
+            'http://ftp.otrs.org/pub/otrs/packages/'                       => 'OTRS Freebie Features',
             'http://otrs.com'                                              => 'Test Repository',
             "http://ftp.otrs.org/pub/otrs/itsm/packages$FrameworkVersion/" => "OTRS::ITSM $FrameworkVersion Master",
         },
@@ -99,13 +99,13 @@ my @Tests = (
     {
         Name      => 'ITSM 6 Repository',
         ConfigSet => {
-            'http://ftp.otrs.org/pub/otrs/packages/'                       => 'OTRS Free Features',
+            'http://ftp.otrs.org/pub/otrs/packages/'                       => 'OTRS Freebie Features',
             'http://otrs.com'                                              => 'Test Repository',
             "http://ftp.otrs.org/pub/otrs/itsm/packages$FrameworkVersion/" => "OTRS::ITSM $FrameworkVersion Master",
         },
         Success        => 1,
         ExpectedResult => {
-            'http://ftp.otrs.org/pub/otrs/packages/'                       => 'OTRS Free Features',
+            'http://ftp.otrs.org/pub/otrs/packages/'                       => 'OTRS Freebie Features',
             'http://otrs.com'                                              => 'Test Repository',
             "http://ftp.otrs.org/pub/otrs/itsm/packages$FrameworkVersion/" => "OTRS::ITSM $FrameworkVersion Master",
         },

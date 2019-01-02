@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Output::HTML::Layout;
@@ -31,6 +31,7 @@ our @ObjectDependencies = (
     'Kernel::System::Log',
     'Kernel::System::Main',
     'Kernel::System::OTRSBusiness',
+    'Kernel::System::State',
     'Kernel::System::Storable',
     'Kernel::System::SystemMaintenance',
     'Kernel::System::User',
@@ -102,7 +103,7 @@ sub new {
     #   is none yet.
     if ( !$Self->{UserLanguage} ) {
         my @BrowserLanguages = split /\s*,\s*/, $Self->{Lang} || $ENV{HTTP_ACCEPT_LANGUAGE} || '';
-        my %Data = %{ $ConfigObject->Get('DefaultUsedLanguages') };
+        my %Data             = %{ $ConfigObject->Get('DefaultUsedLanguages') };
         LANGUAGE:
         for my $BrowserLang (@BrowserLanguages) {
             for my $Language ( reverse sort keys %Data ) {
@@ -616,7 +617,7 @@ sub Redirect {
     #  o http://bugs.otrs.org/show_bug.cgi?id=9835
     #  o http://support.microsoft.com/default.aspx?scid=kb;en-us;221154
     if ( $ENV{SERVER_SOFTWARE} =~ /^microsoft\-iis\/6/i ) {
-        my $Host = $ENV{HTTP_HOST} || $ConfigObject->Get('FQDN');
+        my $Host     = $ENV{HTTP_HOST} || $ConfigObject->Get('FQDN');
         my $HttpType = $ConfigObject->Get('HttpType');
         $Param{Redirect} = $HttpType . '://' . $Host . $Param{Redirect};
     }
@@ -718,6 +719,7 @@ sub Login {
     my $OTRSBusinessObject = $Kernel::OM->Get('Kernel::System::OTRSBusiness');
     $Param{OTRSBusinessIsInstalled} = $OTRSBusinessObject->OTRSBusinessIsInstalled();
     $Param{OTRSSTORMIsInstalled}    = $OTRSBusinessObject->OTRSSTORMIsInstalled();
+    $Param{OTRSCONTROLIsInstalled}  = $OTRSBusinessObject->OTRSCONTROLIsInstalled();
 
     # we need the baselink for VerfifiedGet() of selenium tests
     $Self->AddJSData(
@@ -1421,6 +1423,15 @@ sub Header {
             MODULE:
             for my $Key ( sort keys %Modules ) {
                 next MODULE if !%{ $Modules{$Key} };
+
+                # For ToolBarSearchFulltext module take into consideration SearchInArchive settings.
+                # See bug#13790 (https://bugs.otrs.org/show_bug.cgi?id=13790).
+                if ( $ConfigObject->Get('Ticket::ArchiveSystem') && $Modules{$Key}->{Block} eq 'ToolBarSearchFulltext' )
+                {
+                    $Modules{$Key}->{SearchInArchive}
+                        = $ConfigObject->Get('Ticket::Frontend::AgentTicketSearch')->{Defaults}->{SearchInArchive};
+                }
+
                 $Self->Block(
                     Name => $Modules{$Key}->{Block},
                     Data => {
@@ -1449,7 +1460,12 @@ sub Header {
                 = '//www.gravatar.com/avatar/' . md5_hex( lc $Self->{UserEmail} ) . '?s=100&d=' . $DefaultIcon;
         }
         else {
-            $Param{UserInitials} = $Self->UserInitialsGet( Fullname => $Self->{UserFullname} );
+            my %User = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+                User          => $Self->{UserLogin},
+                NoOutOfOffice => 1,
+            );
+
+            $Param{UserInitials} = $Self->UserInitialsGet( Fullname => $User{UserFullname} );
         }
 
         # show logged in notice
@@ -1508,7 +1524,7 @@ sub Footer {
 
     # get datepicker data, if needed in module
     if ($HasDatepicker) {
-        my $VacationDays = $Self->DatepickerGetVacationDays();
+        my $VacationDays  = $Self->DatepickerGetVacationDays();
         my $TextDirection = $Self->{LanguageObject}->{TextDirection} || '';
 
         # send data to JS
@@ -1565,6 +1581,7 @@ sub Footer {
     if ( $ConfigObject->Get('SecureMode') ) {
         $Param{OTRSBusinessIsInstalled} = $OTRSBusinessObject->OTRSBusinessIsInstalled();
         $Param{OTRSSTORMIsInstalled}    = $OTRSBusinessObject->OTRSSTORMIsInstalled();
+        $Param{OTRSCONTROLIsInstalled}  = $OTRSBusinessObject->OTRSCONTROLIsInstalled();
     }
 
     # Check if video chat is enabled.
@@ -1572,6 +1589,12 @@ sub Footer {
         $Param{VideoChatEnabled} = $Kernel::OM->Get('Kernel::System::VideoChat')->IsEnabled()
             || $Kernel::OM->Get('Kernel::System::Web::Request')->GetParam( Param => 'UnitTestMode' ) // 0;
     }
+
+    # Set an array with pending states.
+    my @PendingStateIDs = $Kernel::OM->Get('Kernel::System::State')->StateGetStatesByType(
+        StateType => [ 'pending reminder', 'pending auto' ],
+        Result    => 'ID',
+    );
 
     # add JS data
     my %JSConfig = (
@@ -1596,6 +1619,7 @@ sub Footer {
         InputFieldsActivated           => $ConfigObject->Get('ModernizeFormFields'),
         OTRSBusinessIsInstalled        => $Param{OTRSBusinessIsInstalled},
         VideoChatEnabled               => $Param{VideoChatEnabled},
+        PendingStateIDs                => \@PendingStateIDs,
         CheckSearchStringsForStopWords => (
             $ConfigObject->Get('Ticket::SearchIndex::WarnOnStopWordUsage')
                 &&
@@ -1603,7 +1627,7 @@ sub Footer {
                 $ConfigObject->Get('Ticket::SearchIndexModule')
                 eq 'Kernel::System::Ticket::ArticleSearchIndex::DB'
                 )
-            ) ? 1 : 0,
+        ) ? 1 : 0,
         SearchFrontend => $JSCall,
         Autocomplete   => $AutocompleteConfig,
     );
@@ -3053,7 +3077,7 @@ sub NavigationBar {
                     %Param,
                     Config => $Jobs{$Job},
                     NavBar => \%NavBar || {}
-                    )
+                )
             );
         }
     }
@@ -3358,7 +3382,7 @@ sub BuildDateSelection {
             'Kernel::System::DateTime',
             ObjectParams => {
                 TimeZone => $Self->{UserTimeZone}
-                }
+            }
         );
         if ( $Param{AddSeconds} ) {
             $DateTimeObject->Add( Seconds => $Param{AddSeconds} );
@@ -3593,7 +3617,7 @@ sub BuildDateSelection {
                     defined( $Param{ $Prefix . 'Minute' } )
                     ? int( $Param{ $Prefix . 'Minute' } )
                     : $m
-                    )
+                )
                 ) . "\" "
                 . ( $Param{Disabled} ? 'readonly="readonly"' : '' ) . "/>";
         }
@@ -3676,7 +3700,7 @@ sub BuildDateSelection {
 
 Produces human readable data size.
 
-    my $SizeStr = $MainObject->HumanReadableDataSize(
+    my $SizeStr = $LayoutObject->HumanReadableDataSize(
         Size => 123,  # size in bytes
     );
 
@@ -3723,7 +3747,7 @@ sub HumanReadableDataSize {
         return;
     }
 
-    if ( !IsPositiveInteger( $Param{Size} ) ) {
+    if ( !IsInteger( $Param{Size} ) ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
             Message  => 'Size must be integer!',
@@ -3737,22 +3761,22 @@ sub HumanReadableDataSize {
     if ( $Param{Size} >= ( 1024**4 ) ) {
 
         $ReadableSize = $FormatSize->( $Param{Size} / ( 1024**4 ) );
-        $SizeStr = $Self->{LanguageObject}->Translate( '%s TB', $ReadableSize );
+        $SizeStr      = $Self->{LanguageObject}->Translate( '%s TB', $ReadableSize );
     }
     elsif ( $Param{Size} >= ( 1024**3 ) ) {
 
         $ReadableSize = $FormatSize->( $Param{Size} / ( 1024**3 ) );
-        $SizeStr = $Self->{LanguageObject}->Translate( '%s GB', $ReadableSize );
+        $SizeStr      = $Self->{LanguageObject}->Translate( '%s GB', $ReadableSize );
     }
     elsif ( $Param{Size} >= ( 1024**2 ) ) {
 
         $ReadableSize = $FormatSize->( $Param{Size} / ( 1024**2 ) );
-        $SizeStr = $Self->{LanguageObject}->Translate( '%s MB', $ReadableSize );
+        $SizeStr      = $Self->{LanguageObject}->Translate( '%s MB', $ReadableSize );
     }
     elsif ( $Param{Size} >= 1024 ) {
 
         $ReadableSize = $FormatSize->( $Param{Size} / 1024 );
-        $SizeStr = $Self->{LanguageObject}->Translate( '%s KB', $ReadableSize );
+        $SizeStr      = $Self->{LanguageObject}->Translate( '%s KB', $ReadableSize );
     }
     else {
         $SizeStr = $Self->{LanguageObject}->Translate( '%s B', $Param{Size} );
@@ -3819,6 +3843,7 @@ sub CustomerLogin {
     my $OTRSBusinessObject = $Kernel::OM->Get('Kernel::System::OTRSBusiness');
     $Param{OTRSBusinessIsInstalled} = $OTRSBusinessObject->OTRSBusinessIsInstalled();
     $Param{OTRSSTORMIsInstalled}    = $OTRSBusinessObject->OTRSSTORMIsInstalled();
+    $Param{OTRSCONTROLIsInstalled}  = $OTRSBusinessObject->OTRSCONTROLIsInstalled();
 
     $Self->AddJSData(
         Key   => 'Baselink',
@@ -3949,10 +3974,27 @@ sub CustomerLogin {
         Value => $Param{LoginFailed},
     );
 
+    # Display footer links.
+    my $FooterLinks = $ConfigObject->Get('PublicFrontend::FooterLinks');
+    if ( IsHashRefWithData($FooterLinks) ) {
+
+        my @FooterLinks;
+
+        for my $Link ( sort keys %{$FooterLinks} ) {
+
+            push @FooterLinks, {
+                Description => $FooterLinks->{$Link},
+                Target      => $Link,
+            };
+        }
+
+        $Param{FooterLinks} = \@FooterLinks;
+    }
+
     # create & return output
     $Output .= $Self->Output(
         TemplateFile => 'CustomerLogin',
-        Data         => \%Param
+        Data         => \%Param,
     );
 
     # remove the version tag from the header if configured
@@ -4114,7 +4156,7 @@ sub CustomerFooter {
 
     # get datepicker data, if needed in module
     if ($HasDatepicker) {
-        my $VacationDays = $Self->DatepickerGetVacationDays();
+        my $VacationDays  = $Self->DatepickerGetVacationDays();
         my $TextDirection = $Self->{LanguageObject}->{TextDirection} || '';
 
         # send data to JS
@@ -4135,11 +4177,44 @@ sub CustomerFooter {
             || $Kernel::OM->Get('Kernel::System::Web::Request')->GetParam( Param => 'UnitTestMode' ) // 0;
     }
 
+    # Check if customer user has permission for chat.
+    my $CustomerChatPermission;
+    if ( $Kernel::OM->Get('Kernel::System::Main')->Require( 'Kernel::System::Chat', Silent => 1 ) ) {
+
+        my $CustomerChatConfig = $ConfigObject->Get('CustomerFrontend::Module')->{'CustomerChat'} || {};
+
+        if (
+            $Kernel::OM->Get('Kernel::Config')->Get('CustomerGroupSupport')
+            && (
+                IsArrayRefWithData( $CustomerChatConfig->{GroupRo} )
+                || IsArrayRefWithData( $CustomerChatConfig->{Group} )
+            )
+            )
+        {
+
+            my $CustomerGroupObject = $Kernel::OM->Get('Kernel::System::CustomerGroup');
+
+            GROUP:
+            for my $GroupName ( @{ $CustomerChatConfig->{GroupRo} }, @{ $CustomerChatConfig->{Group} } ) {
+                $CustomerChatPermission = $CustomerGroupObject->PermissionCheck(
+                    UserID    => $Self->{UserID},
+                    GroupName => $GroupName,
+                    Type      => 'ro',
+                );
+                last GROUP if $CustomerChatPermission;
+            }
+        }
+        else {
+            $CustomerChatPermission = 1;
+        }
+    }
+
     # don't check for business package if the database was not yet configured (in the installer)
     if ( $ConfigObject->Get('SecureMode') ) {
         my $OTRSBusinessObject = $Kernel::OM->Get('Kernel::System::OTRSBusiness');
         $Param{OTRSBusinessIsInstalled} = $OTRSBusinessObject->OTRSBusinessIsInstalled();
         $Param{OTRSSTORMIsInstalled}    = $OTRSBusinessObject->OTRSSTORMIsInstalled();
+        $Param{OTRSCONTROLIsInstalled}  = $OTRSBusinessObject->OTRSCONTROLIsInstalled();
     }
 
     # AutoComplete-Config
@@ -4166,10 +4241,12 @@ sub CustomerFooter {
         CheckEmailAddresses      => $ConfigObject->Get('CheckEmailAddresses'),
         OTRSBusinessIsInstalled  => $Param{OTRSBusinessIsInstalled},
         OTRSSTORMIsInstalled     => $Param{OTRSSTORMIsInstalled},
+        OTRSCONTROLIsInstalled   => $Param{OTRSCONTROLIsInstalled},
         InputFieldsActivated     => $ConfigObject->Get('ModernizeCustomerFormFields'),
         Autocomplete             => $AutocompleteConfig,
         VideoChatEnabled         => $Param{VideoChatEnabled},
         WebMaxFileUpload         => $ConfigObject->Get('WebMaxFileUpload'),
+        CustomerChatPermission   => $CustomerChatPermission,
     );
 
     for my $Config ( sort keys %JSConfig ) {
@@ -4179,10 +4256,27 @@ sub CustomerFooter {
         );
     }
 
+    # Display footer links.
+    my $FooterLinks = $ConfigObject->Get('PublicFrontend::FooterLinks');
+    if ( IsHashRefWithData($FooterLinks) ) {
+
+        my @FooterLinks;
+
+        for my $Link ( sort keys %{$FooterLinks} ) {
+
+            push @FooterLinks, {
+                Description => $FooterLinks->{$Link},
+                Target      => $Link,
+            };
+        }
+
+        $Param{FooterLinks} = \@FooterLinks;
+    }
+
     # create & return output
     return $Self->Output(
         TemplateFile => "CustomerFooter$Type",
-        Data         => \%Param
+        Data         => \%Param,
     );
 }
 
@@ -5270,7 +5364,11 @@ sub _BuildSelectionDataRefCreate {
 
         # get missing parents and mark them for disable later
         if ( $OptionRef->{Sort} eq 'TreeView' ) {
-            my %List = reverse %{ $DataLocal || {} };
+
+            # Delete entries in hash with value = undef,
+            #   because otherwise the reverse statement will cause warnings.
+            # Reverse hash, skipping undefined values.
+            my %List = map { $DataLocal->{$_} => $_ } grep { defined $DataLocal->{$_} } keys %{$DataLocal};
 
             # get each data value
             for my $Key ( sort keys %List ) {
@@ -5959,8 +6057,8 @@ sub SetRichTextParameters {
     my $ScreenRichTextWidth  = $Param{Data}->{RichTextWidth}  || $ConfigObject->Get("Frontend::RichTextWidth");
     my $RichTextType         = $Param{Data}->{RichTextType}   || '';
     my $PictureUploadAction = $Param{Data}->{RichTextPictureUploadAction} || '';
-    my $TextDir = $Self->{TextDirection} || '';
-    my $EditingAreaCSS = 'body.cke_editable { ' . $ConfigObject->Get("Frontend::RichText::DefaultCSS") . ' }';
+    my $TextDir             = $Self->{TextDirection}                      || '';
+    my $EditingAreaCSS      = 'body.cke_editable { ' . $ConfigObject->Get("Frontend::RichText::DefaultCSS") . ' }';
 
     # decide if we need to use the enhanced mode (with tables)
     my @Toolbar;
@@ -6217,6 +6315,9 @@ sub UserInitialsGet {
     # Remove anything found in brackets (email address, etc).
     my $Fullname = $Param{Fullname} =~ s/[<[{(].*[>\]})]//r;
 
+    # Trim whitespaces.
+    $Fullname =~ s/^\s+|\s+$//g;
+
     # Split full name by whitespace.
     my @UserNames = split /\s+/, $Fullname;
     if (@UserNames) {
@@ -6248,10 +6349,10 @@ sub UserInitialsGet {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::GenericInterface::Transport::HTTP::Test;
@@ -22,7 +22,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::GenericInterface::Transport::Test - GenericInterface network transport interface for testing purposes
+Kernel::GenericInterface::Transport::HTTP::Test - GenericInterface network transport interface for testing purposes
 
 =head1 PUBLIC INTERFACE
 
@@ -204,7 +204,7 @@ sub RequesterPerformRequest {
         testhttp => 'Kernel::GenericInterface::Transport::HTTP::Test::CustomHTTPProtocol'
     );
     my $UserAgent = LWP::UserAgent->new();
-    my $Response = $UserAgent->post( 'testhttp://localhost.local/', Content => $Param{Data} );
+    my $Response  = $UserAgent->post( 'testhttp://localhost.local/', Content => $Param{Data} );
 
     return {
         Success => 1,
@@ -264,10 +264,10 @@ sub request {                                                                   
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::SupportBundleGenerator;
@@ -219,7 +219,7 @@ sub Generate {
     }
 
     my $DateTimeObject = $Kernel::OM->Create('Kernel::System::DateTime');
-    my $Filename = "SupportBundle_" . $DateTimeObject->Format( Format => "%Y-%m-%d_%H-%M" );
+    my $Filename       = "SupportBundle_" . $DateTimeObject->Format( Format => "%Y-%m-%d_%H-%M" );
 
     # add files to the tar archive
     my $Archive   = $TempDir . '/' . $Filename;
@@ -338,18 +338,14 @@ sub GenerateCustomFilesArchive {
     CONFIGFILE:
     for my $ConfigFile ( $TarObject->list_files() ) {
 
-        my $File = $ConfigFile;
-        $File =~ s{$HomeWithoutSlash/}{}g;
-        my $FullFilePath = $HomeWithoutSlash . '/' . $File;
+        next CONFIGFILE if ( $ConfigFile !~ 'Kernel/Config.pm' && $ConfigFile !~ 'Kernel/Config/Files' );
 
-        next CONFIGFILE if ( $File !~ 'Kernel/Config.pm' && $File !~ 'Kernel/Config/Files' );
-
-        my $Content = $TarObject->get_content($FullFilePath);
+        my $Content = $TarObject->get_content($ConfigFile);
 
         if ( !$Content ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
-                Message  => "$File was not found in the modified files!",
+                Message  => "$ConfigFile was not found in the modified files!",
             );
             next CONFIGFILE;
         }
@@ -358,7 +354,7 @@ sub GenerateCustomFilesArchive {
             StringToMask => $Content,
         );
 
-        $TarObject->replace_content( $FullFilePath, $Content );
+        $TarObject->replace_content( $ConfigFile, $Content );
     }
 
     my $Write = $TarObject->write( $CustomFilesArchive, 0 );
@@ -723,11 +719,11 @@ sub _MaskPasswords {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut
 

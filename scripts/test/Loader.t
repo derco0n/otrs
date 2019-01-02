@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -39,6 +39,7 @@ my $Home = $ConfigObject->Get('Home');
     );
 
     $ExpectedCSS = ${$ExpectedCSS};
+    chomp $ExpectedCSS;
 
     my $MinifiedCSS = $LoaderObject->MinifyCSS( Code => $CSS );
 
@@ -93,6 +94,8 @@ my $Home = $ConfigObject->Get('Home');
     $ExpectedJS = ${$ExpectedJS};
     $ExpectedJS =~ s{\r\n}{\n}xmsg;
 
+    #chomp $ExpectedJS;
+
     $Self->Is(
         $MinifiedJS || '',
         $ExpectedJS,
@@ -140,6 +143,7 @@ my $Home = $ConfigObject->Get('Home');
     );
     $MinifiedJS = ${$MinifiedJS};
     $MinifiedJS =~ s{\r\n}{\n}xmsg;
+    chomp $MinifiedJS;
 
     my $Expected = $MainObject->FileRead(
         Location => $Home . '/scripts/test/sample/Loader/CombinedJavaScript.min.js',

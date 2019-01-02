@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::AuthSession::FS;
@@ -184,7 +184,7 @@ sub GetSessionIDData {
 
     # read data structure back from file dump, use block eval for safety reasons
     my $Session = eval {
-        $Kernel::OM->Get('Kernel::System::Storable')->Deserialize( Data => ${$Content} )
+        $Kernel::OM->Get('Kernel::System::Storable')->Deserialize( Data => ${$Content} );
     };
 
     if ( !$Session || ref $Session ne 'HASH' ) {

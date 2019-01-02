@@ -2,13 +2,16 @@ package Sisimai::Message;
 use feature ':5.10';
 use strict;
 use warnings;
-use Module::Load '';
 use Class::Accessor::Lite;
+use Sisimai::RFC5322;
+use Sisimai::Address;
+use Sisimai::String;
+use Sisimai::SMTP::Error;
 
 my $rwaccessors = [
     'from',     # [String] UNIX From line
     'header',   # [Hash]   Header part of an email
-    'ds',       # [Array]  Parsed data by Sisimai::MTA::*
+    'ds',       # [Array]  Parsed data by Sisimai::Bite::*::*
     'rfc822',   # [Hash]   Header part of the original message
     'catch'     # [?]      The results returned by hook method
 ];
@@ -33,7 +36,7 @@ sub new {
 
     if( $input eq 'email' ) {
         # Sisimai::Message::Email
-        return undef unless length $email;
+        return undef unless $email;
         $child = 'Sisimai::Message::Email';
 
     } elsif( $input eq 'json' ) {
@@ -43,7 +46,7 @@ sub new {
 
     } else {
         # Unsupported value in "input"
-        warn sprintf(qq| ***warning: Unsupported value in "input": %s|, $input);
+        warn ' ***warning: Unsupported value in "input": '.$input;
         return undef;
     }
 
@@ -53,11 +56,8 @@ sub new {
         return undef;
     }
 
-    eval { Module::Load::load $child };
-    if( $@ ) {
-        warn sprintf(" ***warning: Failed to load module: %s", $@);
-        return undef;
-    }
+    (my $modulepath = $child) =~ s|::|/|g; 
+    require $modulepath.'.pm';
 
     my $methodargv = {
         'data'  => $email,
@@ -67,8 +67,8 @@ sub new {
     my $datasource = undef;
     my $mesgobject = undef;
 
-    for my $e ( 'load', 'order' ) {
-        # Order of MTA, MSP modules
+    for my $e ('load', 'order') {
+        # Order of MTA modules
         next unless exists $argvs->{ $e };
         next unless ref $argvs->{ $e } eq 'ARRAY';
         next unless scalar @{ $argvs->{ $e } };
@@ -155,7 +155,7 @@ in the argument of this method as an array reference like following code:
                         'load' => ['Your::Custom::MTA::Module']
                   );
 
-Beggining from v4.19.0, `hook` argument is available to callback user defined
+Beginning from v4.19.0, `hook` argument is available to callback user defined
 method like the following codes:
 
     my $cmethod = sub {
@@ -173,7 +173,7 @@ method like the following codes:
         }
 
         # Message body of the bounced email
-        if( $argv->{'message'} =~ m/^X-Postfix-Queue-ID:\s*(.+)$/m ) {
+        if( $argv->{'message'} =~ /^X-Postfix-Queue-ID:\s*(.+)$/m ) {
             $data->{'queue-id'} = $1;
         }
 
@@ -231,7 +231,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2017 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -64,8 +64,8 @@ $Selenium->RunTest(
                     $Selenium->get_page_source(),
                     $LanguageObject->Translate(
                         "There are no roles defined. Please use the 'Add' button to create a new role."
-                        )
-                    ) > -1,
+                    )
+                ) > -1,
                 "There are no roles defined.",
             );
         }
@@ -117,7 +117,10 @@ $Selenium->RunTest(
         # Create a real test role.
         my $RandomID = 'TestRole' . $Helper->GetRandomID();
         $Selenium->find_element( "#Name", 'css' )->send_keys($RandomID);
-        $Selenium->execute_script("\$('#ValidID').val('1').trigger('redraw.InputField').trigger('change');");
+        $Selenium->InputFieldValueSet(
+            Element => '#ValidID',
+            Value   => 1,
+        );
         $Selenium->find_element( "#Comment", 'css' )->send_keys('Selenium test role');
         $Selenium->find_element("//button[\@type='submit']")->VerifiedClick();
 
@@ -173,7 +176,10 @@ $Selenium->RunTest(
         }
 
         # Set test role to invalid.
-        $Selenium->execute_script("\$('#ValidID').val('2').trigger('redraw.InputField').trigger('change');");
+        $Selenium->InputFieldValueSet(
+            Element => '#ValidID',
+            Value   => 2,
+        );
         $Selenium->find_element( "#Comment", 'css' )->clear();
         $Selenium->find_element("//button[\@type='submit']")->VerifiedClick();
 

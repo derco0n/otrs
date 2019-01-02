@@ -1,14 +1,16 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 <label for="RecipientEmail">[% Translate("Additional recipient email addresses") | html %]: </label>
 <div class="Field">
-    <input type="text" name="RecipientEmail" id="RecipientEmail" class="W50pc" value="[% Data.RecipientEmail | html %]"/>
+    <input type="text" name="RecipientEmail" id="RecipientEmail" class="W50pc Validate_MaxLength [% Data.RecipientEmailServerError | html %]" value="[% Data.RecipientEmail | html %]" data-maxlength="200"/>
+    <div id="RecipientEmailError" class="TooltipErrorMessage"><p>[% Translate("This field must have less then 200 characters.") | html %]</p></div>
+    <div id="RecipientEmailServerError" class="TooltipErrorMessage"><p>[% Translate("This field must have less then 200 characters.") | html %]</p></div>
 </div>
 <div class="Clear"></div>
 

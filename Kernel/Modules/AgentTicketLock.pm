@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Modules::AgentTicketLock;
@@ -91,7 +91,7 @@ sub Run {
         );
         if ( $OwnerID != $Self->{UserID} ) {
             my $Output = $LayoutObject->Header(
-                Title => 'Error',
+                Title => Translatable('Error'),
                 Type  => 'Small',
             );
             $Output .= $LayoutObject->Warning(
@@ -114,6 +114,22 @@ sub Run {
         if ( !$Lock ) {
             return $LayoutObject->ErrorScreen();
         }
+
+        my $PreviousOwner = $Kernel::OM->Get('Kernel::System::Web::Request')->GetParam( Param => 'PreviousOwner' );
+
+        if ($PreviousOwner) {
+
+            my $OwnerSet = $TicketObject->TicketOwnerSet(
+                TicketID  => $Self->{TicketID},
+                UserID    => $Self->{UserID},
+                NewUserID => $PreviousOwner,
+            );
+
+            if ( !$OwnerSet ) {
+                return $LayoutObject->ErrorScreen();
+            }
+        }
+
     }
     else {
 
@@ -126,7 +142,7 @@ sub Run {
                 TicketID => $Self->{TicketID},
             );
             my $Output = $LayoutObject->Header(
-                Title => 'Error',
+                Title => Translatable('Error'),
                 Type  => 'Small',
             );
             $Output .= $LayoutObject->Warning(

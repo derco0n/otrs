@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Output::HTML::TicketOverview::Small;
@@ -721,7 +721,7 @@ sub Run {
                     Name => 'OverviewNavBarPageFlagEmpty',
                     Data => {
                         Name => $Item,
-                        }
+                    }
                 );
             }
             else {
@@ -1547,7 +1547,7 @@ sub Run {
                 if ( $TicketColumn eq 'EscalationSolutionTime' ) {
                     $BlockType = 'Escalation';
                     $DataValue = $LayoutObject->CustomerAge(
-                        Age => $Article{SolutionTime} || 0,
+                        Age                => $Article{SolutionTime} || 0,
                         TimeShowAlwaysLong => 1,
                         Space              => ' ',
                     );
@@ -1558,7 +1558,7 @@ sub Run {
                 elsif ( $TicketColumn eq 'EscalationResponseTime' ) {
                     $BlockType = 'Escalation';
                     $DataValue = $LayoutObject->CustomerAge(
-                        Age => $Article{FirstResponseTime} || 0,
+                        Age                => $Article{FirstResponseTime} || 0,
                         TimeShowAlwaysLong => 1,
                         Space              => ' ',
                     );
@@ -1573,7 +1573,7 @@ sub Run {
                 elsif ( $TicketColumn eq 'EscalationUpdateTime' ) {
                     $BlockType = 'Escalation';
                     $DataValue = $LayoutObject->CustomerAge(
-                        Age => $Article{UpdateTime} || 0,
+                        Age                => $Article{UpdateTime} || 0,
                         TimeShowAlwaysLong => 1,
                         Space              => ' ',
                     );

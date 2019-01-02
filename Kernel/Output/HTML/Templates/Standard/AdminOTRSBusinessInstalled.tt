@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 [%
@@ -12,7 +12,7 @@
 %]
 
 <div class="MainBox ARIARoleMain LayoutFixedSidebar SidebarFirst">
-    <h1>[% Translate("Manage %s") | html | ReplacePlaceholders(OTRSBusinessLabel) %]</h1>
+    <h1 class="InvisibleText">[% Translate("Manage %s") | html | ReplacePlaceholders(OTRSBusinessLabel) %]</h1>
 
     [% BreadcrumbPath = [
             {
@@ -34,7 +34,7 @@
                 <ul class="ActionList">
                     <li>
                         <a href="[% Env("Baselink") %]Action=[% Env("Action") %];Subaction=Uninstall" class="CallForAction Fullsize Center">
-                            <span><i class="fa fa-angle-double-down"></i> [% Translate("Downgrade to OTRS Free") | html %]</span>
+                            <span><i class="fa fa-angle-double-down"></i> [% Translate("Downgrade to ((OTRS)) Community Edition") | html %]</span>
                         </a>
                     </li>
                     <li>

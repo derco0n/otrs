@@ -1,9 +1,9 @@
 // --
-// Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+// Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 // --
 // This software comes with ABSOLUTELY NO WARRANTY. For details, see
-// the enclosed file COPYING for license information (AGPL). If you
-// did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+// the enclosed file COPYING for license information (GPL). If you
+// did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 // --
 
 "use strict";
@@ -89,12 +89,13 @@ Core.Agent.LinkObject = (function (TargetNS) {
                     var Regex = new RegExp('^Widget(.*?)$'),
                         Name = ElementID.match(Regex)[1];
 
-                    Core.Agent.TableFilters.SetAllocationList();
+                    Core.Agent.TableFilters.SetAllocationList(Name);
                     RegisterActions(Name);
                 });
             });
         }
 
+        InitInstantLinkDelete();
         Core.UI.InitWidgetActionToggle();
     };
 
@@ -107,19 +108,23 @@ Core.Agent.LinkObject = (function (TargetNS) {
      */
     TargetNS.Init = function () {
 
-        var Name = Core.Config.Get('LinkObjectName');
-        var Preferences = Core.Config.Get('LinkObjectPreferences');
+        var LinkObjectTables = Core.Config.Get('LinkObjectTables'),
+            ArrayIndex;
 
-        // events for link object complex table
-        if (typeof Name !== 'undefined') {
+        // If there are no link object complex tables dont't do anything.
+        if (typeof LinkObjectTables === 'undefined') return;
 
-            // initialize allocation list
-            if (typeof Preferences !== 'undefined') {
-                Core.Agent.TableFilters.SetAllocationList();
+        for (ArrayIndex in LinkObjectTables) {
+
+            // Events for link object complex table.
+            if (typeof LinkObjectTables[ArrayIndex] !== 'undefined') {
+                RegisterActions(Core.App.EscapeSelector(LinkObjectTables[ArrayIndex]));
             }
-
-            RegisterActions(Core.App.EscapeSelector(Name));
         }
+
+        // Initialize allocation list.
+        Core.Agent.TableFilters.SetAllocationList();
+
         InitInstantLinkDelete();
     };
 

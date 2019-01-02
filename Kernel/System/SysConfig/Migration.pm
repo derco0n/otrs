@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::SysConfig::Migration;
@@ -375,7 +375,7 @@ sub MigrateXMLStructure {
                 if ( $Setting =~ m{<SubGroup>(.*?)</SubGroup>} ) {
                     my $NavigationStr = $NavigationLookup{$1} || $1;
                     $NavigationStr .= "::MainMenu";
-                    $Navigation .= sprintf( "\n%-*s%s", 8, "", "<Navigation>$NavigationStr</Navigation>" );
+                    $Navigation    .= sprintf( "\n%-*s%s", 8, "", "<Navigation>$NavigationStr</Navigation>" );
                 }
 
                 $Navigation .= sprintf( "\n%-*s%s", 8,  "", "<Value>" );
@@ -565,7 +565,7 @@ sub MigrateXMLStructure {
                     if ( $Setting =~ m{<SubGroup>(.*?)</SubGroup>} ) {
                         my $NavigationStr = $NavigationLookup{$1} || $1;
                         $NavigationStr .= "::MainMenu";
-                        $Navigation .= sprintf( "\n%-*s%s", 8, "", "<Navigation>$NavigationStr</Navigation>" );
+                        $Navigation    .= sprintf( "\n%-*s%s", 8, "", "<Navigation>$NavigationStr</Navigation>" );
                     }
 
                     $Navigation .= sprintf( "\n%-*s%s", 8,  "", "<Value>" );
@@ -598,7 +598,7 @@ sub MigrateXMLStructure {
                 if ( $Setting =~ m{<SubGroup>(.*?)</SubGroup>} ) {
                     my $NavigationStr = $NavigationLookup{$1} || $1;
 
-                    $NavigationStr .= '::AdminOverview';
+                    $NavigationStr    .= '::AdminOverview';
                     $NavigationModule .= sprintf( "\n%-*s%s", 8, "", "<Navigation>$NavigationStr</Navigation>" );
                 }
 
@@ -880,7 +880,7 @@ sub MigrateXMLStructure {
                 $ReplacementString = "\n\t\t\t<Hash>\n" .
                     "\t\t\t\t<DefaultItem ValueType=\"Select\">\n";
                 for my $DFoption (@DFoptions) {
-                    ## nofilter (TidyAll::Plugin::OTRS::Perl::Translatable)
+                    ## nofilter(TidyAll::Plugin::OTRS::Perl::Translatable)
                     $ReplacementString
                         .= "\t\t\t\t\t<Item ValueType=\"Option\" Value=\"$DFCount\" Translatable=\"1\">$DFoption</Item>\n";
                     $DFCount++;
@@ -985,7 +985,7 @@ sub MigrateXMLStructure {
         }
 
         # get the needed ArticleTypeMapping from a YML file
-        my $TaskConfig = $Self->GetTaskConfig( Module => 'MigrateArticleData' );
+        my $TaskConfig         = $Self->GetTaskConfig( Module => 'MigrateArticleData' );
         my %ArticleTypeMapping = %{ $TaskConfig->{ArticleTypeMapping} };
 
         # Migrate Postmaster settings for
@@ -1016,7 +1016,7 @@ sub MigrateXMLStructure {
         my @NavigationValues = $Setting =~ m{<Navigation>(.*?)</Navigation>}g;
         if ( scalar @NavigationValues ) {
             my $NavigationValue = $NavigationValues[0];
-            my $NavigationStr = $NavigationLookup{$NavigationValue} || $NavigationValue;
+            my $NavigationStr   = $NavigationLookup{$NavigationValue} || $NavigationValue;
 
             if (
                 scalar @NavigationValues < 2
@@ -1024,7 +1024,7 @@ sub MigrateXMLStructure {
                     'Frontend::Admin::ModuleRegistration',
                     'Frontend::Agent::ModuleRegistration',
                     'Frontend::Customer::ModuleRegistration',
-                    )
+                )
                 )
             {
                 $Setting =~ s{<Navigation>.*?</Navigation>}{<Navigation>$NavigationStr</Navigation>}gsmx;
@@ -1208,17 +1208,17 @@ sub MigrateXMLStructure {
             'Ticket::Frontend::AgentTicketQueue###SortBy::Default',
             'Ticket::Frontend::AgentTicketSearch###Defaults###ArticleCreateTimePoint',
             'Ticket::Frontend::AgentTicketSearch###Defaults###ArticleCreateTimeSlot',
-            'Ticket::Frontend::AgentTicketSearch###Defaults###Body',
-            'Ticket::Frontend::AgentTicketSearch###Defaults###Cc',
+            'Ticket::Frontend::AgentTicketSearch###Defaults###MIMEBase_Body',
+            'Ticket::Frontend::AgentTicketSearch###Defaults###MIMEBase_Cc',
             'Ticket::Frontend::AgentTicketSearch###Defaults###CustomerID',
             'Ticket::Frontend::AgentTicketSearch###Defaults###CustomerUserLogin',
             'Ticket::Frontend::AgentTicketSearch###Defaults###DynamicField',
-            'Ticket::Frontend::AgentTicketSearch###Defaults###From',
+            'Ticket::Frontend::AgentTicketSearch###Defaults###MIMEBase_From',
             'Ticket::Frontend::AgentTicketSearch###Defaults###Fulltext',
             'Ticket::Frontend::AgentTicketSearch###Defaults###QueueIDs',
             'Ticket::Frontend::AgentTicketSearch###Defaults###SearchInArchive',
             'Ticket::Frontend::AgentTicketSearch###Defaults###StateIDs',
-            'Ticket::Frontend::AgentTicketSearch###Defaults###Subject',
+            'Ticket::Frontend::AgentTicketSearch###Defaults###MIMEBase_Subject',
             'Ticket::Frontend::AgentTicketSearch###Defaults###TicketChangeTimePoint',
             'Ticket::Frontend::AgentTicketSearch###Defaults###TicketChangeTimeSlot',
             'Ticket::Frontend::AgentTicketSearch###Defaults###TicketCloseTimePoint',
@@ -1229,7 +1229,7 @@ sub MigrateXMLStructure {
             'Ticket::Frontend::AgentTicketSearch###Defaults###TicketEscalationTimeSlot',
             'Ticket::Frontend::AgentTicketSearch###Defaults###TicketNumber',
             'Ticket::Frontend::AgentTicketSearch###Defaults###Title',
-            'Ticket::Frontend::AgentTicketSearch###Defaults###To',
+            'Ticket::Frontend::AgentTicketSearch###Defaults###MIMEBase_To',
             'Ticket::Frontend::AgentTicketSearch###Order::Default',
             'Ticket::Frontend::AgentTicketSearch###SortBy::Default',
             'Ticket::Frontend::AgentTicketService###Order::Default',
@@ -1279,17 +1279,17 @@ sub MigrateXMLStructure {
             'Ticket::Frontend::AgentTicketQueue###SortBy::Default',
             'Ticket::Frontend::AgentTicketSearch###Defaults###ArticleCreateTimePoint',
             'Ticket::Frontend::AgentTicketSearch###Defaults###ArticleCreateTimeSlot',
-            'Ticket::Frontend::AgentTicketSearch###Defaults###Body',
-            'Ticket::Frontend::AgentTicketSearch###Defaults###Cc',
+            'Ticket::Frontend::AgentTicketSearch###Defaults###MIMEBase_Body',
+            'Ticket::Frontend::AgentTicketSearch###Defaults###MIMEBase_Cc',
             'Ticket::Frontend::AgentTicketSearch###Defaults###CustomerID',
             'Ticket::Frontend::AgentTicketSearch###Defaults###CustomerUserLogin',
             'Ticket::Frontend::AgentTicketSearch###Defaults###DynamicField',
-            'Ticket::Frontend::AgentTicketSearch###Defaults###From',
+            'Ticket::Frontend::AgentTicketSearch###Defaults###MIMEBase_From',
             'Ticket::Frontend::AgentTicketSearch###Defaults###Fulltext',
             'Ticket::Frontend::AgentTicketSearch###Defaults###QueueIDs',
             'Ticket::Frontend::AgentTicketSearch###Defaults###SearchInArchive',
             'Ticket::Frontend::AgentTicketSearch###Defaults###StateIDs',
-            'Ticket::Frontend::AgentTicketSearch###Defaults###Subject',
+            'Ticket::Frontend::AgentTicketSearch###Defaults###MIMEBase_Subject',
             'Ticket::Frontend::AgentTicketSearch###Defaults###TicketChangeTimePoint',
             'Ticket::Frontend::AgentTicketSearch###Defaults###TicketChangeTimeSlot',
             'Ticket::Frontend::AgentTicketSearch###Defaults###TicketCloseTimePoint',
@@ -1300,7 +1300,7 @@ sub MigrateXMLStructure {
             'Ticket::Frontend::AgentTicketSearch###Defaults###TicketEscalationTimeSlot',
             'Ticket::Frontend::AgentTicketSearch###Defaults###TicketNumber',
             'Ticket::Frontend::AgentTicketSearch###Defaults###Title',
-            'Ticket::Frontend::AgentTicketSearch###Defaults###To',
+            'Ticket::Frontend::AgentTicketSearch###Defaults###MIMEBase_To',
             'Ticket::Frontend::AgentTicketSearch###Order::Default',
             'Ticket::Frontend::AgentTicketSearch###SortBy::Default',
             'Ticket::Frontend::AgentTicketService###Order::Default',
@@ -1473,17 +1473,17 @@ sub MigrateXMLStructure {
             'Ticket::Frontend::AgentTicketQueue###SortBy::Default'                       => 'Advanced',
             'Ticket::Frontend::AgentTicketSearch###Defaults###ArticleCreateTimePoint'    => 'Advanced',
             'Ticket::Frontend::AgentTicketSearch###Defaults###ArticleCreateTimeSlot'     => 'Advanced',
-            'Ticket::Frontend::AgentTicketSearch###Defaults###Body'                      => 'Advanced',
-            'Ticket::Frontend::AgentTicketSearch###Defaults###Cc'                        => 'Advanced',
+            'Ticket::Frontend::AgentTicketSearch###Defaults###MIMEBase_Body'             => 'Advanced',
+            'Ticket::Frontend::AgentTicketSearch###Defaults###MIMEBase_Cc'               => 'Advanced',
             'Ticket::Frontend::AgentTicketSearch###Defaults###CustomerID'                => 'Advanced',
             'Ticket::Frontend::AgentTicketSearch###Defaults###CustomerUserLogin'         => 'Advanced',
             'Ticket::Frontend::AgentTicketSearch###Defaults###DynamicField'              => 'Advanced',
-            'Ticket::Frontend::AgentTicketSearch###Defaults###From'                      => 'Advanced',
+            'Ticket::Frontend::AgentTicketSearch###Defaults###MIMEBase_From'             => 'Advanced',
             'Ticket::Frontend::AgentTicketSearch###Defaults###Fulltext'                  => 'Advanced',
             'Ticket::Frontend::AgentTicketSearch###Defaults###QueueIDs'                  => 'Advanced',
             'Ticket::Frontend::AgentTicketSearch###Defaults###SearchInArchive'           => 'Advanced',
             'Ticket::Frontend::AgentTicketSearch###Defaults###StateIDs'                  => 'Advanced',
-            'Ticket::Frontend::AgentTicketSearch###Defaults###Subject'                   => 'Advanced',
+            'Ticket::Frontend::AgentTicketSearch###Defaults###MIMEBase_Subject'          => 'Advanced',
             'Ticket::Frontend::AgentTicketSearch###Defaults###TicketChangeTimePoint'     => 'Advanced',
             'Ticket::Frontend::AgentTicketSearch###Defaults###TicketChangeTimeSlot'      => 'Advanced',
             'Ticket::Frontend::AgentTicketSearch###Defaults###TicketCloseTimePoint'      => 'Advanced',
@@ -1494,7 +1494,7 @@ sub MigrateXMLStructure {
             'Ticket::Frontend::AgentTicketSearch###Defaults###TicketEscalationTimeSlot'  => 'Advanced',
             'Ticket::Frontend::AgentTicketSearch###Defaults###TicketNumber'              => 'Advanced',
             'Ticket::Frontend::AgentTicketSearch###Defaults###Title'                     => 'Advanced',
-            'Ticket::Frontend::AgentTicketSearch###Defaults###To'                        => 'Advanced',
+            'Ticket::Frontend::AgentTicketSearch###Defaults###MIMEBase_To'               => 'Advanced',
             'Ticket::Frontend::AgentTicketSearch###Order::Default'                       => 'Advanced',
             'Ticket::Frontend::AgentTicketSearch###SortBy::Default'                      => 'Advanced',
             'Ticket::Frontend::AgentTicketService###Order::Default'                      => 'Advanced',
@@ -1625,8 +1625,8 @@ sub MigrateConfigEffectiveValues {
     # my @SearchResult = grep /###/, sort values %DefaultSettings;
     my @SearchResult = grep { $_->{Name} =~ m{###} } @DefaultSettings;
 
-    # find all the setting which have sublevels and store them in a hash
-    my %SettingsWithSubLevels;
+    # find all the setting which have sublevels and store them in a hash for OTRS 6
+    my %SettingsWithSubLevelsOTRS6;
     for my $Setting (@SearchResult) {
 
         my @SettingNameParts = split /###/, $Setting->{Name};
@@ -1638,18 +1638,18 @@ sub MigrateConfigEffectiveValues {
             @SettingNameParts
 
             # Skip any setting with more than one sub-levels in hash key (unsupported in OTRS 5).
-            && !defined $SettingsWithSubLevels{$FirstLevelKey}->{ $SettingNameParts[0] }
+            && !defined $SettingsWithSubLevelsOTRS6{$FirstLevelKey}->{ $SettingNameParts[0] }
             )
         {
-            $SettingsWithSubLevels{$FirstLevelKey}->{ $SettingNameParts[0] }->{$LastLevelKey} = 1;
+            $SettingsWithSubLevelsOTRS6{$FirstLevelKey}->{ $SettingNameParts[0] }->{$LastLevelKey} = 1;
         }
         else {
-            $SettingsWithSubLevels{$FirstLevelKey}->{$LastLevelKey} = 1;
+            $SettingsWithSubLevelsOTRS6{$FirstLevelKey}->{$LastLevelKey} = 1;
         }
     }
 
     # get the needed ArticleTypeMapping from a YML file (needed for Postmaster filter settings later)
-    my $TaskConfig = $Self->GetTaskConfig( Module => 'MigrateArticleData' );
+    my $TaskConfig         = $Self->GetTaskConfig( Module => 'MigrateArticleData' );
     my %ArticleTypeMapping = %{ $TaskConfig->{ArticleTypeMapping} };
 
     # build a lookup hash of all given package settings
@@ -1663,6 +1663,21 @@ sub MigrateConfigEffectiveValues {
 
     # to store unsuccessfull settings which could not be migrated
     my @UnsuccessfullSettings;
+
+    # Add an additional mapping for 2-Level settings, which have a renamed first part.
+    if ( $Param{PackageLookupNewConfigName} ) {
+
+        my %AdditionalMapping;
+        for my $OldName ( sort keys %{ $Param{PackageLookupNewConfigName} } ) {
+            my $NewName = $Param{PackageLookupNewConfigName}->{$OldName};
+
+            $OldName =~ s{#.*\z}{}ms;
+            $NewName =~ s{#.*\z}{}ms;
+            $AdditionalMapping{$OldName} = $NewName;
+        }
+
+        %{ $Param{PackageLookupNewConfigName} } = ( %{ $Param{PackageLookupNewConfigName} }, %AdditionalMapping );
+    }
 
     SETTINGNAME:
     for my $SettingName ( sort keys %OTRS5Config ) {
@@ -1686,8 +1701,21 @@ sub MigrateConfigEffectiveValues {
         next SETTINGNAME if $SettingName eq 'Ticket::StorageModule::CheckAllBackends';
         next SETTINGNAME if $SettingName eq 'ArticleDir';
 
+        my $CheckSubLevels;
+        if ( $SettingsWithSubLevelsOTRS6{$SettingName} ) {
+            $CheckSubLevels = 1;
+        }
+        elsif (
+            $Param{PackageLookupNewConfigName}
+            && $Param{PackageLookupNewConfigName}->{$SettingName}
+            && $SettingsWithSubLevelsOTRS6{ $Param{PackageLookupNewConfigName}->{$SettingName} }
+            )
+        {
+            $CheckSubLevels = 1;
+        }
+
         # check if this OTRS5 setting has subhashes in the name
-        if ( $SettingsWithSubLevels{$SettingName} ) {
+        if ($CheckSubLevels) {
 
             SETTINGKEYFIRSTLEVEL:
             for my $SettingKeyFirstLevel ( sort keys %{ $OTRS5Config{$SettingName} } ) {
@@ -1695,8 +1723,8 @@ sub MigrateConfigEffectiveValues {
                 # there is a second level
                 # example: Ticket::Frontend::AgentTicketZoom###Widgets###0100-TicketInformation
                 if (
-                    $SettingsWithSubLevels{$SettingName}->{$SettingKeyFirstLevel}
-                    && IsHashRefWithData( $SettingsWithSubLevels{$SettingName}->{$SettingKeyFirstLevel} )
+                    $SettingsWithSubLevelsOTRS6{$SettingName}->{$SettingKeyFirstLevel}
+                    && IsHashRefWithData( $SettingsWithSubLevelsOTRS6{$SettingName}->{$SettingKeyFirstLevel} )
                     && IsHashRefWithData( $OTRS5Config{$SettingName}->{$SettingKeyFirstLevel} )
                     )
                 {
@@ -2432,9 +2460,6 @@ sub _LookupNewConfigName {
         'Queue::EventModulePost###130-UpdateQueue' =>
             'Queue::EventModulePost###2300-UpdateQueue',
 
-        'Ticket::EventModulePost###098-ArticleSearchIndex' =>
-            'Ticket::EventModulePost###2000-ArticleSearchIndex',
-
         'Ticket::EventModulePost###100-ArchiveRestore' =>
             'Ticket::EventModulePost###2300-ArchiveRestore',
 
@@ -2494,6 +2519,21 @@ sub _LookupNewConfigName {
 
         'PostMaster::PreCreateFilterModule###000-FollowUpArticleTypeCheck' =>
             'PostMaster::PreCreateFilterModule###000-FollowUpArticleVisibilityCheck',
+
+        'Ticket::Frontend::AgentTicketSearch###Defaults###From' =>
+            'Ticket::Frontend::AgentTicketSearch###Defaults###MIMEBase_From',
+
+        'Ticket::Frontend::AgentTicketSearch###Defaults###To' =>
+            'Ticket::Frontend::AgentTicketSearch###Defaults###MIMEBase_To',
+
+        'Ticket::Frontend::AgentTicketSearch###Defaults###Cc' =>
+            'Ticket::Frontend::AgentTicketSearch###Defaults###MIMEBase_Cc',
+
+        'Ticket::Frontend::AgentTicketSearch###Defaults###Subject' =>
+            'Ticket::Frontend::AgentTicketSearch###Defaults###MIMEBase_Subject',
+
+        'Ticket::Frontend::AgentTicketSearch###Defaults###Body' =>
+            'Ticket::Frontend::AgentTicketSearch###Defaults###MIMEBase_Body',
 
         # Moved and renamed config setting from OTRSBusiness.xml to Framework.xml
         'ChatEngine::AgentOnlineThreshold' => 'SessionAgentOnlineThreshold',
@@ -2717,7 +2757,7 @@ sub _MigrateFrontendModuleSetting {
         #
         $Param{FrontendSettingName} =~ s{Frontend::Module}{Frontend::Navigation}gsmx;
 
-        my $Search = $Param{FrontendSettingName} . '###' . $Param{FrontendModuleName} . '###';
+        my $Search       = $Param{FrontendSettingName} . '###' . $Param{FrontendModuleName} . '###';
         my @SearchResult = grep { $_->{Name} =~ m{$Search} } @DefaultSettings;
 
         if ( scalar @SearchResult == 1 ) {
@@ -2778,7 +2818,7 @@ sub _MigrateFrontendModuleSetting {
         #
         $Param{FrontendSettingName} =~ s{Frontend::Module}{Frontend::Navigation}gsmx;
 
-        my $Search = $Param{FrontendSettingName} . '###' . $Param{FrontendModuleName} . '###';
+        my $Search       = $Param{FrontendSettingName} . '###' . $Param{FrontendModuleName} . '###';
         my @SearchResult = grep { $_->{Name} =~ m{$Search} } @DefaultSettings;
 
         NAVBARSETTING:
@@ -2873,10 +2913,10 @@ sub _SettingUpdate {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

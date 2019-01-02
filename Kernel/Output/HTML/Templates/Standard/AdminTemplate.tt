@@ -1,18 +1,18 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 [% RenderBlockStart("Overview") %]
 <div class="MainBox ARIARoleMain LayoutFixedSidebar SidebarFirst">
-    <h1 class="InvisibleText">[% Translate("Manage Templates") | html %]</h1>
+    <h1 class="InvisibleText">[% Translate("Template Management") | html %]</h1>
 
     [% BreadcrumbPath = [
             {
-                Name => Translate('Manage Templates'),
+                Name => Translate('Template Management'),
                 Link => Env("Action"),
             },
         ]
@@ -41,7 +41,7 @@
 [% RenderBlockEnd("ActionOverview") %]
 [% RenderBlockStart("ActionAdd") %]
                     <li>
-                        <a href="[% Env("Baselink") %]Action=[% Env("Action") %];Subaction=Add" class="CallForAction Fullsize Center"><span><i class="fa fa-plus-square"></i>[% Translate("Add template") | html %]</span></a>
+                        <a href="[% Env("Baselink") %]Action=[% Env("Action") %];Subaction=Add" class="CallForAction Fullsize Center"><span><i class="fa fa-plus-square"></i>[% Translate("Add Template") | html %]</span></a>
                     </li>
 [% RenderBlockEnd("ActionAdd") %]
                 </ul>
@@ -50,10 +50,10 @@
 [% RenderBlockStart("Filter") %]
         <div class="WidgetSimple">
             <div class="Header">
-                <h2><label for="Filter">[% Translate("Filter") | html %]</label></h2>
+                <h2><label for="Filter">[% Translate("Filter for Templates") | html %]</label></h2>
             </div>
             <div class="Content">
-                <input type="text" id="Filter" class="FilterBox" placeholder="[% Translate("Just start typing to filter...") | html %]" name="Filter" value="" title="[% Translate("Filter") | html %]" />
+                <input type="text" id="Filter" class="FilterBox" placeholder="[% Translate("Just start typing to filter...") | html %]" name="Filter" value="" title="[% Translate("Filter for templates") | html %]" />
             </div>
         </div>
 [% RenderBlockEnd("Filter") %]

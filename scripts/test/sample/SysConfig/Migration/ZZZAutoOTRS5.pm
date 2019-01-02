@@ -5,6 +5,9 @@ use strict;
 use warnings;
 no warnings 'redefine';
 use utf8;
+
+## nofilter(TidyAll::Plugin::OTRS::Perl::PerlTidy)
+
 sub Load {
     my ($File, $Self) = @_;
 
@@ -539,11 +542,6 @@ $Self->{'Loader::Customer::CommonJS'}->{'000-Framework'} =  [
   'Core.Customer.js',
   'Core.Customer.Responsive.js'
 ];
-# renamed to 'Ticket::EventModulePost###2000-ArticleSearchIndex'
-$Self->{'Ticket::EventModulePost'}->{'098-ArticleSearchIndex'} =  {
-  'Event' => '(ArticleCreate|ArticleUpdate)',
-  'Module' => 'Kernel::System::Ticket::Event::ArticleSearchIndex'
-};
 # renamed to 'Frontend::NotifyModule###8000-Daemon-Check'
 $Self->{'Frontend::NotifyModule'}->{'800-Daemon-Check'} =  {
   'Module' => 'Kernel::Output::HTML::Notification::DaemonCheck'
@@ -870,6 +868,10 @@ $Self->{'PostMaster::CheckFollowUpModule'}->{'0100-Subject'} =  {
   'X-OTRS-ArticleType' => 'email-internal',
   'X-OTRS-FollowUp-ArticleType' => 'email-external'
 };
+
+$Self->{'Ticket::Frontend::AgentTicketQueue'}->{'HighlightAge1'} = '1234';
+
+$Self->{'Test'}->{'HighlightAge2'} = '5678';
 
 }
 

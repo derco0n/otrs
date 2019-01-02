@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -109,7 +109,7 @@ $Selenium->RunTest(
         );
 
         # Check test attachment in MIME-Viwer, WaitFor will be done after switch to window.
-        $Selenium->find_element( "a.ViewAttachment i", "css" )->click();
+        $Selenium->execute_script("\$('a.ViewAttachment i').click();");
 
         # Switch to link object window.
         $Selenium->WaitFor( WindowCount => 2 );
@@ -216,8 +216,6 @@ $Selenium->RunTest(
             index( $Selenium->get_page_source(), 'Munguía' ) > -1,
             'Article displayed using correct encoding'
         );
-
-        $Selenium->close();
 
         # Delete created test ticket.
         my $Success = $TicketObject->TicketDelete(

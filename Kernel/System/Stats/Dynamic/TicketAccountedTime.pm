@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::Stats::Dynamic::TicketAccountedTime;
@@ -972,7 +972,7 @@ sub GetStatElement {
 
     if ( $SelectedKindOfReporting eq 'TicketAverage' ) {
         my $NumberOfTickets = scalar keys %TicketID;
-        my $Average = $NumberOfTickets ? $Time / $NumberOfTickets : 0;
+        my $Average         = $NumberOfTickets ? $Time / $NumberOfTickets : 0;
         $Reporting = sprintf( "%.2f", $Average );
     }
     if ( $SelectedKindOfReporting eq 'TicketMinTime' ) {
@@ -986,7 +986,7 @@ sub GetStatElement {
     }
     if ( $SelectedKindOfReporting eq 'ArticleAverage' ) {
         my $NumberOfArticles = scalar keys %ArticleID;
-        my $Average = $NumberOfArticles ? $Time / $NumberOfArticles : 0;
+        my $Average          = $NumberOfArticles ? $Time / $NumberOfArticles : 0;
         $Reporting = sprintf( "%.2f", $Average );
     }
     if ( $SelectedKindOfReporting eq 'ArticleMinTime' ) {

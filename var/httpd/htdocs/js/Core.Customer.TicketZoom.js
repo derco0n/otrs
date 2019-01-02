@@ -1,9 +1,9 @@
 // --
-// Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+// Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 // --
 // This software comes with ABSOLUTELY NO WARRANTY. For details, see
-// the enclosed file COPYING for license information (AGPL). If you
-// did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+// the enclosed file COPYING for license information (GPL). If you
+// did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 // --
 
 "use strict";
@@ -64,14 +64,10 @@ Core.Customer.TicketZoom = (function (TargetNS) {
      */
     function ResizeIframe(Iframe, Callback){
         Iframe = isJQueryObject(Iframe) ? Iframe.get(0) : Iframe;
-
-        // initial height calculation
-        $(Iframe).on('load', function() {
-            CalculateHeight(this);
-            if ($.isFunction(Callback)) {
-                Callback();
-            }
-        });
+        CalculateHeight(Iframe);
+        if ($.isFunction(Callback)) {
+            Callback();
+        }
     }
 
     /**
@@ -91,15 +87,15 @@ Core.Customer.TicketZoom = (function (TargetNS) {
         Iframe = isJQueryObject(Iframe) ? Iframe.get(0) : Iframe;
 
         if ($.browser.safari || $.browser.opera){
-            $(Iframe).load(Iframe.src, null, function() {
-                setTimeout(ResizeIframe, 0, this, Callback);
+            $(Iframe).on('load', function() {
+                setTimeout(ResizeIframe, 0, Iframe, Callback);
             });
             Source = Iframe.src;
             Iframe.src = '';
             Iframe.src = Source;
         }
         else {
-            $(Iframe).load(Iframe.src, null, function() {
+            $(Iframe).on('load', function() {
                 ResizeIframe(this, Callback);
             });
         }

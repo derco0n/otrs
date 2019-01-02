@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Output::HTML::Dashboard::AppointmentCalendar;
@@ -32,7 +32,7 @@ sub new {
     my $ParamObject = $Kernel::OM->Get('Kernel::System::Web::Request');
 
     # get current filter
-    my $Name = $ParamObject->GetParam( Param => 'Name' ) || '';
+    my $Name           = $ParamObject->GetParam( Param => 'Name' ) || '';
     my $PreferencesKey = 'DashboardCalendarAppointmentFilter' . $Self->{Name};
     if ( $Self->{Name} eq $Name ) {
         $Self->{Filter} = $ParamObject->GetParam( Param => 'Filter' ) || '';
@@ -403,14 +403,21 @@ sub Run {
         my $StartTimeObject = $Kernel::OM->Create(
             'Kernel::System::DateTime',
             ObjectParams => {
-                String   => $Appointments{$AppointmentID}->{StartTime},
-                TimeZone => $Self->{UserTimeZone},
+                String => $Appointments{$AppointmentID}->{StartTime},
             },
         );
+
+        # Convert time to user time zone.
+        if ( $Self->{UserTimeZone} ) {
+            $StartTimeObject->ToTimeZone(
+                TimeZone => $Self->{UserTimeZone},
+            );
+        }
+
         my $StartTimeSettings = $StartTimeObject->Get();
 
         # prepare dates and times
-        my $StartTime = sprintf( "%02d:%02d", $StartTimeSettings->{Hour}, $StartTimeSettings->{Minute} );
+        my $StartTime     = sprintf( "%02d:%02d", $StartTimeSettings->{Hour}, $StartTimeSettings->{Minute} );
         my $StartTimeLong = $LayoutObject->{LanguageObject}
             ->FormatTimeString( $Appointments{$AppointmentID}->{StartTime}, 'DateFormatLong' );
 

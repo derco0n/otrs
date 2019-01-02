@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::Ticket::IndexAccelerator::StaticDB;
@@ -182,7 +182,7 @@ sub TicketAcceleratorUpdateOnQueueUpdate {
 
     # Updated ticket_index for all sub queue names when parent name is changed.
     #   See bug#13570 for more information.
-    my %AllQueue = $Kernel::OM->Get('Kernel::System::Queue')->QueueList( Valid => 0 );
+    my %AllQueue    = $Kernel::OM->Get('Kernel::System::Queue')->QueueList( Valid => 0 );
     my @ParentQueue = split( /::/, $Param{OldQueueName} );
 
     for my $QueueID ( sort keys %AllQueue ) {
@@ -522,7 +522,7 @@ sub TicketAcceleratorIndex {
                 },
             );
 
-            my $Delta = $TicketCreatedDTObj->Delta( DateTimeObject => $CurrentDateTimeObject );
+            my $Delta  = $TicketCreatedDTObj->Delta( DateTimeObject => $CurrentDateTimeObject );
             my $MaxAge = $Delta->{AbsoluteSeconds};
             $QueueData->{MaxAge} = $MaxAge if $MaxAge > $QueueData->{MaxAge};
 

@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 ## no critic (Modules::RequireExplicitPackage)
@@ -54,9 +54,9 @@ $Selenium->RunTest(
         );
 
         # Change dropdown value do 'Down'.
-        $Selenium->execute_script(
-            "\$('.SettingContent select').val('Down')"
-                . ".trigger('redraw.InputField').trigger('change');",
+        $Selenium->InputFieldValueSet(
+            Element => '.SettingContent select',
+            Value   => 'Down',
         );
 
         # Save.
@@ -187,9 +187,9 @@ $Selenium->RunTest(
             );
 
             # Reset locally.
-            $Selenium->execute_script(
-                "\$('#ResetOptions').val(['reset-locally'])"
-                    . ".trigger('redraw.InputField').trigger('change');",
+            $Selenium->InputFieldValueSet(
+                Element => '#ResetOptions',
+                Value   => "['reset-locally']",
             );
 
             # Confirm.

@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -11,8 +11,6 @@ use warnings;
 use utf8;
 
 use vars (qw($Self));
-
-use Unicode::Normalize;
 
 my $ConfigObject         = $Kernel::OM->Get('Kernel::Config');
 my $MainObject           = $Kernel::OM->Get('Kernel::System::Main');
@@ -121,11 +119,6 @@ for my $Backend (qw(DB FS)) {
 
             my $TargetFilename = $FileName . $File;
 
-            # Mac OS (HFS+) will store all filenames as NFD internally.
-            if ( $^O eq 'darwin' && $Backend eq 'FS' ) {
-                $TargetFilename = Unicode::Normalize::NFD($TargetFilename);
-            }
-
             $Self->Is(
                 $AttachmentIndex{1}->{Filename},
                 $TargetFilename,
@@ -230,13 +223,7 @@ for my $Backend (qw(DB FS)) {
     my $TargetFilename = '[Terminology Guide äöß]';
 
     if ( $Backend eq 'FS' ) {
-
         $TargetFilename = '_Terminology_Guide_äöß_';
-
-        # Mac OS (HFS+) will store all filenames as NFD internally.
-        if ( $^O eq 'darwin' ) {
-            $TargetFilename = Unicode::Normalize::NFD($TargetFilename);
-        }
     }
 
     $Self->Is(

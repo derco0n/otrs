@@ -13,9 +13,9 @@ sub match {
     # @since v4.0.0
     my $class = shift;
     my $argv1 = shift // return undef;
-    my $regex = qr/message too large/i;
+    my $index = ['message too large'];
 
-    return 1 if $argv1 =~ $regex;
+    return 1 if grep { rindex($argv1, $_) > -1 } @$index;
     return 0;
 }
 
@@ -29,29 +29,17 @@ sub true {
     my $class = shift;
     my $argvs = shift // return undef;
 
-    return undef unless ref $argvs eq 'Sisimai::Data';
-    my $statuscode = $argvs->deliverystatus // '';
-    my $reasontext = __PACKAGE__->text;
+    return undef unless $argvs->deliverystatus;
+    return 1 if $argvs->reason eq 'exceedlimit';
 
-    return undef unless length $statuscode;
-    return 1 if $argvs->reason eq $reasontext;
+    # Delivery status code points "exceedlimit".
+    # Status: 5.2.3
+    # Diagnostic-Code: SMTP; 552 5.2.3 Message size exceeds fixed maximum message size
+    return 1 if Sisimai::SMTP::Status->name($argvs->deliverystatus) eq 'exceedlimit';
 
-    require Sisimai::SMTP::Status;
-    my $diagnostic = $argvs->diagnosticcode // '';
-    my $v = 0;
-
-    if( Sisimai::SMTP::Status->name($statuscode) eq $reasontext ) {
-        # Delivery status code points "exceedlimit".
-        # Status: 5.2.3
-        # Diagnostic-Code: SMTP; 552 5.2.3 Message size exceeds fixed maximum message size
-        $v = 1;
-
-    } else {
-        # Check the value of Diagnosic-Code: header with patterns
-        $v = 1 if __PACKAGE__->match($diagnostic);
-    }
-
-    return $v;
+    # Check the value of Diagnosic-Code: header with patterns
+    return 1 if __PACKAGE__->match(lc $argvs->diagnosticcode);
+    return 0;
 }
 
 1;
@@ -115,7 +103,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2016 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2016,2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

@@ -24,7 +24,6 @@ my $TimeUnit = {
     'm' => 60,                      # Minute,
     's' => 1,                       # Second
 };
-
 my $MathematicalConstant = {
     'e' => CONST_E,
     'p' => CONST_P,
@@ -32,29 +31,17 @@ my $MathematicalConstant = {
 };
 
 my $MonthName = {
-    'full' => [
-        'January', 'February', 'March', 'April', 'May', 'June', 'July', 
-        'August', 'September', 'October', 'November', 'December',
-    ],
-    'abbr' => [
-        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-    ],
+    'full' => [qw|January February March April May June July August September October November December|],
+    'abbr' => [qw|Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec|],
 };
 
 my $DayOfWeek = {
-    'full' => [
-        'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday',
-        'Friday', 'Saturday',
-    ],
-    'abbr' => ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+    'full' => [qw|Sunday Monday Tuesday Wednesday Thursday Friday Saturday|],
+    'abbr' => [qw|Sun Mon Tue Wed Thu Fri Sat|],
 };
 
 my $HourName = {
-    'full' => [
-        'Midnight', 1, 2, 3, 4, 5, 'Morning', 7, 8, 9, 10, 11, 'Noon',
-        13, 14, 15, 16, 17, 'Evening', 19, 20, 21, 22, 23,
-    ],
+    'full' => [qw|Midnight 1 2 3 4 5 Morning 7 8 9 10 11 Noon 13 14 15 16 17 Evening 19 20 21 22 23|],
     'abbr' => [0..23],
 };
 
@@ -202,13 +189,13 @@ sub to_second {
     my $unitoftime = [keys %$TimeUnit];
     my $mathconsts = [keys %$MathematicalConstant];
 
-    if( $value =~ m/\A(\d+|\d+[.]\d+)([@$unitoftime])?\z/o ) {
+    if( $value =~ /\A(\d+|\d+[.]\d+)([@$unitoftime])?\z/o ) {
         # 1d, 1.5w
         my $n = $1;
         my $u = $2 // 'd';
         $getseconds = $n * $TimeUnit->{ $u };
 
-    } elsif( $value =~ m/\A(\d+|\d+[.]\d+)?([@$mathconsts])([@$unitoftime])?\z/o ) {
+    } elsif( $value =~ /\A(\d+|\d+[.]\d+)?([@$mathconsts])([@$unitoftime])?\z/o ) {
         # 1pd, 1.5pw
         my $n = $1 // 1;
         my $m = $MathematicalConstant->{ $2 } // 0;
@@ -267,34 +254,6 @@ sub hourname {
     return $HourName->{ $value };
 }
 
-sub o2d {
-    # Convert from date offset to date string
-    # @param    [Integer] argv1 Offset of the timezone
-    # @param    [String]  argv2 Delimiter character: default is '-'
-    # @return   [String]        Date string
-    # @example  Get the value of n days before(today is 2015/11/04)
-    #   o2d(1)      #=> 2015-11-03
-    #   o2d(2,'/')  #=> 2015/11/02
-    my $class = shift;
-    my $argv1 = shift // 0;
-    my $argv2 = shift // '-';
-    my $piece = new Time::Piece;
-    my $epoch = 0;
-
-    return $piece->ymd($argv2) unless $argv1 =~ m/\A[-]?\d+\z/;
-
-    $epoch = $piece->epoch - $argv1 * 86400;
-    if( $epoch < 0 ) {
-        # Negative value
-        $epoch = 0;
-
-    } elsif( $epoch >= 2 ** 31 ) {
-        # See http://en.wikipedia.org/wiki/Year_2038_problem
-        $epoch = 2 ** 31 - 1;
-    }
-    return Time::Piece->new($epoch)->ymd($argv2);
-}
-
 sub parse {
     # Parse date string; strptime() wrapper
     # @param    [String] argv1  Date string
@@ -325,7 +284,7 @@ sub parse {
 
     while( my $p = shift @timetokens ) {
         # Parse each piece of time
-        if( $p =~ m/\A[A-Z][a-z]{2}[,]?\z/ ) {
+        if( $p =~ /\A[A-Z][a-z]{2}[,]?\z/ ) {
             # Day of week or Day of week; Thu, Apr, ...
             chop $p if length($p) == 4; # Thu, -> Thu
 
@@ -337,8 +296,7 @@ sub parse {
                 # Month name abbr.; Apr, May, ...
                 $v->{'M'} = $p;
             }
-
-        } elsif( $p =~ m/\A\d{1,4}\z/ ) {
+        } elsif( $p =~ /\A\d{1,4}\z/ ) {
             # Year or Day; 2005, 31, 04,  1, ...
             if( $p > 31 ) {
                 # The piece is the value of an year
@@ -355,9 +313,8 @@ sub parse {
                     $v->{'d'} = $p;
                 }
             }
-
-        } elsif( $p =~ m/\A([0-2]\d):([0-5]\d):([0-5]\d)\z/ ||
-                 $p =~ m/\A(\d{1,2})[-:](\d{1,2})[-:](\d{1,2})\z/ ) {
+        } elsif( $p =~ /\A([0-2]\d):([0-5]\d):([0-5]\d)\z/ ||
+                 $p =~ /\A(\d{1,2})[-:](\d{1,2})[-:](\d{1,2})\z/ ) {
             # Time; 12:34:56, 03:14:15, ...
             # Arrival-Date: 2014-03-26 00-01-19
             if( $1 < 24 && $2 < 60 && $3 < 60 ) {
@@ -365,27 +322,26 @@ sub parse {
                 $v->{'T'} = sprintf("%02d:%02d:%02d", $1, $2, $3);
             }
 
-        } elsif( $p =~ m/\A([0-2]\d):([0-5]\d)\z/ ) {
+        } elsif( $p =~ /\A([0-2]\d):([0-5]\d)\z/ ) {
             # Time; 12:34 => 12:34:00
             if( $1 < 24 && $2 < 60 ) {
                 $v->{'T'} = sprintf("%02d:%02d:00", $1, $2);
             }
-
-        } elsif( $p =~ m/\A(\d\d?):(\d\d?)\z/ ) {
+        } elsif( $p =~ /\A(\d\d?):(\d\d?)\z/ ) {
             # Time: 1:4 => 01:04:00
             $v->{'T'} = sprintf("%02d:%02d:00", $1, $2);
 
-        } elsif( $p =~ m/\A[APap][Mm]\z/ ) {
+        } elsif( $p =~ /\A[APap][Mm]\z/ ) {
             # AM or PM
             $afternoon1 = 1;
 
         } else {
             # Timezone offset and others
-            if( $p =~ m/\A[-+][01]\d{3}\z/ ) {
+            if( $p =~ /\A[-+][01]\d{3}\z/ ) {
                 # Timezone offset; +0000, +0900, -1000, ...
                 $v->{'z'} ||= $p;
 
-            } elsif( $p =~ m/\A[(]?[A-Z]{2,5}[)]?\z/ ) {
+            } elsif( $p =~ /\A[(]?[A-Z]{2,5}[)]?\z/ ) {
                 # Timezone abbreviation; JST, GMT, UTC, ...
                 $v->{'z'} ||= __PACKAGE__->abbr2tz($p) || '+0000';
 
@@ -401,21 +357,23 @@ sub parse {
                     # ISO 8601; 2000-04-29T01:23:45
                     $v->{'Y'} = int $1;
                     $v->{'M'} = $MonthName->{'abbr'}->[int($2) - 1];
-
-                    if( $3 < 32 ) {
-                        $v->{'d'} = int $3;
-                    }
+                    $v->{'d'} = int $3 if $3 < 32;
 
                     if( $4 < 24 && $5 < 60 && $6 < 60 ) {
                         $v->{'T'} = sprintf("%02d:%02d:%02d", $4, $5, $6);
                     }
-
                 } elsif( $p =~ m|\A(\d{1,2})/(\d{1,2})/(\d{1,2})\z| ) {
                     # 4/29/01 11:34:45 PM
                     $v->{'M'} = $MonthName->{'abbr'}->[int($1) - 1];
                     $v->{'d'}  = int $2;
                     $v->{'Y'}  = int($3) + 2000;
                     $v->{'Y'} -= 100 if $v->{'Y'} > Time::Piece->new->year() + 1;
+
+                } elsif( $p =~ m|\A(\d{1,2})[-/](\d{1,2})[-/](\d{4})| ) {
+                    # 29-04-2017 22:22
+                    $v->{'d'} = int $1 if $1 < 32;
+                    $v->{'M'} = $MonthName->{'abbr'}->[int($2) - 1];
+                    $v->{'Y'} = int($3);
                 }
             }
         }
@@ -490,7 +448,7 @@ sub tz2second {
     my $class = shift;
     my $argv1 = shift || return undef;
 
-    if( $argv1 =~ m/\A([-+])(\d)(\d)(\d{2})\z/ ) {
+    if( $argv1 =~ /\A([-+])(\d)(\d)(\d{2})\z/ ) {
         my $ztime = 0;
         my $digit = {
             'operator' => $1,
@@ -505,7 +463,7 @@ sub tz2second {
         return undef if abs($ztime) > TZ_OFFSET;
         return $ztime;
 
-    } elsif( $argv1 =~ m/\A[A-Za-z]+\z/ ) {
+    } elsif( $argv1 =~ /\A[A-Za-z]+\z/ ) {
         return __PACKAGE__->tz2second($TimeZoneAbbr->{ $argv1 });
 
     } else {
@@ -586,7 +544,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2016 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

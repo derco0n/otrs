@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Output::HTML::TicketZoom::CustomerInformation;
@@ -24,7 +24,13 @@ sub Run {
             User => $Param{Ticket}->{CustomerUserID},
         );
     }
-    my $LayoutObject  = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
+
+    my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
+
+    if ( $CustomerData{UserTitle} ) {
+        $CustomerData{UserTitle} = $LayoutObject->{LanguageObject}->Translate( $CustomerData{UserTitle} );
+    }
+
     my $CustomerTable = $LayoutObject->AgentCustomerViewTable(
         Data   => \%CustomerData,
         Ticket => $Param{Ticket},

@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 <div id="MainBox" class="TicketCompose ARIARoleMain">
     <div class="Content">
@@ -62,14 +62,14 @@
 
 [% RenderBlockStart("TicketSLA") %]
                 <div>
-                    [% IF Data.SLAMAndatory %]
+                    [% IF Data.SLAMandatory %]
                         <label for="SLAID" title="[% Translate("Service level agreement") | html %]" class="Mandatory"><span class="Marker">*</span> [% Translate("SLA") | html %]:</label>
 
                     [% ELSE %]
                         <label for="SLAID" title="[% Translate("Service level agreement") | html %]">[% Translate("SLA") | html %]:</label>
                     [% END %]
                     [% Data.SLAStrg %]
-                    [% IF Data.SLAMAndatory %]
+                    [% IF Data.SLAMandatory %]
                         <div id="SLAIDError" class="TooltipErrorMessage" ><p>[% Translate("This field is required.") | html %]</p></div>
                         <div id="SLAIDServerError" class="TooltipErrorMessage" ><p>[% Translate("This field is required.") | html %]</p></div>
                     [% END %]

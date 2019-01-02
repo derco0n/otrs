@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::Console::Command::Maint::Stats::Dashboard::Generate;
@@ -92,7 +92,7 @@ sub Run {
         $Self->Print("<yellow>Stat $Stat{StatNumber}: $Stat{Title}</yellow>\n");
 
         # now find out all users which have this statistic enabled in their dashboard
-        my $DashboardActiveSetting = 'UserDashboard' . ( 1000 + $StatID ) . "-Stats";
+        my $DashboardActiveSetting   = 'UserDashboard' . ( 1000 + $StatID ) . "-Stats";
         my %UsersWithActivatedWidget = $Kernel::OM->Get('Kernel::System::User')->SearchPreferences(
             Key   => $DashboardActiveSetting,
             Value => 1,

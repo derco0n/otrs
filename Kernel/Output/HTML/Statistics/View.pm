@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Output::HTML::Statistics::View;
@@ -242,9 +242,9 @@ sub StatsParamsWidget {
                         Data       => $ParamItem->{Data},
                         Name       => $ParamItem->{Name},
                         SelectedID => $LocalGetParam->( Param => $ParamItem->{Name} ) // $ParamItem->{SelectedID} || '',
-                        Multiple => $ParamItem->{Multiple} || 0,
-                        Size     => $ParamItem->{Size}     || '',
-                        Class    => 'Modernize',
+                        Multiple   => $ParamItem->{Multiple} || 0,
+                        Size       => $ParamItem->{Size} || '',
+                        Class      => 'Modernize',
                     ),
                 },
             );
@@ -389,14 +389,14 @@ sub StatsParamsWidget {
 
                     if ( $ObjectAttribute->{Block} eq 'MultiSelectField' ) {
                         $BlockData{SelectField} = $LayoutObject->BuildSelection(
-                            Data        => \%ValueHash,
-                            Name        => $ElementName,
-                            Multiple    => 1,
-                            Size        => 5,
-                            SelectedID  => @SelectedIDs ? [@SelectedIDs] : $ObjectAttribute->{SelectedValues},
-                            Translation => $ObjectAttribute->{Translation},
-                            TreeView => $ObjectAttribute->{TreeView} || 0,
-                            Sort => scalar $ObjectAttribute->{Sort},
+                            Data           => \%ValueHash,
+                            Name           => $ElementName,
+                            Multiple       => 1,
+                            Size           => 5,
+                            SelectedID     => @SelectedIDs ? [@SelectedIDs] : $ObjectAttribute->{SelectedValues},
+                            Translation    => $ObjectAttribute->{Translation},
+                            TreeView       => $ObjectAttribute->{TreeView} || 0,
+                            Sort           => scalar $ObjectAttribute->{Sort},
                             SortIndividual => scalar $ObjectAttribute->{SortIndividual},
                             Class          => 'Modernize',
                         );
@@ -757,7 +757,7 @@ sub GeneralSpecificationsWidget {
                 Name        => 'ObjectModule',
                 Translation => 1,
                 Class       => 'Modernize ' . ( $Errors{ObjectModuleServerError} ? ' ServerError' : '' ),
-                SelectedID => $GetParam{ObjectModule} // $ConfigObject->Get('Stats::DefaultSelectedDynamicObject'),
+                SelectedID  => $GetParam{ObjectModule} // $ConfigObject->Get('Stats::DefaultSelectedDynamicObject'),
             );
         }
 
@@ -769,7 +769,7 @@ sub GeneralSpecificationsWidget {
                 Name        => 'ObjectModule',
                 Translation => 1,
                 Class       => 'Modernize ' . ( $Errors{ObjectModuleServerError} ? ' ServerError' : '' ),
-                SelectedID => $GetParam{ObjectModule} // $ConfigObject->Get('Stats::DefaultSelectedDynamicObject'),
+                SelectedID  => $GetParam{ObjectModule} // $ConfigObject->Get('Stats::DefaultSelectedDynamicObject'),
             );
 
         }
@@ -780,19 +780,19 @@ sub GeneralSpecificationsWidget {
 
     # create multiselectboxes 'format'
     $Stat->{SelectFormat} = $LayoutObject->BuildSelection(
-        Data     => $AvailableFormats,
-        Name     => 'Format',
-        Class    => 'Modernize Validate_Required' . ( $Errors{FormatServerError} ? ' ServerError' : '' ),
-        Multiple => 1,
-        Size     => 5,
+        Data       => $AvailableFormats,
+        Name       => 'Format',
+        Class      => 'Modernize Validate_Required' . ( $Errors{FormatServerError} ? ' ServerError' : '' ),
+        Multiple   => 1,
+        Size       => 5,
         SelectedID => $GetParam{Format} // $Stat->{Format} || $DefaultSelectedFormat,
     );
 
     # create multiselectboxes 'permission'
     my %Permission = (
-        Data => { $Kernel::OM->Get('Kernel::System::Group')->GroupList( Valid => 1 ) },
-        Name => 'Permission',
-        Class => 'Modernize Validate_Required' . ( $Errors{PermissionServerError} ? ' ServerError' : '' ),
+        Data        => { $Kernel::OM->Get('Kernel::System::Group')->GroupList( Valid => 1 ) },
+        Name        => 'Permission',
+        Class       => 'Modernize Validate_Required' . ( $Errors{PermissionServerError} ? ' ServerError' : '' ),
         Multiple    => 1,
         Size        => 5,
         Translation => 0,
@@ -1532,7 +1532,7 @@ sub StatsResultRender {
     my ( $Self, %Param ) = @_;
 
     my @StatArray = @{ $Param{StatArray} // [] };
-    my $Stat = $Param{Stat};
+    my $Stat      = $Param{Stat};
 
     my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
@@ -1573,7 +1573,7 @@ sub StatsResultRender {
                     @StatArray,
                 ],
                 Format => $Param{Format},
-                }
+            }
         );
 
         $Output .= $LayoutObject->Output(
@@ -1907,6 +1907,7 @@ sub StatsConfigurationValidate {
             XVALUE:
             for my $Xvalue ( @{ $Stat{UseAsXvalue} } ) {
 
+                last XVALUE if defined $XAxisFieldErrors{ $Xvalue->{Element} };
                 next XVALUE if !( $Xvalue->{Selected} && $Xvalue->{Block} eq 'Time' );
 
                 my $Flag = 1;
@@ -2465,10 +2466,10 @@ sub _StopWordFieldsGet {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

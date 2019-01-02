@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::CustomerUser::DB;
@@ -237,7 +237,8 @@ sub CustomerName {
         push @NameParts, $NameParts{$CustomerUserNameField};
     }
 
-    my $Name = join ' ', @NameParts;
+    my $JoinCharacter = $Self->{CustomerUserMap}->{CustomerUserNameFieldsJoin} // ' ';
+    my $Name          = join $JoinCharacter, @NameParts;
 
     # cache request
     if ( $Self->{CacheObject} ) {
@@ -1264,10 +1265,12 @@ sub CustomerUserDataGet {
         $CustomerUserListFieldsMap = [ 'first_name', 'last_name', 'email', ];
     }
 
-    # to build the UserMailString
-    my %LookupCustomerUserListFields = map { $_ => 1 } @{$CustomerUserListFieldsMap};
-    my @CustomerUserListFields
-        = map { $_->[0] } grep { $LookupCustomerUserListFields{ $_->[2] } } @{ $Self->{CustomerUserMap}->{Map} };
+    # Order fields by CustomerUserListFields (see bug#13821).
+    my @CustomerUserListFields;
+    for my $Field ( @{$CustomerUserListFieldsMap} ) {
+        my @FieldNames = map { $_->[0] } grep { $_->[2] eq $Field } @{ $Self->{CustomerUserMap}->{Map} };
+        push @CustomerUserListFields, $FieldNames[0];
+    }
 
     my $UserMailString = '';
     my @UserMailStringParts;
@@ -1665,7 +1668,7 @@ sub SetPassword {
     my ( $Self, %Param ) = @_;
 
     my $Login = $Param{UserLogin};
-    my $Pw = $Param{PW} || '';
+    my $Pw    = $Param{PW} || '';
 
     # check ro/rw
     if ( $Self->{ReadOnly} ) {

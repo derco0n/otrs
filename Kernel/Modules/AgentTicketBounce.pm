@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Modules::AgentTicketBounce;
@@ -48,7 +48,7 @@ sub Run {
 
     # get ticket data
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
-    my %Ticket = $TicketObject->TicketGet( TicketID => $Self->{TicketID} );
+    my %Ticket       = $TicketObject->TicketGet( TicketID => $Self->{TicketID} );
 
     # get config object
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
@@ -93,23 +93,35 @@ sub Run {
     # get lock state && write (lock) permissions
     if ( $Config->{RequiredLock} ) {
         if ( !$TicketObject->TicketLockGet( TicketID => $Self->{TicketID} ) ) {
-            $TicketObject->TicketLockSet(
+
+            my $Lock = $TicketObject->TicketLockSet(
                 TicketID => $Self->{TicketID},
                 Lock     => 'lock',
                 UserID   => $Self->{UserID}
             );
-            if (
-                $TicketObject->TicketOwnerSet(
-                    TicketID  => $Self->{TicketID},
-                    UserID    => $Self->{UserID},
-                    NewUserID => $Self->{UserID},
-                )
-                )
-            {
 
+            if ($Lock) {
+
+                # Set new owner if ticket owner is different then logged user.
+                if ( $Ticket{OwnerID} != $Self->{UserID} ) {
+
+                    # Remember previous owner, which will be used to restore ticket owner on undo action.
+                    $Param{PreviousOwner} = $Ticket{OwnerID};
+
+                    $TicketObject->TicketOwnerSet(
+                        TicketID  => $Self->{TicketID},
+                        UserID    => $Self->{UserID},
+                        NewUserID => $Self->{UserID},
+                    );
+                }
+
+                # Show lock state.
                 $LayoutObject->Block(
                     Name => 'PropertiesLock',
-                    Data => { %Param, TicketID => $Self->{TicketID} },
+                    Data => {
+                        %Param,
+                        TicketID => $Self->{TicketID},
+                    },
                 );
             }
         }
@@ -427,7 +439,7 @@ $Param{Signature}";
                 $Param{Body} =~ s/&lt;OTRS_BOUNCE_TO&gt;/&amp;lt;OTRS_BOUNCE_TO&amp;gt;/gi;
             }
 
-            $Param{InformationFormat} = $Param{Body};
+            $Param{InformationFormat}   = $Param{Body};
             $Param{InformSenderChecked} = $Param{InformSender} ? 'checked="checked"' : '';
 
             my $Output = $LayoutObject->Header(

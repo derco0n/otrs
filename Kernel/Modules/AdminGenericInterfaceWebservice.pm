@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Modules::AdminGenericInterfaceWebservice;
@@ -1027,7 +1027,7 @@ sub _ShowEdit {
         $GITransports{$Transport} = $GITransportConfig->{$Transport}->{ConfigDialog};
     }
 
-    # Get operations data.
+    # Get operation data.
     my %GIOperations;
     my $GIOperationConfig = $ConfigObject->Get('GenericInterface::Operation::Module');
     OPERATION:
@@ -1036,7 +1036,7 @@ sub _ShowEdit {
         $GIOperations{$Operation} = $GIOperationConfig->{$Operation}->{ConfigDialog};
     }
 
-    # Get operations data.
+    # Get invoker data.
     my %GIInvokers;
     my $GIInvokerConfig = $ConfigObject->Get('GenericInterface::Invoker::Module');
     INVOKER:
@@ -1363,7 +1363,7 @@ sub _ShowEdit {
                         CommunicationType => $CommunicationType,
                         WebserviceID      => $Param{WebserviceID},
 
-                        }
+                    }
                 );
             }
         }

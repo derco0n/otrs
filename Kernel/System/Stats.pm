@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::Stats;
@@ -1121,7 +1121,7 @@ sub GetObjectBehaviours {
 
     # check if it is cached
     if ( $Self->{'Cache::ObjectBehaviours'}->{$Module} ) {
-        return $Self->{'Cache::ObjectBehaviours'}->{$Module}
+        return $Self->{'Cache::ObjectBehaviours'}->{$Module};
     }
 
     # load module, return if module does not exist
@@ -1568,7 +1568,7 @@ sub StatsRun {
         }
     }
 
-    my $Stat = $Self->StatsGet( StatID => $Param{StatID} );
+    my $Stat     = $Self->StatsGet( StatID => $Param{StatID} );
     my %GetParam = %{ $Param{GetParam} };
     my @Result;
 
@@ -2529,7 +2529,7 @@ sub _GenerateDynamicStats {
             'Kernel::System::DateTime',
             ObjectParams => {
                 String => $Element->{TimeStop},
-                }
+            }
         );
         $TimeAbsolutStopUnixTime = $DateTimeObject->ToEpoch();
 
@@ -2565,7 +2565,7 @@ sub _GenerateDynamicStats {
             $Second = 0;
             $Minute = 0;
             $Hour   = 0;
-            ( $Year, $Month, $Day ) = $Self->_MondayOfWeek( $Year, $Month, $Day )
+            ( $Year, $Month, $Day ) = $Self->_MondayOfWeek( $Year, $Month, $Day );
         }
         elsif ( $Element->{SelectedValues}[0] eq 'Month' ) {
             $Second = 0;
@@ -2626,7 +2626,7 @@ sub _GenerateDynamicStats {
                     sprintf(
                         "%02d:%02d:%02d-%02d:%02d:%02d",
                         $Hour, $Minute, $Second, $ToHour, $ToMinute, $ToSecond
-                        )
+                    )
                 );
             }
             elsif ( $Element->{SelectedValues}[0] eq 'Minute' ) {
@@ -2639,7 +2639,7 @@ sub _GenerateDynamicStats {
                     sprintf(
                         "%02d:%02d:%02d-%02d:%02d:%02d",
                         $Hour, $Minute, $Second, $ToHour, $ToMinute, $ToSecond
-                        )
+                    )
                 );
             }
             elsif ( $Element->{SelectedValues}[0] eq 'Hour' ) {
@@ -2652,7 +2652,7 @@ sub _GenerateDynamicStats {
                     sprintf(
                         "%02d:%02d:%02d-%02d:%02d:%02d",
                         $Hour, $Minute, $Second, $ToHour, $ToMinute, $ToSecond
-                        )
+                    )
                 );
             }
             elsif ( $Element->{SelectedValues}[0] eq 'Day' ) {
@@ -2671,7 +2671,7 @@ sub _GenerateDynamicStats {
                         sprintf(
                             "%02d.%02d.%04d - %02d.%02d.%04d",
                             $Day, $Month, $Year, $ToDay, $ToMonth, $ToYear
-                            )
+                        )
                     );
                 }
             }
@@ -2709,7 +2709,7 @@ sub _GenerateDynamicStats {
                         sprintf(
                             "%02d.%02d.%04d - %02d.%02d.%04d",
                             $Day, $Month, $Year, $ToDay, $ToMonth, $ToYear
-                            )
+                        )
                     );
                 }
             }
@@ -2734,7 +2734,7 @@ sub _GenerateDynamicStats {
                         sprintf(
                             "%02d.%02d.%04d - %02d.%02d.%04d",
                             $Day, $Month, $Year, $ToDay, $ToMonth, $ToYear
-                            )
+                        )
                     );
                 }
             }
@@ -2759,7 +2759,7 @@ sub _GenerateDynamicStats {
                         sprintf(
                             "%02d.%02d.%04d - %02d.%02d.%04d",
                             $Day, $Month, $Year, $ToDay, $ToMonth, $ToYear
-                            )
+                        )
                     );
                 }
             }
@@ -2778,7 +2778,7 @@ sub _GenerateDynamicStats {
                         sprintf(
                             "%02d.%02d.%04d - %02d.%02d.%04d",
                             $Day, $Month, $Year, $ToDay, $ToMonth, $ToYear
-                            )
+                        )
                     );
                 }
             }
@@ -3137,7 +3137,7 @@ sub _GenerateDynamicStats {
                     sprintf(
                         "%04d-%02d-%02d %02d:00:00 - %02d:59:59",
                         $VSYear, $VSMonth, $VSDay, $VSHour, $ToHour
-                        )
+                    )
                     } = {
                     $Ref1->{Values}{TimeStop}  => $TimeStop,
                     $Ref1->{Values}{TimeStart} => $TimeStart
@@ -3173,7 +3173,7 @@ sub _GenerateDynamicStats {
                     sprintf(
                         "%04d-%02d-%02d %02d:%02d:00 - %02d:%02d:59",
                         $VSYear, $VSMonth, $VSDay, $VSHour, $VSMinute, $ToHour, $ToMinute
-                        )
+                    )
                     } = {
                     $Ref1->{Values}{TimeStop}  => $TimeStop,
                     $Ref1->{Values}{TimeStart} => $TimeStart
@@ -3426,7 +3426,7 @@ sub _GenerateDynamicStats {
     my @StatArray = ( [$Title], \@HeaderLine, @DataArray );
 
     if ( !$Param{Cache} || $Preview ) {
-        return @StatArray
+        return @StatArray;
     }
 
     # check if we should cache this result
@@ -3655,7 +3655,7 @@ sub _WriteResultCache {
                 Hour   => $DateTimeNowValues->{Hour},
                 Minute => $DateTimeNowValues->{Minute},
                 Second => $DateTimeNowValues->{Second},
-                }
+            }
         );
 
         # if get params in future do not cache
@@ -4441,10 +4441,10 @@ sub _TimeStamp2DateTime {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

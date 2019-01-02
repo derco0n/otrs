@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Modules::AgentTicketCustomer;
@@ -150,7 +150,7 @@ sub Run {
             # if more the one customer user exists, show list
             # and clean CustomerID
             else {
-                $Param{CustomerID} = '';
+                $Param{CustomerID}            = '';
                 $Param{"CustomerUserOptions"} = \%CustomerUserList;
             }
             return $Self->Form(%Param);
@@ -178,9 +178,6 @@ sub Run {
         # check needed data
         if ( !$Param{CustomerUserID} ) {
             $Error{'CustomerUserIDInvalid'} = 'ServerError';
-        }
-        if ( !$Param{CustomerID} ) {
-            $Error{'CustomerIDInvalid'} = 'ServerError';
         }
 
         if (%Error) {
@@ -252,15 +249,18 @@ sub Form {
                 User => $Param{CustomerUserID} || $TicketData{CustomerUserID},
             );
         }
+
+        if ( $CustomerUserData{UserTitle} ) {
+            $CustomerUserData{UserTitle} = $LayoutObject->{LanguageObject}->Translate( $CustomerUserData{UserTitle} );
+        }
+
         $TicketCustomerID = $TicketData{CustomerID};
         $Param{SelectedCustomerUser} = $TicketData{CustomerUserID};
 
         $Param{Table} = $LayoutObject->AgentCustomerViewTable(
-            Data => {
-                %CustomerUserData,
-                TicketID => $Self->{TicketID},
-            },
-            Max => $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Frontend::CustomerInfoComposeMaxSize'),
+            Data   => \%CustomerUserData,
+            Ticket => \%TicketData,
+            Max    => $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Frontend::CustomerInfoComposeMaxSize'),
         );
 
         # show customer field as "FirstName Lastname" <MailAddress>

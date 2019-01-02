@@ -21,7 +21,7 @@ sub token {
     # @return   [String]        Message token(MD5 hex digest) or empty string 
     #                           if the any argument is missing
     # @see       http://en.wikipedia.org/wiki/ASCII
-    # @see       http://search.cpan.org/~gaas/Digest-MD5-2.39/MD5.pm
+    # @see       https://metacpan.org/pod/Digest::MD5
     my $class = shift || return '';
     my $addr1 = shift || return '';
     my $addr2 = shift || return '';
@@ -42,7 +42,7 @@ sub is_8bit {
 
     return undef unless ref $argv1;
     return undef unless ref $argv1 eq 'SCALAR';
-    return 1 unless $$argv1 =~ m/\A[\x00-\x7f]+\z/;
+    return 1 unless $$argv1 =~ /\A[\x00-\x7f]+\z/;
     return 0;
 }
 
@@ -56,12 +56,11 @@ sub sweep {
     my $argv1 = shift // return undef;
 
     chomp $argv1;
-    $argv1 =~ y{ }{}s;
-    $argv1 =~ s{\t}{}g;
-    $argv1 =~ s{\A }{}g;
-    $argv1 =~ s{ \z}{}g;
-    $argv1 =~ s{ [-]{2,}[^ \t].+\z}{};
-
+    $argv1 =~ y/ //s;
+    $argv1 =~ y/\t//d;
+    $argv1 =~ s/\A //g;
+    $argv1 =~ s/ \z//g;
+    $argv1 =~ s/ [-]{2,}[^ \t].+\z//;
     return $argv1;
 }
 
@@ -85,9 +84,12 @@ sub to_plain {
 
     if( $loose || $plain =~ $match->{'html'} || $plain =~ $match->{'body'} ) {
         # <html> ... </html>
-        # Rewrite <a> elements
-        # 1. <a href = 'http://...'>...</a> to " http://... "
-        # 2. <a href = 'mailto:...'>...</a> to " Value <mailto:...> "
+        # 1. Remove <head>...</head>
+        # 2. Remove <style>...</style>
+        # 3. <a href = 'http://...'>...</a> to " http://... "
+        # 4. <a href = 'mailto:...'>...</a> to " Value <mailto:...> "
+        $plain =~ s|<head>.+</head>||gsim;
+        $plain =~ s|<style.+?>.+</style>||gsim;
         $plain =~ s|<a\s+href\s*=\s*['"](https?://.+?)['"].*?>(.*?)</a>| [$2]($1) |gsim;
         $plain =~ s|<a\s+href\s*=\s*["']mailto:([^\s]+?)["']>(.*?)</a>| [$2](mailto:$1) |gsim;
 
@@ -117,13 +119,13 @@ sub to_utf8 {
     my $argv2 = shift;
 
     my $tobeutf8ed = $$argv1;
-    my $encodefrom = $argv2 || '';
+    my $encodefrom = lc $argv2 || '';
     my $hasencoded = undef;
     my $hasguessed = Encode::Guess->guess($tobeutf8ed);
-    my $encodingto = ref $hasguessed ? $hasguessed->name : '';
-    my $dontencode = qr/\A(?>utf[-]?8|(?:us[-])?ascii)\z/i;
+    my $encodingto = ref $hasguessed ? lc($hasguessed->name) : '';
+    my $dontencode = qr/\A(?>utf[-]?8|(?:us[-])?ascii)\z/;
 
-    if( length $encodefrom ) {
+    if( $encodefrom ) {
         # The 2nd argument is a encoding name of the 1st argument
         while(1) {
             # Encode a given string when the encoding of the string is neigther
@@ -143,7 +145,7 @@ sub to_utf8 {
     unless( $hasencoded ) {
         # The 2nd argument was not given or failed to convert from $encodefrom
         # to UTF-8
-        if( length $encodingto ) {
+        if( $encodingto ) {
             # Guessed encoding name is available, try to encode using it.
             unless( $encodingto =~ $dontencode ) {
                 # Encode a given string when the encoding of the string is neigther
@@ -230,7 +232,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2016 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2016,2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

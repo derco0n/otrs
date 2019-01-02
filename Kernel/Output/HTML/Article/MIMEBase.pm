@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Output::HTML::Article::MIMEBase;
@@ -43,7 +43,7 @@ sub new {
 
 Returns common article fields for a MIMEBase article.
 
-    my %ArticleFields = $MIMEBaseObject->ArticleFields(
+    my %ArticleFields = $LayoutObject->ArticleFields(
         TicketID  => 123,   # (required)
         ArticleID => 123,   # (required)
     );
@@ -225,7 +225,7 @@ sub ArticleFields {
 
 Returns article preview for a MIMEBase article.
 
-    $ArticleBaseObject->ArticlePreview(
+    $LayoutObject->ArticlePreview(
         TicketID   => 123,     # (required)
         ArticleID  => 123,     # (required)
         ResultType => 'plain', # (optional) plain|HTML. Default HTML.
@@ -321,7 +321,7 @@ sub ArticlePreview {
 
 Returns HTMLBodyAttachmentID.
 
-    my $HTMLBodyAttachmentID = $ArticleBaseObject->HTMLBodyAttachmentIDGet(
+    my $HTMLBodyAttachmentID = $LayoutObject->HTMLBodyAttachmentIDGet(
         TicketID  => 123,     # (required)
         ArticleID => 123,     # (required)
     );

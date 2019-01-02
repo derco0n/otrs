@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 [% IF Data.ShowSearchDialog %]
@@ -48,7 +48,6 @@
                 <label>[% Translate("Add another attribute") | html %]:</label>
                 <div class="Field">
                     [% Data.AttributesStrg %]
-                    <a class="AddButton" href="#" title="Add entry"><i class="fa fa-plus-square-o"></i><span class="InvisibleText">[% Translate("Add") | html %]</span></a>
                     <div class="FieldExplanation">[% Translate("The attributes with the identifier '(Customer)' are from the customer company.") | html %]</div>
                 </div>
                 <div class="Clear"></div>

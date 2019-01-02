@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::LinkObject;
@@ -225,7 +225,7 @@ sub PossibleLinkList {
 
     # get possible link list
     my $PossibleLinkListRef = $ConfigObject->Get('LinkObject::PossibleLink') || {};
-    my %PossibleLinkList = %{$PossibleLinkListRef};
+    my %PossibleLinkList    = %{$PossibleLinkListRef};
 
     # prepare the possible link list
     POSSIBLELINK:
@@ -1888,7 +1888,7 @@ sub TypeList {
 
     # get type list
     my $TypeListRef = $Kernel::OM->Get('Kernel::Config')->Get('LinkObject::Type') || {};
-    my %TypeList = %{$TypeListRef};
+    my %TypeList    = %{$TypeListRef};
 
     # get check item object
     my $CheckItemObject = $Kernel::OM->Get('Kernel::System::CheckItem');
@@ -1952,7 +1952,7 @@ sub TypeGroupList {
 
     # get possible type groups
     my $TypeGroupListRef = $Kernel::OM->Get('Kernel::Config')->Get('LinkObject::TypeGroup') || {};
-    my %TypeGroupList = %{$TypeGroupListRef};
+    my %TypeGroupList    = %{$TypeGroupListRef};
 
     # get check item object
     my $CheckItemObject = $Kernel::OM->Get('Kernel::System::CheckItem');
@@ -2412,7 +2412,7 @@ sub _LinkListRaw {
 
         # prepare SQL statement
         my $TypeSQL = '';
-        my @Bind = ( \$Param{ObjectID}, \$Param{StateID} );
+        my @Bind    = ( \$Param{ObjectID}, \$Param{StateID} );
 
         # get fields based on type
         my $SQL;
@@ -2474,10 +2474,10 @@ sub _LinkListRaw {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

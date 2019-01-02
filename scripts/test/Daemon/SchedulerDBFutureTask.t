@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 ## no critic (Modules::RequireExplicitPackage)
@@ -305,7 +305,7 @@ for my $Test (@Tests) {
 }
 
 #FutureTaskList() tests
-my @List = $SchedulerDBObject->FutureTaskList();
+my @List       = $SchedulerDBObject->FutureTaskList();
 my %ListLookup = map { $_->{TaskID} => $_ } @List;
 
 for my $TaskID (@AddedTasksIDs) {
@@ -412,7 +412,7 @@ for my $Test (@Tests) {
             $Success,
             "$Test->{Name} FutureTaskToExecute() - with false",
         );
-        my @List = $SchedulerDBObject->FutureTaskList();
+        my @List       = $SchedulerDBObject->FutureTaskList();
         my %ListLookup = map { $_->{TaskID} => $_ } @List;
         $Self->True(
             $ListLookup{$TaskID},
@@ -433,7 +433,7 @@ for my $Test (@Tests) {
         $Success,
         "$Test->{Name} FutureTaskToExecute() - with true",
     );
-    my @List = $SchedulerDBObject->FutureTaskList();
+    my @List       = $SchedulerDBObject->FutureTaskList();
     my %ListLookup = map { $_->{TaskID} => $_ } @List;
     $Self->False(
         $ListLookup{$TaskID},

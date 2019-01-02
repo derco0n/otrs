@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::Stats::Dynamic::TicketList;
@@ -132,7 +132,7 @@ sub GetObjectAttributes {
     );
 
     my %TicketAttributes = %{ $Self->_TicketAttributes() };
-    my %OrderBy = map { $_ => $TicketAttributes{$_} } grep { $_ ne 'Number' } keys %TicketAttributes;
+    my %OrderBy          = map { $_ => $TicketAttributes{$_} } grep { $_ ne 'Number' } keys %TicketAttributes;
 
     # get dynamic field backend object
     my $DynamicFieldBackendObject = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
@@ -151,7 +151,7 @@ sub GetObjectAttributes {
 
         # remove dynamic fields from the list if is not sortable
         if ( !$IsSortable ) {
-            delete $OrderBy{ 'DynamicField_' . $DynamicFieldConfig->{Name} }
+            delete $OrderBy{ 'DynamicField_' . $DynamicFieldConfig->{Name} };
         }
     }
 
@@ -877,8 +877,8 @@ sub GetStatTable {
     my $OrderRef = first { $_->{Element} eq 'OrderBy' } @{ $Param{ValueSeries} };
     my $OrderBy = $OrderRef ? $OrderRef->{SelectedValues}[0] : 'Age';
     my $SortRef = first { $_->{Element} eq 'SortSequence' } @{ $Param{ValueSeries} };
-    my $Sort = $SortRef ? $SortRef->{SelectedValues}[0] : 'Down';
-    my $Limit = $Param{Restrictions}{Limit};
+    my $Sort    = $SortRef ? $SortRef->{SelectedValues}[0] : 'Down';
+    my $Limit   = $Param{Restrictions}{Limit};
 
     # check if we can use the sort and order function of TicketSearch
     my $OrderByIsValueOfTicketSearchSort = $Self->_OrderByIsValueOfTicketSearchSort(
@@ -1735,7 +1735,7 @@ sub _TicketAttributes {
         next DYNAMICFIELD if !IsHashRefWithData($DynamicFieldConfig);
         next DYNAMICFIELD if !$DynamicFieldConfig->{Name};
 
-        $TicketAttributes{ 'DynamicField_' . $DynamicFieldConfig->{Name} } = $DynamicFieldConfig->{Label}
+        $TicketAttributes{ 'DynamicField_' . $DynamicFieldConfig->{Name} } = $DynamicFieldConfig->{Label};
     }
 
     return \%TicketAttributes;

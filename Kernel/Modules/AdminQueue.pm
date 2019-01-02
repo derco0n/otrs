@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Modules::AdminQueue;
@@ -38,7 +38,7 @@ sub Run {
     );
 
     my $ParamObject = $Kernel::OM->Get('Kernel::System::Web::Request');
-    my $QueueID = $ParamObject->GetParam( Param => 'QueueID' ) || '';
+    my $QueueID     = $ParamObject->GetParam( Param => 'QueueID' ) || '';
 
     my @Params = (
         qw(
@@ -168,7 +168,7 @@ sub Run {
             ID   => $GetParam{QueueID}
         );
         if ($NameExists) {
-            $Errors{NameExists} = 1;
+            $Errors{NameExists}    = 1;
             $Errors{'NameInvalid'} = 'ServerError';
         }
 
@@ -438,7 +438,7 @@ sub Run {
         # check if a queue exist with this name
         my $NameExists = $QueueObject->NameExistsCheck( Name => $GetParam{Name} );
         if ($NameExists) {
-            $Errors{NameExists} = 1;
+            $Errors{NameExists}    = 1;
             $Errors{'NameInvalid'} = 'ServerError';
         }
 
@@ -579,7 +579,7 @@ sub _Edit {
         Data => {
             $Kernel::OM->Get('Kernel::System::Group')->GroupList(
                 Valid => 1,
-                )
+            )
         },
         Translation => 0,
         Name        => 'GroupID',
@@ -600,7 +600,7 @@ sub _Edit {
     }
 
     my $QueueObject = $Kernel::OM->Get('Kernel::System::Queue');
-    my %Data = $QueueObject->QueueList( Valid => 0 );
+    my %Data        = $QueueObject->QueueList( Valid => 0 );
 
     my $QueueName = '';
     if ( $Param{QueueID} ) {
@@ -707,7 +707,7 @@ sub _Edit {
         Translation => 0,
         Name        => 'SignatureID',
         SelectedID  => $Param{SignatureID},
-        Class => 'Modernize Validate_Required ' . ( $Param{Errors}->{'SignatureIDInvalid'} || '' ),
+        Class       => 'Modernize Validate_Required ' . ( $Param{Errors}->{'SignatureIDInvalid'} || '' ),
     );
     $Param{FollowUpLockYesNoOption} = $LayoutObject->BuildSelection(
         Data       => $ConfigObject->Get('YesNoOptions'),
@@ -747,7 +747,7 @@ sub _Edit {
         Translation => 0,
         Name        => 'SalutationID',
         SelectedID  => $Param{SalutationID},
-        Class => 'Modernize Validate_Required ' . ( $Param{Errors}->{'SalutationIDInvalid'} || '' ),
+        Class       => 'Modernize Validate_Required ' . ( $Param{Errors}->{'SalutationIDInvalid'} || '' ),
     );
 
     $Param{FollowUpOption} = $LayoutObject->BuildSelection(
@@ -789,6 +789,7 @@ sub _Edit {
     );
 
     if ( $Param{DefaultSignKeyOption} ) {
+        $Param{DefaultSignKeyListAvailable} = IsHashRefWithData( \%DefaultSignKeyList );
         $LayoutObject->Block(
             Name => 'OptionalField',
             Data => \%Param,

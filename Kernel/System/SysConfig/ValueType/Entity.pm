@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::SysConfig::ValueType::Entity;
@@ -54,7 +54,7 @@ sub new {
 
 Check if provided EffectiveValue matches structure defined in XMLContentParsed.
 
-    my %Result = $SysConfigObject->SettingEffectiveValueCheck(
+    my %Result = $ValueTypeObject->SettingEffectiveValueCheck(
         XMLContentParsed => {
             Value => [
                 {
@@ -141,7 +141,7 @@ sub SettingEffectiveValueCheck {
 
 Returns a list of valid values for provided EntityType.
 
-    my $Result = $EntityObject->EntityValueList(
+    my $Result = $ValueTypeObject->EntityValueList(
         EntityType    => 'Priority',
         EntitySubType => 'SomeSubtype',     # optional e.g. the ObjectType for DynamicField entities
     );
@@ -250,7 +250,7 @@ sub SettingRender {
         && $Param{Item}->[0]->{ValueEntityType}
         )
     {
-        $EntityType = $Param{Item}->[0]->{ValueEntityType};
+        $EntityType    = $Param{Item}->[0]->{ValueEntityType};
         $EntitySubType = $Param{Item}->[0]->{ValueEntitySubType} || '';
     }
     elsif (
@@ -258,11 +258,11 @@ sub SettingRender {
         && $Value->[0]->{Item}->[0]->{ValueEntityType}
         )
     {
-        $EntityType = $Value->[0]->{Item}->[0]->{ValueEntityType};
+        $EntityType    = $Value->[0]->{Item}->[0]->{ValueEntityType};
         $EntitySubType = $Value->[0]->{Item}->[0]->{ValueEntitySubType} || '';
     }
     elsif ( $Value->[0]->{Array} ) {
-        $EntityType = $Value->[0]->{Array}->[0]->{DefaultItem}->[0]->{ValueEntityType};
+        $EntityType    = $Value->[0]->{Array}->[0]->{DefaultItem}->[0]->{ValueEntityType};
         $EntitySubType = $Value->[0]->{Array}->[0]->{DefaultItem}->[0]->{ValueEntitySubType} || '';
     }
     elsif ( $Value->[0]->{Hash} ) {
@@ -273,7 +273,7 @@ sub SettingRender {
         {
 
             # take ValueEntityType from DefaultItem
-            $EntityType = $Value->[0]->{Hash}->[0]->{DefaultItem}->[0]->{ValueEntityType};
+            $EntityType    = $Value->[0]->{Hash}->[0]->{DefaultItem}->[0]->{ValueEntityType};
             $EntitySubType = $Value->[0]->{Hash}->[0]->{DefaultItem}->[0]->{ValueEntitySubType} || '';
         }
         else {
@@ -336,7 +336,7 @@ sub SettingRender {
     if ( !$EffectiveValueCheck{Success} ) {
         my $Message = $LanguageObject->Translate("Value is not correct! Please, consider updating this field.");
 
-        $HTML .= "<div class='BadEffectiveValue'>\n";
+        $HTML .= $Param{IsValid} ? "<div class='BadEffectiveValue'>\n" : "<div>\n";
         $HTML .= "<p>* $Message</p>\n";
         $HTML .= "</div>\n";
     }
@@ -462,10 +462,10 @@ sub EntityLookupFromWebRequest {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

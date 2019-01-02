@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::OTRSBusiness;
@@ -145,6 +145,43 @@ sub OTRSSTORMIsInstalled {
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => 'OTRSSTORMIsInstalled',
+        Value => $IsInstalled,
+    );
+
+    return $IsInstalled;
+}
+
+=head2 OTRSCONTROLIsInstalled()
+
+checks if OTRSControl is installed in the current system.
+That does not necessarily mean that it is also active, for
+example if the package is only on the database but not on
+the file system.
+
+=cut
+
+sub OTRSCONTROLIsInstalled {
+    my ( $Self, %Param ) = @_;
+
+    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+
+    # as the check for installed packages can be
+    # very expensive, we want to use caching here
+    my $Cache = $CacheObject->Get(
+        Type => $Self->{CacheType},
+        TTL  => $Self->{CacheTTL},
+        Key  => 'OTRSCONTROLIsInstalled',
+    );
+
+    return $Cache if defined $Cache;
+
+    my $IsInstalled = $Self->_GetCONTROLPackageFromRepository() ? 1 : 0;
+
+    # set cache
+    $CacheObject->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => 'OTRSCONTROLIsInstalled',
         Value => $IsInstalled,
     );
 
@@ -598,7 +635,7 @@ sub OTRSBusinessContractExpiryDateCheck {
         'Kernel::System::DateTime',
         ObjectParams => {
             String => $EntitlementData{ExpiryDate},
-            }
+        }
     );
 
     my $DateTimeObject = $Kernel::OM->Create('Kernel::System::DateTime');
@@ -1033,14 +1070,31 @@ sub _GetSTORMPackageFromRepository {
     return;
 }
 
+sub _GetCONTROLPackageFromRepository {
+    my ( $Self, %Param ) = @_;
+
+    my $PackageObject = $Kernel::OM->Get('Kernel::System::Package');
+
+    my @RepositoryList = $PackageObject->RepositoryList(
+        Result => 'short',
+    );
+
+    for my $Package (@RepositoryList) {
+
+        return $Package if $Package->{Name} eq 'OTRSCONTROL';
+    }
+
+    return;
+}
+
 1;
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

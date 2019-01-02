@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Modules::AgentTicketQueue;
@@ -294,13 +294,13 @@ sub Run {
 
     # get personal page shown count
     my $PageShownPreferencesKey = 'UserTicketOverview' . $View . 'PageShown';
-    my $PageShown = $Self->{$PageShownPreferencesKey} || 10;
+    my $PageShown               = $Self->{$PageShownPreferencesKey} || 10;
 
     # do shown tickets lookup
     my $Limit = 10_000;
 
     my $ElementChanged = $ParamObject->GetParam( Param => 'ElementChanged' ) || '';
-    my $HeaderColumn = $ElementChanged;
+    my $HeaderColumn   = $ElementChanged;
     $HeaderColumn =~ s{\A ColumnFilter }{}msxg;
 
     # get data (viewable tickets...)
@@ -415,7 +415,7 @@ sub Run {
         next COLUMNNAME if $GetColumnFilter{$ColumnName} eq '';
         $ColumnFilterLink
             .= ';' . $LayoutObject->Ascii2Html( Text => 'ColumnFilter' . $ColumnName )
-            . '=' . $LayoutObject->Ascii2Html( Text => $GetColumnFilter{$ColumnName} )
+            . '=' . $LayoutObject->Ascii2Html( Text => $GetColumnFilter{$ColumnName} );
     }
 
     my $SubQueueLink = '';
@@ -478,9 +478,8 @@ sub Run {
 
     # show tickets
     $Output .= $LayoutObject->TicketListShow(
-        Filter     => $Filter,
-        Filters    => \%NavBarFilter,
-        FilterLink => $LinkFilter,
+        Filter  => $Filter,
+        Filters => \%NavBarFilter,
 
         DataInTheMiddle => $LayoutObject->Output(
             TemplateFile => 'AgentTicketQueue',
@@ -635,9 +634,9 @@ sub _MaskQueueView {
             $Totals{$CustomQueue}  = $Totals{ $Queue{Queue} };
             $Queue{Queue}          = $CustomQueue;
         }
-        my @QueueName = split /::/, $Queue{Queue};
+        my @QueueName      = split /::/, $Queue{Queue};
         my $ShortQueueName = $QueueName[-1];
-        $Queue{MaxAge} = $Queue{MaxAge} / 60;
+        $Queue{MaxAge}  = $Queue{MaxAge} / 60;
         $Queue{QueueID} = 0 if ( !$Queue{QueueID} );
 
         # skip empty Queues (or only locked tickets)

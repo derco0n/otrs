@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::ACL::DB::ACL;
@@ -26,7 +26,7 @@ our @ObjectDependencies = (
 
 =head1 NAME
 
-Kernel::System::ACL::DB::ACL.pm
+Kernel::System::ACL::DB::ACL
 
 =head1 DESCRIPTION
 
@@ -996,7 +996,7 @@ sub ACLImport {
             return {
                 Success => 0,
                 Message => "$Needed is missing can not continue.",
-                }
+            };
         }
     }
 
@@ -1076,7 +1076,7 @@ sub ACLImport {
         AddedACLs   => join( ', ', @AddedACLs ) || '',
         UpdatedACLs => join( ', ', @UpdatedACLs ) || '',
         ACLErrors   => join( ', ', @ACLErrors ) || '',
-        }
+    };
 }
 
 =begin Internal:
@@ -1263,11 +1263,11 @@ sub _ACLMigrateFrom33 {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut
 

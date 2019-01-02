@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Output::HTML::TicketZoom::Agent::Base;
@@ -206,7 +206,8 @@ sub _ArticleSenderImage {
     if (@Addresses) {
         my $Email = $EmailParser->GetEmailAddress( Email => $Addresses[0] );
         if ($Email) {
-            my $DefaultIcon = 'identicon';    # a geometric pattern based on an email hash
+            my $DefaultIcon
+                = $Kernel::OM->Get('Kernel::Config')->Get('Frontend::Gravatar::ArticleDefaultImage') || 'mm';
 
             # Get current user's email and compare it to the sender's email.
             if ( $Param{UserID} ) {
@@ -313,13 +314,13 @@ sub _ArticleModuleMeta {
 
                 # replace the whole keyword
                 my $MatchLinkEncode = $LayoutObject->LinkEncode( $Match->{Name} );
-                $URL =~ s/<MATCH>/$MatchLinkEncode/g;
+                $URL        =~ s/<MATCH>/$MatchLinkEncode/g;
                 $URLPreview =~ s/<MATCH>/$MatchLinkEncode/g;
 
                 # replace the keyword components
                 for my $Part ( sort keys %{ $Match->{Parts} || {} } ) {
                     $MatchLinkEncode = $LayoutObject->LinkEncode( $Match->{Parts}->{$Part} );
-                    $URL =~ s/<MATCH$Part>/$MatchLinkEncode/g;
+                    $URL        =~ s/<MATCH$Part>/$MatchLinkEncode/g;
                     $URLPreview =~ s/<MATCH$Part>/$MatchLinkEncode/g;
                 }
 

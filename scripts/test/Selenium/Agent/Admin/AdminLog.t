@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -105,6 +105,41 @@ $Selenium->RunTest(
             ),
             'none',
             "Sidebar column is not visible on the screen",
+        );
+
+        # Verify log time stamp is in user default time zone (UTC).
+        $Self->True(
+            $Selenium->execute_script("return \$('#LogEntries .Error:eq(0)').text().indexOf('UTC') !== -1"),
+            "Log time stamp is in user default time zone (UTC) format."
+        );
+
+        # Get test UserID.
+        my $UserObject = $Kernel::OM->Get('Kernel::System::User');
+        my $UserID     = $UserObject->UserLookup(
+            UserLogin => $TestUserLogin,
+        );
+
+        # Set test user's time zone.
+        my $UserTimeZone = 'Europe/Berlin';
+        $UserObject->SetPreferences(
+            Key    => 'UserTimeZone',
+            Value  => $UserTimeZone,
+            UserID => $UserID,
+        );
+
+        # Relog test user.
+        $Selenium->Login(
+            Type     => 'Agent',
+            User     => $TestUserLogin,
+            Password => $TestUserLogin,
+        );
+
+        $Selenium->VerifiedGet("${ScriptAlias}index.pl?Action=AdminLog");
+
+        # Verify log time stamp is in user preference time zone (Europe/Berlin).
+        $Self->True(
+            $Selenium->execute_script("return \$('#LogEntries .Error:eq(0)').text().indexOf('$UserTimeZone') !== -1"),
+            "Log time stamp is in user preference time zone ($UserTimeZone) format."
         );
 
         # Clear log.

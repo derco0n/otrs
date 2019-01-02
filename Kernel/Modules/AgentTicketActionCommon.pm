@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Modules::AgentTicketActionCommon;
@@ -243,19 +243,29 @@ sub Run {
     # get lock state
     if ( $Config->{RequiredLock} ) {
         if ( !$TicketObject->TicketLockGet( TicketID => $Self->{TicketID} ) ) {
-            $TicketObject->TicketLockSet(
+
+            my $Lock = $TicketObject->TicketLockSet(
                 TicketID => $Self->{TicketID},
                 Lock     => 'lock',
                 UserID   => $Self->{UserID}
             );
-            my $Success = $TicketObject->TicketOwnerSet(
-                TicketID  => $Self->{TicketID},
-                UserID    => $Self->{UserID},
-                NewUserID => $Self->{UserID},
-            );
 
-            # show lock state
-            if ($Success) {
+            if ($Lock) {
+
+                # Set new owner if ticket owner is different then logged user.
+                if ( $Ticket{OwnerID} != $Self->{UserID} ) {
+
+                    # Remember previous owner, which will be used to restore ticket owner on undo action.
+                    $Param{PreviousOwner} = $Ticket{OwnerID};
+
+                    $TicketObject->TicketOwnerSet(
+                        TicketID  => $Self->{TicketID},
+                        UserID    => $Self->{UserID},
+                        NewUserID => $Self->{UserID},
+                    );
+                }
+
+                # Show lock state.
                 $LayoutObject->Block(
                     Name => 'PropertiesLock',
                     Data => {
@@ -1850,9 +1860,9 @@ sub _Mask {
             UserID => $Self->{UserID},
         );
         $Param{TypeStrg} = $LayoutObject->BuildSelection(
-            Class => 'Validate_Required Modernize ' . ( $Param{Errors}->{TypeIDInvalid} || '' ),
-            Data  => \%Type,
-            Name  => 'TypeID',
+            Class        => 'Validate_Required Modernize ' . ( $Param{Errors}->{TypeIDInvalid} || '' ),
+            Data         => \%Type,
+            Name         => 'TypeID',
             SelectedID   => $Param{TypeID},
             PossibleNone => 1,
             Sort         => 'AlphanumericValue',
@@ -1979,7 +1989,7 @@ sub _Mask {
             %ShownUsers = %AllGroupsMembers;
         }
         else {
-            my $GID = $QueueObject->GetQueueGroupID( QueueID => $Ticket{QueueID} );
+            my $GID        = $QueueObject->GetQueueGroupID( QueueID => $Ticket{QueueID} );
             my %MemberList = $GroupObject->PermissionGroupGet(
                 GroupID => $GID,
                 Type    => 'owner',
@@ -2086,7 +2096,7 @@ sub _Mask {
             %ShownUsers = %AllGroupsMembers;
         }
         else {
-            my $GID = $QueueObject->GetQueueGroupID( QueueID => $Ticket{QueueID} );
+            my $GID        = $QueueObject->GetQueueGroupID( QueueID => $Ticket{QueueID} );
             my %MemberList = $GroupObject->PermissionGroupGet(
                 GroupID => $GID,
                 Type    => 'responsible',
@@ -2185,7 +2195,7 @@ sub _Mask {
                     YearPeriodFuture => 5,
                     DiffTime         => $ConfigObject->Get('Ticket::Frontend::PendingDiffTime')
                         || 0,
-                    Class => $Param{DateInvalid} || ' ',
+                    Class                => $Param{DateInvalid} || ' ',
                     Validate             => 1,
                     ValidateDateInFuture => 1,
                     Calendar             => $Calendar,
@@ -2313,7 +2323,7 @@ sub _Mask {
             Type  => 'Long',
             Valid => 1,
         );
-        my $GID = $QueueObject->GetQueueGroupID( QueueID => $Ticket{QueueID} );
+        my $GID        = $QueueObject->GetQueueGroupID( QueueID => $Ticket{QueueID} );
         my %MemberList = $GroupObject->PermissionGroupGet(
             GroupID => $GID,
             Type    => 'note',
@@ -2564,10 +2574,10 @@ sub _Mask {
             )
         {
             $Param{StandardTemplateStrg} = $LayoutObject->BuildSelection(
-                Data       => $QueueStandardTemplates    || {},
-                Name       => 'StandardTemplateID',
-                SelectedID => $Param{StandardTemplateID} || '',
-                Class      => 'Modernize',
+                Data         => $QueueStandardTemplates || {},
+                Name         => 'StandardTemplateID',
+                SelectedID   => $Param{StandardTemplateID} || '',
+                Class        => 'Modernize',
                 PossibleNone => 1,
                 Sort         => 'AlphanumericValue',
                 Translation  => 1,
@@ -2908,7 +2918,7 @@ sub _GetQuotedReplyBody {
         if ( $Param{Body} ) {
             $Param{Body} =~ s/\t/ /g;
             my $Quote = $LayoutObject->Ascii2Html(
-                Text => $ConfigObject->Get('Ticket::Frontend::Quote') || '',
+                Text           => $ConfigObject->Get('Ticket::Frontend::Quote') || '',
                 HTMLResultMode => 1,
             );
             if ($Quote) {

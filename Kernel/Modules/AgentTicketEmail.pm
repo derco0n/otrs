@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Modules::AgentTicketEmail;
@@ -352,7 +352,7 @@ sub Run {
         if (
             $Self->{LastScreenOverview}
             && $Self->{LastScreenOverview} !~ /Action=AgentTicketEmail/
-            && $Self->{RequestedURL} !~ /Action=AgentTicketEmail.*LinkTicketID=/
+            && $Self->{RequestedURL}       !~ /Action=AgentTicketEmail.*LinkTicketID=/
             )
         {
             $Kernel::OM->Get('Kernel::System::AuthSession')->UpdateSessionID(
@@ -840,7 +840,7 @@ sub Run {
             QueueID        => $Self->{QueueID}         || 1,
         );
         my $SLAs = $Self->_GetSLAs(
-            QueueID => $Self->{QueueID} || 1,
+            QueueID  => $Self->{QueueID} || 1,
             Services => $Services,
             %GetParam,
             %ACLCompatGetParam,
@@ -894,7 +894,13 @@ sub Run {
                 %ACLCompatGetParam,
                 %SplitTicketParam,
                 CustomerUserID => $CustomerData{UserLogin} || '',
-                QueueID => $Self->{QueueID}
+                QueueID        => $Self->{QueueID}
+            ),
+            TimeUnits => $Self->_GetTimeUnits(
+                %GetParam,
+                %ACLCompatGetParam,
+                %SplitTicketParam,
+                ArticleID => $Article{ArticleID},
             ),
             FromSelected      => $Dest,
             To                => $Article{From} // '',
@@ -924,7 +930,7 @@ sub Run {
     # deliver signature
     elsif ( $Self->{Subaction} eq 'Signature' ) {
         my $CustomerUser = $ParamObject->GetParam( Param => 'SelectedCustomerUser' ) || '';
-        my $QueueID = $ParamObject->GetParam( Param => 'QueueID' );
+        my $QueueID      = $ParamObject->GetParam( Param => 'QueueID' );
         if ( !$QueueID ) {
             my $Dest = $ParamObject->GetParam( Param => 'Dest' ) || '';
             ($QueueID) = split( /\|\|/, $Dest );
@@ -999,7 +1005,7 @@ sub Run {
             || $ParamObject->GetParam( Param => 'PreSelectedCustomerUser' )
             || $ParamObject->GetParam( Param => 'SelectedCustomerUser' )
             || '';
-        my $CustomerID = $ParamObject->GetParam( Param => 'CustomerID' ) || '';
+        my $CustomerID           = $ParamObject->GetParam( Param => 'CustomerID' ) || '';
         my $SelectedCustomerUser = $ParamObject->GetParam( Param => 'SelectedCustomerUser' )
             || '';
         my $ExpandCustomerName = $ParamObject->GetParam( Param => 'ExpandCustomerName' )
@@ -1477,7 +1483,7 @@ sub Run {
             my $SLAs = $Self->_GetSLAs(
                 %GetParam,
                 %ACLCompatGetParam,
-                QueueID => $NewQueueID || 1,
+                QueueID  => $NewQueueID || 1,
                 Services => $Services,
             );
 
@@ -1668,7 +1674,7 @@ sub Run {
             UserID  => $Self->{UserID},
         );
 
-        my $ArticleObject = $Kernel::OM->Get('Kernel::System::Ticket::Article');
+        my $ArticleObject        = $Kernel::OM->Get('Kernel::System::Ticket::Article');
         my $ArticleBackendObject = $ArticleObject->BackendForChannel( ChannelName => 'Email' );
 
         # send email
@@ -1854,7 +1860,7 @@ sub Run {
             %GetParam,
             %ACLCompatGetParam,
             CustomerUserID => $CustomerUser || '',
-            QueueID => $QueueID,
+            QueueID        => $QueueID,
         );
 
         my $NewTos;
@@ -1951,7 +1957,7 @@ sub Run {
                 CustomerUserID => $CustomerUser || '',
                 Action         => $Self->{Action},
                 TicketID       => $Self->{TicketID},
-                QueueID        => $QueueID      || 0,
+                QueueID        => $QueueID || 0,
                 ReturnType     => 'Ticket',
                 ReturnSubType  => 'DynamicField_' . $DynamicFieldConfig->{Name},
                 Data           => \%AclData,
@@ -2097,7 +2103,7 @@ sub Run {
 
                 # get AJAX param values
                 if ( $Object->can('GetParamAJAX') ) {
-                    %GetParam = ( %GetParam, $Object->GetParamAJAX(%GetParam) )
+                    %GetParam = ( %GetParam, $Object->GetParamAJAX(%GetParam) );
                 }
 
                 # get options that have to be removed from the selection visible
@@ -2286,7 +2292,7 @@ sub _GetUsers {
 
     # show all users who are owner or rw in the queue group
     elsif ( $Param{QueueID} ) {
-        my $GID = $Kernel::OM->Get('Kernel::System::Queue')->GetQueueGroupID( QueueID => $Param{QueueID} );
+        my $GID        = $Kernel::OM->Get('Kernel::System::Queue')->GetQueueGroupID( QueueID => $Param{QueueID} );
         my %MemberList = $Kernel::OM->Get('Kernel::System::Group')->PermissionGroupGet(
             GroupID => $GID,
             Type    => 'owner',
@@ -2349,7 +2355,7 @@ sub _GetResponsibles {
 
     # show all users who are responsible or rw in the queue group
     elsif ( $Param{QueueID} ) {
-        my $GID = $Kernel::OM->Get('Kernel::System::Queue')->GetQueueGroupID( QueueID => $Param{QueueID} );
+        my $GID        = $Kernel::OM->Get('Kernel::System::Queue')->GetQueueGroupID( QueueID => $Param{QueueID} );
         my %MemberList = $Kernel::OM->Get('Kernel::System::Group')->PermissionGroupGet(
             GroupID => $GID,
             Type    => 'responsible',
@@ -2532,6 +2538,21 @@ sub _GetSignature {
     );
 
     return $Signature;
+}
+
+sub _GetTimeUnits {
+    my ( $Self, %Param ) = @_;
+
+    my $AccountedTime = '';
+
+    # Get accounted time if AccountTime config item is enabled.
+    if ( $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Frontend::AccountTime') && defined $Param{ArticleID} ) {
+        $AccountedTime = $Kernel::OM->Get('Kernel::System::Ticket::Article')->ArticleAccountedTimeGet(
+            ArticleID => $Param{ArticleID},
+        );
+    }
+
+    return $AccountedTime ? $AccountedTime : '';
 }
 
 sub _GetStandardTemplates {
@@ -2934,10 +2955,10 @@ sub _MaskEmailNew {
     # build text template string
     if ( IsHashRefWithData( \%StandardTemplates ) ) {
         $Param{StandardTemplateStrg} = $LayoutObject->BuildSelection(
-            Data       => $Param{StandardTemplates}  || {},
-            Name       => 'StandardTemplateID',
-            SelectedID => $Param{StandardTemplateID} || '',
-            Class      => 'Modernize',
+            Data         => $Param{StandardTemplates} || {},
+            Name         => 'StandardTemplateID',
+            SelectedID   => $Param{StandardTemplateID} || '',
+            Class        => 'Modernize',
             PossibleNone => 1,
             Sort         => 'AlphanumericValue',
             Translation  => 1,

@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::GenericInterface::Event::Handler;
@@ -68,7 +68,7 @@ sub Run {
     my $RequesterObject  = $Kernel::OM->Get('Kernel::GenericInterface::Requester');
     my $ConfigObject     = $Kernel::OM->Get('Kernel::Config');
 
-    my %WebserviceList = %{ $WebserviceObject->WebserviceList( Valid => 1 ) };
+    my %WebserviceList   = %{ $WebserviceObject->WebserviceList( Valid => 1 ) };
     my %RegisteredEvents = $Kernel::OM->Get('Kernel::System::Event')->EventList();
 
     # Loop over web services.
@@ -844,7 +844,7 @@ sub _ConditionCheck {
                     for my $ArrayField (@ArrayFields) {
                         next ARRAYFIELD if ref $Param{Data}->{$ArrayField} ne '';
                         if ( $Param{Data}->{$ArrayField} !~ $ActualCondition->{Fields}->{$FieldName}->{Match} ) {
-                            next ARRAYFIELD
+                            next ARRAYFIELD;
                         }
 
                         $FieldSuccess++;
@@ -990,10 +990,10 @@ sub _ConditionCheck {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

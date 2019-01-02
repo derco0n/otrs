@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -13,6 +13,19 @@ use utf8;
 use vars (qw($Self));
 
 my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+
+# make sure to enable cloud services
+$Helper->ConfigSettingChange(
+    Valid => 1,
+    Key   => 'CloudServices::Disabled',
+    Value => 0,
+);
+
+$Helper->ConfigSettingChange(
+    Valid => 1,
+    Key   => 'Package::AllowNotVerifiedPackages',
+    Value => 0,
+);
 
 my $RandomID = $Helper->GetRandomID();
 
@@ -29,7 +42,10 @@ use warnings;
 {
     no warnings 'redefine';
     sub Request {
-        return;
+        return (
+            Status  => '200 OK',
+            Content => '{"Success":1,"Results":{"PackageManagement":[{"Operation":"PackageVerify","Data":{"Test":"not_verified","TestPackageIncompatible":"not_verified"},"Success":"1"}]},"ErrorMessage":""},
+        );
     }
 }
 1;
@@ -46,7 +62,7 @@ my $CheckBreadcrumb = sub {
     my %Param = @_;
 
     my $BreadcrumbText = $Param{BreadcrumbText} || '';
-    my $Count = 1;
+    my $Count          = 1;
 
     for my $BreadcrumbText ( 'Package Manager', "$BreadcrumbText Test" ) {
         $Self->Is(
@@ -78,8 +94,8 @@ $Selenium->RunTest(
                   <Version>0.0.1</Version>
                   <Framework>x.x.x</Framework>
                   <Vendor>OTRS AG</Vendor>
-                  <URL>http://otrs.org/</URL>
-                  <License>GNU GENERAL PUBLIC LICENSE Version 2, June 199</License>
+                  <URL>https://otrs.com/</URL>
+                  <License>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</License>
                   <ChangeLog>2005-11-10 New package (some test &lt; &gt; &amp;).</ChangeLog>
                   <Description Lang="en">A test package (some test &lt; &gt; &amp;).</Description>
                   <Description Lang="de">Ein Test Paket (some test &lt; &gt; &amp;).</Description>
@@ -165,13 +181,62 @@ $Selenium->RunTest(
             BreadcrumbText => 'Install Package:',
         );
 
-        $Selenium->find_element("//button[\@value='Continue'][\@type='submit']")->VerifiedClick();
+        # Package is not verified, so it's not possible to continue with the installation.
+        $Self->Is(
+            $Selenium->execute_script("return \$('button[type=\"submit\"][value=\"Continue\"]').length"),
+            '0',
+            'Continue button not available because package is not verified'
+        );
 
-        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $(".DataTable").length;' );
         $Self->True(
-            $Selenium->find_element(
-                "//a[contains(\@href, \'Subaction=View;Name=Test' )]"
-                )->is_displayed(),
+            index(
+                $Selenium->get_page_source(),
+                'The installation of packages which are not verified by the OTRS Group is not possible by default.'
+            ) > 0,
+            'Message for aborting installation of package is displayed'
+        );
+
+        # Continue with package installation.
+        $Helper->ConfigSettingChange(
+            Valid => 1,
+            Key   => 'Package::AllowNotVerifiedPackages',
+            Value => 1,
+        );
+
+        # Allow apache to pick up the changed SysConfig via Apache::Reload.
+        sleep 2;
+
+        $Selenium->VerifiedGet("${ScriptAlias}index.pl?Action=AdminPackageManager");
+
+        # Check for notification.
+        $Self->True(
+            $Selenium->execute_script(
+                'return $("div.MessageBox.Error p:contains(\'The installation of packages which are not verified by the OTRS Group is activated. These packages could threaten your whole system! It is recommended not to use unverified packages.\')").length',
+            ),
+            'Install warning for not verified packages is displayed',
+        );
+
+        $Selenium->find_element( '#FileUpload', 'css' )->send_keys($Location);
+        sleep 2;
+
+        $Selenium->find_element("//button[\@value='Install'][\@type='submit']")->VerifiedClick();
+
+        $CheckBreadcrumb->(
+            BreadcrumbText => 'Install Package:',
+        );
+
+        $Selenium->find_element("//button[\@value='Continue'][\@type='submit']")->VerifiedClick();
+        $Selenium->WaitFor(
+            Time => 120,
+            JavaScript =>
+                'return typeof($) == "function" && !$("button[value=\'Continue\']").length;'
+        );
+
+        $PackageCheck = $PackageObject->PackageIsInstalled(
+            Name => 'Test',
+        );
+        $Self->True(
+            $PackageCheck,
             'Test package is installed'
         );
 
@@ -235,6 +300,31 @@ $Selenium->RunTest(
             'Info for incompatible package is shown'
         );
 
+        # Set default repository list.
+        $Helper->ConfigSettingChange(
+            Valid => 1,
+            Key   => 'Package::RepositoryList',
+            Value => {
+                'ftp://ftp.example.com/pub/otrs/misc/packages/' => '[Example] ftp://ftp.example.com/'
+            },
+        );
+
+        # Allow web server to pick up the changed SysConfig.
+        sleep 2;
+
+        $Selenium->VerifiedGet("${ScriptAlias}index.pl?Action=AdminPackageManager");
+        $Selenium->InputFieldValueSet(
+            Element => '#Soruce',
+            Value   => 'ftp://ftp.example.com/pub/otrs/misc/packages/',
+        );
+        $Selenium->find_element("//button[\@name=\'GetRepositoryList']")->VerifiedClick();
+
+        # Check that there is a notification about no packages.
+        my $Notification = 'No packages found in selected repository. Please check log for more info!';
+        $Self->True(
+            $Selenium->execute_script("return \$('.MessageBox.Notice p:contains($Notification)').length"),
+            "$Notification - notification is found."
+        );
     }
 );
 

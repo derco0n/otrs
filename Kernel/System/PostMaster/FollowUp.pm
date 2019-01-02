@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::PostMaster::FollowUp;
@@ -187,7 +187,7 @@ sub Run {
         )
     {
         $TicketObject->TicketStateSet(
-            State => $GetParam{'X-OTRS-FollowUp-State'} || $State,
+            State    => $GetParam{'X-OTRS-FollowUp-State'} || $State,
             TicketID => $Param{TicketID},
             UserID   => $Param{InmailUserID},
         );
@@ -455,7 +455,7 @@ sub Run {
                 'Kernel::System::DateTime',
                 ObjectParams => {
                     String => $GetParam{$Key}
-                    }
+                }
             );
 
             if ( $DateTimeObject && $DynamicFieldListReversed{ 'TicketFreeTime' . $Count } ) {
@@ -485,13 +485,26 @@ sub Run {
         }
     }
 
-    my $ArticleBackendObject = $Kernel::OM->Get('Kernel::System::Ticket::Article')->BackendForChannel(
+    my $ArticleObject        = $Kernel::OM->Get('Kernel::System::Ticket::Article');
+    my $ArticleBackendObject = $ArticleObject->BackendForChannel(
         ChannelName => 'Email',
     );
 
     my $IsVisibleForCustomer = 1;
     if ( length $GetParam{'X-OTRS-FollowUp-IsVisibleForCustomer'} ) {
         $IsVisibleForCustomer = $GetParam{'X-OTRS-FollowUp-IsVisibleForCustomer'};
+    }
+
+    # Check if X-OTRS-FollowUp-SenderType exists, if not set default 'customer'.
+    if ( !$ArticleObject->ArticleSenderTypeLookup( SenderType => $GetParam{'X-OTRS-FollowUp-SenderType'} ) )
+    {
+        $Self->{CommunicationLogObject}->ObjectLog(
+            ObjectLogType => 'Message',
+            Priority      => 'Error',
+            Key           => 'Kernel::System::PostMaster::FollowUp',
+            Value => "Can't find valid SenderType '$GetParam{'X-OTRS-FollowUp-SenderType'}' in DB, take 'customer'",
+        );
+        $GetParam{'X-OTRS-SenderType'} = 'customer';
     }
 
     $Self->{CommunicationLogObject}->ObjectLog(

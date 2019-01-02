@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -26,7 +26,7 @@ my $CheckBredcrumb = sub {
 
     for my $BreadcrumbText ( $OverviewTitle, $BreadcrumbText ) {
         $Self->Is(
-            $Selenium->execute_script("return \$('.BreadCrumb li:eq($Count)').text().trim()"),
+            $Selenium->execute_script("return \$('.BreadCrumb li:eq($Count)').text().trim();"),
             $BreadcrumbText,
             "Breadcrumb text '$BreadcrumbText' is found on screen"
         );
@@ -123,17 +123,18 @@ $Selenium->RunTest(
                 )
             {
                 my $ObjectType = $Type . "DynamicField";
-                my $Element = $Selenium->find_element( "#$ObjectType option[value=$ID]", 'css' );
+                my $Element    = $Selenium->find_element( "#$ObjectType option[value=$ID]", 'css' );
                 $Element->is_enabled();
 
                 # Create a real test DynamicField.
                 my $RandomID = $Helper->GetRandomID();
-                $Selenium->execute_script(
-                    "\$('#$ObjectType').val('$ID').trigger('redraw.InputField').trigger('change');"
+                $Selenium->InputFieldValueSet(
+                    Element => "#$ObjectType",
+                    Value   => $ID,
                 );
 
                 # Wait until page has finished loading.
-                $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("#Name").length' );
+                $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("#Name").length;' );
 
                 # Modify names in two cases.
                 if ( $ID eq 'DateTime' ) {
@@ -155,7 +156,10 @@ $Selenium->RunTest(
 
                 $Selenium->find_element( "#Name",  'css' )->send_keys($RandomID);
                 $Selenium->find_element( "#Label", 'css' )->send_keys($RandomID);
-                $Selenium->execute_script("\$('#ValidID').val('1').trigger('redraw.InputField').trigger('change');");
+                $Selenium->InputFieldValueSet(
+                    Element => '#ValidID',
+                    Value   => 1,
+                );
                 $Selenium->find_element("//button[\@type='submit']")->VerifiedClick();
 
                 # Check if test DynamicField show on AdminDynamicField screen.
@@ -177,13 +181,16 @@ $Selenium->RunTest(
 
                 $Selenium->find_element( "#Label", 'css' )->clear();
                 $Selenium->find_element( "#Label", 'css' )->send_keys( $RandomID . "-update" );
-                $Selenium->execute_script("\$('#ValidID').val('2').trigger('redraw.InputField').trigger('change');");
+                $Selenium->InputFieldValueSet(
+                    Element => '#ValidID',
+                    Value   => 2,
+                );
                 $Selenium->find_element("//button[\@type='submit']")->VerifiedClick();
 
                 # Check class of invalid DynamicField in the overview table.
                 $Self->True(
                     $Selenium->execute_script(
-                        "return \$('tr.Invalid td a:contains($RandomID)').length"
+                        "return \$('tr.Invalid td a:contains($RandomID)').length;"
                     ),
                     "There is a class 'Invalid' for test DynamicField",
                 );
@@ -231,20 +238,19 @@ $Selenium->RunTest(
 
                 $Selenium->accept_alert();
 
-                # Navigate to AdminDynamicField screen.
-                $Selenium->VerifiedGet("${ScriptAlias}index.pl?Action=AdminDynamicField");
-
-                # Check if dynamic filed is deleted.
-                my $Success;
-                eval {
-                    $Success = $Selenium->find_element( $RandomID, 'link_text' )->is_displayed();
-                };
-
-                $Self->False(
-                    $Success,
-                    "$RandomID dynamic field is deleted!",
+                $Selenium->WaitFor(
+                    JavaScript =>
+                        "return typeof(\$) === 'function' && \$('#DynamicFieldID_$DynamicFieldID').length == 0;"
                 );
+                $Selenium->VerifiedRefresh();
 
+                # Check if dynamic field is deleted.
+                $Self->False(
+                    $Selenium->execute_script(
+                        "return \$('#DynamicFieldID_$DynamicFieldID').length;"
+                    ),
+                    "DynamicField ($Type-$ID) $RandomID is deleted",
+                );
             }
 
             # Make sure the cache is correct.
@@ -285,11 +291,13 @@ $Selenium->RunTest(
         # Set 10 fields per page.
         $Selenium->find_element( "a#ShowContextSettingsDialog", 'css' )->click();
         $Selenium->WaitFor(
-            JavaScript => 'return typeof($) === "function" && $("#AdminDynamicFieldsOverviewPageShown").length'
+            JavaScript => 'return typeof($) === "function" && $("#AdminDynamicFieldsOverviewPageShown").length;'
         );
-        $Selenium->execute_script(
-            "\$('#AdminDynamicFieldsOverviewPageShown').val('10').trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#AdminDynamicFieldsOverviewPageShown',
+            Value   => 10,
         );
+
         $Selenium->find_element( "#DialogButton1", 'css' )->VerifiedClick();
 
         # Get list of all dynamic fields for define MaxFieldOrder default value.
@@ -299,16 +307,17 @@ $Selenium->RunTest(
         my $MaxFieldOrder = scalar @{$DynamicFieldsList} + 1;
 
         # Click to create 'Text' type ticket dynamic field from the first page.
-        $Selenium->execute_script(
-            "\$('#TicketDynamicField').val('Text').trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#TicketDynamicField',
+            Value   => 'Text',
         );
 
         # Wait until page has finished loading.
-        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("#Name").length' );
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("#Name").length;' );
 
         # Check FieldOrder default value.
         $Self->Is(
-            $Selenium->execute_script("return \$('#FieldOrder').val()"),
+            $Selenium->execute_script("return \$('#FieldOrder').val();"),
             $MaxFieldOrder,
             "MaxFieldOrder default value ($MaxFieldOrder) is correct",
         );
@@ -320,16 +329,17 @@ $Selenium->RunTest(
         $Selenium->find_element( "#AdminDynamicFieldPage2", 'css' )->VerifiedClick();
 
         # Click to create 'Text' type ticket dynamic field from the second page.
-        $Selenium->execute_script(
-            "\$('#TicketDynamicField').val('Text').trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#TicketDynamicField',
+            Value   => 'Text',
         );
 
         # Wait until page has finished loading.
-        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("#Name").length' );
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("#Name").length;' );
 
         # Check FieldOrder default value.
         $Self->Is(
-            $Selenium->execute_script("return \$('#FieldOrder').val()"),
+            $Selenium->execute_script("return \$('#FieldOrder').val();"),
             $MaxFieldOrder,
             "MaxFieldOrder default value ($MaxFieldOrder) is correct",
         );
@@ -340,6 +350,16 @@ $Selenium->RunTest(
                 ID     => $TestDynamicFieldID,
                 UserID => 1,
             );
+
+            # Dynamic field deletion could fail. Try again in this case.
+            if ( !$Success ) {
+                sleep 3;
+                $Success = $DynamicFieldObject->DynamicFieldDelete(
+                    ID     => $TestDynamicFieldID,
+                    UserID => 1,
+                );
+            }
+
             $Self->True(
                 $Success,
                 "DynamicFieldID $TestDynamicFieldID is deleted",

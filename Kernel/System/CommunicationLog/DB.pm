@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::CommunicationLog::DB;
@@ -303,7 +303,7 @@ sub CommunicationList {
             'Kernel::System::DateTime',
             ObjectParams => {
                 String => $Param{OlderThan}
-                }
+            }
         );
 
         if ($DateTimeObject) {
@@ -411,7 +411,7 @@ sub CommunicationDelete {
         my $Status   = $Param{Status};
         if ( substr( $Status, 0, 1 ) eq '!' ) {
             $Operator = '!=';
-            $Status = substr( $Status, 1, );
+            $Status   = substr( $Status, 1, );
         }
 
         push @FilterFields, " (status ${ Operator } ?) ";
@@ -623,7 +623,7 @@ sub ObjectLogCreate {
                 q{Error while starting object log type '%s' for CommunicationID '%s'},
                 $Param{ObjectLogType},
                 $Param{CommunicationID},
-                )
+            )
         );
     }
 
@@ -700,7 +700,7 @@ sub ObjectLogUpdate {
                 $Param{ObjectLogID},
                 $Param{ObjectLogType},
                 $Param{CommunicationID},
-                )
+            )
         );
     }
 
@@ -711,7 +711,7 @@ sub ObjectLogUpdate {
 
 Get the object list for a specific communication.
 
-    my $Result = $LogModuleObject->ObjectLogList(
+    my $Result = $CommunicationDBObject->ObjectLogList(
         CommunicationID    => '123',         # (optional)
         ObjectLogID        => '123',         # (optional)
         ObjectLogType      => 'Connection',  # (optional)
@@ -919,7 +919,7 @@ sub ObjectLogDelete {
 
         ITEM:
         for my $Item (@DeleteOrder) {
-            my $ItemSQL = $SQL{$Item}->{Stmt};
+            my $ItemSQL    = $SQL{$Item}->{Stmt};
             my $WhereORAnd = ( $ItemSQL =~ m/\s+where\s+/i ) ? 'AND' : 'WHERE';
 
             if ( $PossibleFilter eq 'CommunicationFilters' ) {
@@ -1073,7 +1073,7 @@ sub ObjectLogEntryCreate {
                 $Param{Key},
                 $Param{Value},
                 $Param{Priority},
-                )
+            )
         );
     }
 
@@ -1722,10 +1722,10 @@ sub _DurationSQL {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

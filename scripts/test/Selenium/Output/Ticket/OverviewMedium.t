@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -128,8 +128,9 @@ $Selenium->RunTest(
         );
 
         # Sort by ticket number.
-        $Selenium->execute_script(
-            "\$('#SortBy').val('TicketNumber|Up').trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#SortBy',
+            Value   => 'TicketNumber|Up',
         );
 
         # Wait for page reload after changing sort param.
@@ -137,14 +138,17 @@ $Selenium->RunTest(
             JavaScript =>
                 'return typeof($) === "function" && $("a[href*=\'SortBy=TicketNumber;OrderBy=Up\']").length'
         );
+        $Selenium->VerifiedRefresh();
 
         # Set 10 tickets per page.
         $Selenium->find_element( "a#ShowContextSettingsDialog", 'css' )->click();
+        sleep 1;
         $Selenium->WaitFor(
             JavaScript => 'return $(".Dialog.Modal #UserTicketOverviewMediumPageShown").length'
         );
-        $Selenium->execute_script(
-            "\$('#UserTicketOverviewMediumPageShown').val('10').trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#UserTicketOverviewMediumPageShown',
+            Value   => '10',
         );
         $Selenium->find_element( "#DialogButton1", 'css' )->click();
         $Selenium->WaitFor(

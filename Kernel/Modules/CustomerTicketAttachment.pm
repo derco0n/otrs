@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Modules::CustomerTicketAttachment;
@@ -39,7 +39,9 @@ sub Run {
 
     # check params
     if ( !$FileID || !$ArticleID ) {
-        my $Output = $LayoutObject->CustomerHeader( Title => 'Error' );
+        my $Output = $LayoutObject->CustomerHeader(
+            Title => Translatable('Error'),
+        );
         $Output .= $LayoutObject->CustomerError(
             Message => Translatable('FileID and ArticleID are needed!'),
             Comment => Translatable('Please contact the administrator.'),
@@ -53,7 +55,9 @@ sub Run {
     }
 
     if ( !$TicketID ) {
-        my $Output = $LayoutObject->CustomerHeader( Title => 'Error' );
+        my $Output = $LayoutObject->CustomerHeader(
+            Title => Translatable('Error'),
+        );
         $Output .= $LayoutObject->CustomerError(
             Message => $LayoutObject->{LanguageObject}->Translate( 'No TicketID for ArticleID (%s)!', $ArticleID ),
             Comment => Translatable('Please contact the administrator.'),
@@ -109,7 +113,9 @@ sub Run {
     );
 
     if ( !%Data ) {
-        my $Output = $LayoutObject->CustomerHeader( Title => 'Error' );
+        my $Output = $LayoutObject->CustomerHeader(
+            Title => Translatable('Error'),
+        );
         $Output .= $LayoutObject->CustomerError(
             Message => $LayoutObject->{LanguageObject}->Translate( 'No such attachment (%s)!', $FileID ),
             Comment => Translatable('Please contact the administrator.'),

@@ -1,9 +1,9 @@
 // --
-// Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+// Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 // --
 // This software comes with ABSOLUTELY NO WARRANTY. For details, see
-// the enclosed file COPYING for license information (AGPL). If you
-// did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+// the enclosed file COPYING for license information (GPL). If you
+// did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 // --
 
 /*eslint-disable no-window*/
@@ -807,10 +807,8 @@ Core.Agent.Admin.ProcessManagement = (function (TargetNS) {
                 Action: 'AdminProcessManagement',
                 Subaction: 'UpdateAccordion'
             },
-            ActiveElement;
-
-        // get active accordion element to open the same element again after updating
-        ActiveElement = $('ul#ProcessElements > li.Active').index();
+            ActiveElementIndex = parseInt($('ul#ProcessElements > li.Active').index(), 10),
+            ActiveElementValue = $('ul#ProcessElements > li:eq(' + ActiveElementIndex + ') .ProcessElementFilter').val();
 
         // Call the ajax function
         Core.AJAX.FunctionCall(Core.Config.Get('CGIHandle'), Data, function (Response) {
@@ -819,14 +817,17 @@ Core.Agent.Admin.ProcessManagement = (function (TargetNS) {
             // Initialize Accordion in the sidebar
             Core.UI.Accordion.Init($('ul#ProcessElements'), 'li.AccordionElement h2 a', 'div.Content');
 
-            // open accordion element again, which was active before the update
-            Core.UI.Accordion.OpenElement($('ul#ProcessElements > li:nth-child(' + (parseInt(ActiveElement, 10) + 1) + ')'));
+            // Open accordion element again, which was active before the update.
+            Core.UI.Accordion.OpenElement($('ul#ProcessElements > li:eq(' + ActiveElementIndex + ')'));
 
             // Initialize filters
             Core.UI.Table.InitTableFilter($('#ActivityFilter'), $('#Activities'));
             Core.UI.Table.InitTableFilter($('#ActivityDialogFilter'), $('#ActivityDialogs'));
             Core.UI.Table.InitTableFilter($('#TransitionFilter'), $('#Transitions'));
             Core.UI.Table.InitTableFilter($('#TransitionActionFilter'), $('#TransitionActions'));
+
+            // Set previous value and filter.
+            $('ul#ProcessElements > li:eq(' + ActiveElementIndex + ') .ProcessElementFilter').trigger('keydown').val(ActiveElementValue);
 
             // Init DnD on Accordion
             TargetNS.InitAccordionDnD();

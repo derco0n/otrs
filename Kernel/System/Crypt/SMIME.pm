@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::Crypt::SMIME;
@@ -691,13 +691,13 @@ sub _CheckCertificateList {
     my ( $Self, %Param ) = @_;
 
     my @CertList = @{ $Param{CertificateList} };
-    my $Search = $Param{Search} || '';
+    my $Search   = $Param{Search} || '';
 
     my @Result;
 
     for my $Filename (@CertList) {
         my $Certificate = $Self->CertificateGet( Filename => $Filename );
-        my %Attributes = $Self->CertificateAttributes(
+        my %Attributes  = $Self->CertificateAttributes(
             Certificate => $Certificate,
             Filename    => $Filename,
         );
@@ -830,7 +830,7 @@ sub ConvertCertFormat {
         );
         return;
     }
-    my $String = $Param{String};
+    my $String     = $Param{String};
     my $PassPhrase = $Param{Passphrase} // '';
 
     my $FileTempObject = $Kernel::OM->Get('Kernel::System::FileTemp');
@@ -1046,7 +1046,7 @@ sub CertificateGet {
         return if !$Param{Filename};
     }
 
-    my $File = "$Self->{CertPath}/$Param{Filename}";
+    my $File           = "$Self->{CertPath}/$Param{Filename}";
     my $CertificateRef = $Kernel::OM->Get('Kernel::System::Main')->FileRead( Location => $File );
 
     return if !$CertificateRef;
@@ -1325,7 +1325,7 @@ sub PrivateSearch {
 
     for my $File (@Certificates) {
         my $Certificate = $Self->CertificateGet( Filename => $File );
-        my %Attributes = $Self->CertificateAttributes(
+        my %Attributes  = $Self->CertificateAttributes(
             Certificate => $Certificate,
             Filename    => $File,
         );
@@ -2600,7 +2600,7 @@ sub _NormalizePrivateSecretFiles {
 
         # all private secret files has different content, just log this as a waring and continue to
         # the next wrong private secret file
-        $Details . "  The private secret file $File has information not stored in any other"
+        $Details .= "  The private secret file $File has information not stored in any other"
             . " private secret file for hash $Hash\n"
             . "    The file will not be deleted... <red>Warning</red>\n";
         next FILENAME;
@@ -2986,10 +2986,10 @@ sub _ReHashCertificates {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

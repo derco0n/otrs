@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -52,8 +52,21 @@ $Selenium->RunTest(
             "Breadcrumb is found on Overview screen.",
         );
 
-        # Click 'Add group' link.
-        $Selenium->find_element("//button[\@value='Add'][\@type='submit']")->VerifiedClick();
+        # Filter for Groups are shown on wrong screens. See bug#14148.
+        # Check that filter is included on page.
+        $Self->True(
+            $Selenium->execute_script("return \$('#FilterGroups').length === 1;"),
+            "Filter is shown on page"
+        );
+
+        # Click 'Add group' link, it should not be a form link.
+        $Selenium->find_element("//a[contains(\@href, \'Action=AdminGroup;Subaction=Add' )]")->VerifiedClick();
+
+        # Check that filter is not included on page.
+        $Self->True(
+            $Selenium->execute_script("return \$('#FilterGroups').length === 0;"),
+            "Filter is not on page"
+        );
 
         # Check add page.
         my $Element = $Selenium->find_element( "#GroupName", 'css' );
@@ -93,12 +106,15 @@ $Selenium->RunTest(
         # Create a real test group.
         my $GroupName = 'TestGroup' . $Helper->GetRandomID();
         $Selenium->find_element( "#GroupName", 'css' )->send_keys($GroupName);
-        $Selenium->execute_script("\$('#ValidID').val('1').trigger('redraw.InputField').trigger('change');");
+        $Selenium->InputFieldValueSet(
+            Element => '#ValidID',
+            Value   => 1,
+        );
         $Selenium->find_element( "#Comment", 'css' )->send_keys('Selenium test group');
         $Selenium->find_element( "#Submit",  'css' )->VerifiedClick();
 
         # After add group followed screen is AddUserGroup(Subaction=Group),
-        # there is posible to set permission for added group.
+        # there is possible to set permission for added group.
         $Self->True(
             index( $Selenium->get_page_source(), $GroupName ) > -1,
             "$GroupName found on page",
@@ -160,6 +176,12 @@ $Selenium->RunTest(
             JavaScript => 'return typeof($) === "function" && $(".Dialog:visible").length'
         );
 
+        # Check that filter is not included on page.
+        $Self->True(
+            $Selenium->execute_script("return \$('#FilterGroups').length === 0;"),
+            "Filter is not on page"
+        );
+
         # Cancel the action & go back to the overview.
         $Selenium->find_element( "#DialogButton1", 'css' )->click();
         $Selenium->WaitFor(
@@ -201,7 +223,10 @@ $Selenium->RunTest(
         }
 
         # Set test group to invalid.
-        $Selenium->execute_script("\$('#ValidID').val('2').trigger('redraw.InputField').trigger('change');");
+        $Selenium->InputFieldValueSet(
+            Element => '#ValidID',
+            Value   => 2,
+        );
         $Selenium->find_element( "#Comment", 'css' )->clear();
         $Selenium->find_element( "#Submit",  'css' )->VerifiedClick();
 

@@ -1,9 +1,9 @@
 // --
-// Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+// Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 // --
 // This software comes with ABSOLUTELY NO WARRANTY. For details, see
-// the enclosed file COPYING for license information (AGPL). If you
-// did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+// the enclosed file COPYING for license information (GPL). If you
+// did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 // --
 
 "use strict";
@@ -591,7 +591,8 @@ Core.UI = (function (TargetNS) {
                     AttachmentItem = Core.Template.Render('AjaxDnDUpload/AttachmentItemUploading', {
                         'Filename' : File.name,
                         'Filetype' : File.type
-                    });
+                    }),
+                    FileExist;
 
                 // check uploaded file size
                 if (File.size > (WebMaxFileUpload - UsedSpace)) {
@@ -615,7 +616,12 @@ Core.UI = (function (TargetNS) {
                 }
 
                 // don't allow uploading multiple files with the same name
-                if ($ContainerObj.find('.AttachmentList tbody tr td.Filename:contains(' + File.name + ')').length) {
+                FileExist = $ContainerObj.find('.AttachmentList tbody tr td.Filename').filter(function() {
+                    if ($(this).text() === File.name) {
+                        return $(this);
+                    }
+                });
+                if (FileExist.length) {
                     AttemptedToUploadAgain.push(File.name);
                     return true;
                 }
@@ -664,7 +670,11 @@ Core.UI = (function (TargetNS) {
 
                             // walk through the list to see if we can update an entry
                             var AttachmentItem,
-                                $ExistingItemObj = $ContainerObj.find('.AttachmentList tbody tr td.Filename:contains(' + Attachment.Filename + ')'),
+                                $ExistingItemObj = $ContainerObj.find('.AttachmentList tbody tr td.Filename').filter(function() {
+                                    if ($(this).text() === Attachment.Filename) {
+                                        return $(this);
+                                    }
+                                }),
                                 $TargetObj;
 
                             // update the existing item if one exists
@@ -769,12 +779,12 @@ Core.UI = (function (TargetNS) {
 
         $('.AttachmentList').each(function() {
             if ($(this).find('tbody tr').length) {
-                $('.AttachmentList').show();
+                $(this).show();
             }
         });
 
         // Attachment deletion
-        $('.AttachmentList').on('click', '.AttachmentDelete', function() {
+        $('.AttachmentList').off('click').on('click', '.AttachmentDelete', function() {
 
             var $TriggerObj = $(this),
                 $AttachmentListContainerObj = $TriggerObj.closest('.AttachmentListContainer'),
@@ -830,6 +840,11 @@ Core.UI = (function (TargetNS) {
                     'IsMultiple': IsMultiple
                 });
 
+            // Only initialize events once per attachment field.
+            if ($(this).next().hasClass('AjaxDnDUploadReady')) {
+                return;
+            }
+
             $(this)
                 .val('')
                 .hide()
@@ -870,7 +885,8 @@ Core.UI = (function (TargetNS) {
                 })
                 .on('drop', function(Event) {
                     UploadFiles(Event.originalEvent.dataTransfer.files, $(this));
-                });
+                })
+                .addClass('AjaxDnDUploadReady');
         });
     };
 

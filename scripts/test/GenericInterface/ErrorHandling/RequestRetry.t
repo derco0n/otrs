@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -285,7 +285,7 @@ my @Test = (
             },
             PastExecutionData => {
                 RetryDateTime => 'blahfasel',
-                }
+            }
         },
         Result => {
             Success      => 0,
@@ -302,7 +302,7 @@ my @Test = (
             },
             PastExecutionData => {
                 InitialRequestDateTime => 'blahfasel',
-                }
+            }
         },
         Result => {
             Success      => 0,
@@ -347,7 +347,7 @@ my @Test = (
             PastExecutionData => {
                 InitialRequestDateTime => $TimeDiff->( $Self, $CurrentDateTime, -86400 ),
                 RetryCount             => 99,
-                }
+            }
         },
         Result => {
             Success => 1,
@@ -377,7 +377,7 @@ my @Test = (
             PastExecutionData => {
                 InitialRequestDateTime => $TimeDiff->( $Self, $CurrentDateTime, -86400 ),
                 RetryCount             => 99,
-                }
+            }
         },
         Result => {
             Success => 1,
@@ -408,7 +408,7 @@ my @Test = (
                 InitialRequestDateTime => $TimeDiff->( $Self, $CurrentDateTime, -60 ),
                 RetryInterval          => 60,
                 RetryCount             => 1,
-                }
+            }
         },
         Result => {
             Success => 1,
@@ -446,7 +446,7 @@ my @Test = (
                 InitialRequestDateTime => $TimeDiff->( $Self, $CurrentDateTime, -86341 ),
                 RetryInterval          => 60,
                 RetryCount             => 1,
-                }
+            }
         },
         Result => {
             Success => 1,
@@ -485,7 +485,7 @@ my @Test = (
                 RetryInterval          => 60,
                 RetryCount             => 1,
                 RetryDateTime          => $TimeDiff->( $Self, $CurrentDateTime, -240 ),
-                }
+            }
         },
         Result => {
             Success => 1,
@@ -523,7 +523,7 @@ my @Test = (
                 InitialRequestDateTime => $TimeDiff->( $Self, $CurrentDateTime, -60 ),
                 RetryInterval          => 60,
                 RetryCount             => 1,
-                }
+            }
         },
         Result => {
             Success => 1,
@@ -561,7 +561,7 @@ my @Test = (
                 InitialRequestDateTime => $TimeDiff->( $Self, $CurrentDateTime, -60 ),
                 RetryInterval          => 60,
                 RetryCount             => 1,
-                }
+            }
         },
         Result => {
             Success => 1,
@@ -600,7 +600,7 @@ my @Test = (
                 InitialRequestDateTime => $TimeDiff->( $Self, $CurrentDateTime, -60 ),
                 RetryInterval          => 60,
                 RetryCount             => 1,
-                }
+            }
         },
         Result => {
             Success => 1,
@@ -638,7 +638,7 @@ my @Test = (
                 InitialRequestDateTime => $TimeDiff->( $Self, $CurrentDateTime, -61 ),
                 RetryInterval          => 61,
                 RetryCount             => 1,
-                }
+            }
         },
         Result => {
             Success => 1,
@@ -678,7 +678,7 @@ my @Test = (
                 RetryInterval          => 97,
                 RetryCount             => 2,
                 RetryDateTime          => $TimeDiff->( $Self, $CurrentDateTime, -3 ),
-                }
+            }
         },
         Result => {
             Success => 1,

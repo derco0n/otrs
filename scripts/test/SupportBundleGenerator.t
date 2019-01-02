@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 ## nofilter(TidyAll::Plugin::OTRS::Perl::TestSubs)
 
@@ -15,6 +15,17 @@ use vars (qw($Self));
 
 use Archive::Tar;
 use Kernel::System::VariableCheck qw(:all);
+
+# Work around a Perl bug that is triggered in Carp
+#   (Bizarre copy of HASH in list assignment at /usr/share/perl5/vendor_perl/Carp.pm line 229).
+#
+#   See https://rt.perl.org/Public/Bug/Display.html?id=52610 and
+#   http://rt.perl.org/rt3/Public/Bug/Display.html?id=78186
+
+no warnings 'redefine';    ## no critic
+use Carp;
+local *Carp::caller_info = sub { };    ## no critic # no-op
+use warnings 'redefine';
 
 # get needed objects
 my $ConfigObject                 = $Kernel::OM->Get('Kernel::Config');
@@ -63,7 +74,7 @@ if ( !-e $Home . '/ARCHIVE' ) {
 }
 else {
     $ArchiveExists = 1;
-    $Success = rename( "ARCHIVE", "ARCHIVE" . $RandomNumber );
+    $Success       = rename( "ARCHIVE", "ARCHIVE" . $RandomNumber );
     $Self->True(
         $Success,
         "Found ARCHIVE file in a system, creating copy to restore it on the end of unit test."
@@ -132,11 +143,11 @@ $OTRSVersion .= '.x';
 
 my $TestPackage = '<?xml version="1.0" encoding="utf-8" ?>
 <otrs_package version="1.0">
-  <Name>Test</Name>
+  <Name>Test - ' . $RandomNumber . '</Name>
   <Version>0.0.1</Version>
   <Vendor>OTRS AG</Vendor>
-  <URL>http://otrs.org/</URL>
-  <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+  <URL>https://otrs.com/</URL>
+  <License>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</License>
   <ChangeLog>2005-11-10 New package (some test &lt; &gt; &amp;).</ChangeLog>
   <Description Lang="en">A test package (some test &lt; &gt; &amp;).</Description>
   <Framework>' . $OTRSVersion . '</Framework>
@@ -263,10 +274,10 @@ for my $Test (@Tests) {
     if ( IsArrayRefWithData( $Test->{RequiredFiles} ) ) {
         for my $File ( @{ $Test->{RequiredFiles} } ) {
 
-            # remove heading slash
+            # Remove leading slash; Archive::Tar 2.28+ allows absolute path names.
             $File =~ s{\A\/}{};
             $Self->True(
-                $FileListLookup{$File},
+                $FileListLookup{$File} // $FileListLookup{"/$File"},
                 "$Test->{Name}: GenerateCustomFilesArchive() - Required:'$File' is in the application.tar file",
             );
         }
@@ -276,10 +287,10 @@ for my $Test (@Tests) {
     if ( IsArrayRefWithData( $Test->{ProhibitFiles} ) ) {
         for my $File ( @{ $Test->{ProhibitFiles} } ) {
 
-            # remove heading slash
+            # Remove leading slash; Archive::Tar 2.28+ allows absolute path names.
             $File =~ s{\A\/}{};
             $Self->False(
-                $FileListLookup{$File},
+                $FileListLookup{$File} // $FileListLookup{"/$File"},
                 "$Test->{Name}: GenerateCustomFilesArchive() - Prohibit'$File' is not the application.tar file",
             );
         }
@@ -298,7 +309,7 @@ for my $Test (@Tests) {
                 "$Test->{Name}: PackageUninstall() - Package:'$Package' with True",
             );
             for my $File (@FilesToDelete) {
-                unlink $File . '.custom_backup'
+                unlink $File . '.custom_backup';
             }
         }
     }
@@ -377,7 +388,7 @@ for my $Test (@Tests) {
             ],
         );
 
-        push @PackageList, @PackageData,
+        push @PackageList, @PackageData;
     }
 
     my $RefArray = $CSVObject->CSV2Array(
@@ -546,8 +557,8 @@ $Self->IsDeeply(
     "GenerateSupportData() - Result",
 );
 
-# Generate ZZZUnitTestMaskPasswords.pm to check later for mask passwords.
-my $MaskPasswordFile    = 'ZZZUnitTest' . $Helper->GetRandomNumber() . 'MaskPasswords';
+# Generate ZZZZUnitTestMaskPasswords.pm to check later for mask passwords.
+my $MaskPasswordFile    = 'ZZZZUnitTest' . $Helper->GetRandomNumber() . 'MaskPasswords';
 my $MaskPasswordContent = <<"EOF";
 # OTRS config file (automatically generated)
 # VERSION:1.1

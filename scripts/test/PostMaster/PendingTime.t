@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -79,16 +79,16 @@ my @Tests = (
                 'Kernel::System::DateTime',
                 ObjectParams => {
                     String => '2021-01-01 00:00:00',
-                    }
-                )->ToEpoch(),
+                }
+            )->ToEpoch(),
         },
         CheckFollowUp => {
             RealTillTimeNotUsed => $Kernel::OM->Create(
                 'Kernel::System::DateTime',
                 ObjectParams => {
                     String => '2022-01-01 00:00:00',
-                    }
-                )->ToEpoch(),
+                }
+            )->ToEpoch(),
         },
     },
     {

@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -91,6 +91,9 @@ $Selenium->RunTest(
         # Force sub menus to be visible in order to be able to click one of the links.
         $Selenium->execute_script("\$('.Cluster ul ul').addClass('ForceVisible');");
 
+        $Selenium->WaitFor( JavaScript => 'return $(".Cluster ul ul").css("opacity") == 1;' );
+        sleep 1;
+
         # Click on 'Link'.
         $Selenium->find_element("//a[contains(\@href, \'Action=AgentLinkObject;SourceObject=Ticket;' )]")->click();
 
@@ -98,7 +101,9 @@ $Selenium->RunTest(
         $Selenium->WaitFor( WindowCount => 2 );
         my $Handles = $Selenium->get_window_handles();
         $Selenium->switch_to_window( $Handles->[1] );
-        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("body").length' );
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("#SubmitSearch").length;' );
+        sleep 1;
+
         $Selenium->execute_script("\$('#SubmitSearch').click();");
 
         $Selenium->WaitFor( AlertPresent => 1 );
@@ -118,10 +123,11 @@ $Selenium->RunTest(
         # Link created test tickets.
         $Selenium->find_element("//input[\@value='$TicketIDs[1]'][\@type='checkbox']")->click();
         $Selenium->WaitFor(
-            JavaScript => "return \$('input[value=$TicketIDs[1]][type=checkbox]:checked').length"
+            JavaScript => "return \$('input[value=$TicketIDs[1]][type=checkbox]:checked').length;"
         );
-        $Selenium->execute_script(
-            "\$('#TypeIdentifier').val('ParentChild::Target').trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#TypeIdentifier',
+            Value   => 'ParentChild::Target',
         );
         $Selenium->find_element("//button[\@type='submit'][\@name='AddLinks']")->click();
 
@@ -133,10 +139,11 @@ $Selenium->RunTest(
         # Link created test tickets.
         $Selenium->find_element("//input[\@value='$TicketIDs[2]'][\@type='checkbox']")->click();
         $Selenium->WaitFor(
-            JavaScript => "return \$('input[value=$TicketIDs[2]][type=checkbox]:checked').length"
+            JavaScript => "return \$('input[value=$TicketIDs[2]][type=checkbox]:checked').length;"
         );
-        $Selenium->execute_script(
-            "\$('#TypeIdentifier').val('Normal::Source').trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#TypeIdentifier',
+            Value   => 'Normal::Source',
         );
         $Selenium->find_element("//button[\@type='submit'][\@name='AddLinks']")->VerifiedClick();
 
@@ -197,7 +204,7 @@ $Selenium->RunTest(
 
         # Ticket::SubjectSize is set to 60 at the beginning of test.
         my $ShortTitle = substr( $LongTicketTitle, 0, 57 ) . "...";
-        my $Success = $TicketObject->TicketTitleUpdate(
+        my $Success    = $TicketObject->TicketTitleUpdate(
             Title    => $LongTicketTitle,
             TicketID => $TicketIDs[1],
             UserID   => 1,
@@ -269,16 +276,18 @@ $Selenium->RunTest(
         $Selenium->WaitFor( AlertPresent => 1 );
         $Selenium->accept_alert();
 
-        # Navigate to AgentTicketZoom screen again.
-        $Selenium->VerifiedGet("${ScriptAlias}index.pl?Action=AgentTicketZoom;TicketID=$TicketIDs[0]");
+        $Selenium->WaitFor(
+            JavaScript =>
+                "return typeof(\$) === 'function' && \$('.DataTable a[title*=$TicketNumbers[2]]').length === 0;"
+        );
 
         # Check that link to third test ticket has been deleted.
         $Self->False(
-            index( $Selenium->get_page_source(), $TicketNumbers[2] ) > -1,
-            "TicketNumber $TicketNumbers[2] - found",
+            $Selenium->execute_script("return \$('.DataTable a[title*=$TicketNumbers[2]]').length;"),
+            "TicketNumber $TicketNumbers[2] - not found",
         ) || die;
 
-        # Show ActionMenu - usually this is done when user hovers, however it's not possible to simulate this behaviour.
+        # Show ActionMenu - usually this is done when user hovers, however it's not possible to simulate this behavior.
         $Selenium->execute_script(
             "\$('#WidgetTicket .ActionMenu').show();"
         );
@@ -395,8 +404,15 @@ $Selenium->RunTest(
                 'Updated 6th column name',
             );
 
+            # Verify there is button to delete link, even though TicketNumber is not in the first column.
+            # See bug#13703 (https://bugs.otrs.org/show_bug.cgi?id=13703).
+            $Self->True(
+                $Selenium->execute_script("return \$('.InstantLinkDelete').length;"),
+                "Delete link button is present."
+            );
+
             # Show ActionMenu - usually this is done when user hovers,
-            # however it's not possible to simulate this behaviour.
+            # however it's not possible to simulate this behavior.
             $Selenium->execute_script(
                 "\$('#WidgetTicket .ActionMenu').show();"
             );
@@ -444,6 +460,9 @@ $Selenium->RunTest(
         # Force sub menus to be visible in order to be able to click one of the links.
         $Selenium->execute_script("\$('.Cluster ul ul').addClass('ForceVisible');");
 
+        $Selenium->WaitFor( JavaScript => 'return $(".Cluster ul ul").css("opacity") == 1;' );
+        sleep 1;
+
         # Click on 'Link'.
         $Selenium->find_element("//a[contains(\@href, \'Action=AgentLinkObject;SourceObject=Ticket;' )]")->click();
 
@@ -451,7 +470,9 @@ $Selenium->RunTest(
         $Selenium->WaitFor( WindowCount => 2 );
         $Handles = $Selenium->get_window_handles();
         $Selenium->switch_to_window( $Handles->[1] );
-        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("body").length' );
+
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("a[href*=\'#ManageLinks\']").length;' );
+        sleep 1;
 
         # Switch to manage links tab.
         $Selenium->find_element("//a[contains(\@href, \'#ManageLinks' )]")->click();
@@ -459,7 +480,7 @@ $Selenium->RunTest(
         # Wait for the manage links tab to show up.
         $Selenium->WaitFor(
             JavaScript =>
-                'return typeof($) === "function" && $("div[data-id=ManageLinks]:visible").length && parseInt($("div[data-id=ManageLinks]").css("opacity"), 10) == 1'
+                'return typeof($) === "function" && $("div[data-id=ManageLinks]:visible").length && parseInt($("div[data-id=ManageLinks]").css("opacity"), 10) == 1;'
         );
 
         # Check for long ticket title in LinkDelete screen.
@@ -479,7 +500,7 @@ $Selenium->RunTest(
         $Selenium->find_element( ".Tabs div.Active .SelectAll", "css" )->click();
 
         # Make sure it's selected.
-        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("#SelectAllLinks0:checked").length' );
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("#SelectAllLinks0:checked").length;' );
 
         # Click on delete links.
         $Selenium->find_element( ".Tabs div.Active .CallForAction", "css" )->VerifiedClick();
@@ -490,7 +511,7 @@ $Selenium->RunTest(
         # Wait for the add new links tab to show up.
         $Selenium->WaitFor(
             JavaScript =>
-                'return typeof($) === "function" && $("div[data-id=AddNewLinks]:visible").length && parseInt($("div[data-id=AddNewLinks]").css("opacity"), 10) == 1'
+                'return typeof($) === "function" && $("div[data-id=AddNewLinks]:visible").length && parseInt($("div[data-id=AddNewLinks]").css("opacity"), 10) == 1;'
         );
 
         my $SuccessArchived = $TicketObject->TicketArchiveFlagSet(
@@ -507,7 +528,7 @@ $Selenium->RunTest(
         # Check if there is "Search archive" drop-down.
         $Self->True(
             $Selenium->execute_script(
-                "return \$('#SEARCH\\\\:\\\\:ArchiveID').length"
+                "return \$('#SEARCH\\\\:\\\\:ArchiveID').length;"
             ),
             'Search archive drop-down present.',
         );
@@ -519,20 +540,21 @@ $Selenium->RunTest(
         # Make sure there are no results.
         $Self->False(
             $Selenium->execute_script(
-                "return \$('#WidgetTicket').length"
+                "return \$('#WidgetTicket').length;"
             ),
             'No result.',
         );
 
         # Click on the Archive search drop-down.
-        $Selenium->execute_script(
-            "\$('#SEARCH\\\\:\\\\:ArchiveID').val('ArchivedTickets').trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#SEARCH\\\\:\\\\:ArchiveID',
+            Value   => 'ArchivedTickets',
         );
 
         $Selenium->find_element( "#SubmitSearch", "css" )->VerifiedClick();
 
         # Wait till search is loaded.
-        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("#SelectAllLinks0").length' );
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("#SelectAllLinks0").length;' );
 
         # Link again.
         $Selenium->find_element( ".Tabs div.Active .SelectAll", "css" )->click();
@@ -545,8 +567,130 @@ $Selenium->RunTest(
         $Selenium->switch_to_window( $Handles->[0] );
 
         # Make sure they are really linked.
-        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("#WidgetTicket").length' );
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("#WidgetTicket").length;' );
         $Selenium->find_element( "#WidgetTicket", "css" );
+
+        # Create Calendar.
+        my $CalendarObject    = $Kernel::OM->Get('Kernel::System::Calendar');
+        my $AppointmentObject = $Kernel::OM->Get('Kernel::System::Calendar::Appointment');
+        my $RandomID          = $Helper->GetRandomID();
+        my %Calendar          = $CalendarObject->CalendarCreate(
+            CalendarName => "Calendar-$RandomID",
+            Color        => '#3A87AD',
+            GroupID      => 1,
+            UserID       => 1,
+        );
+        $Self->True(
+            $Calendar{CalendarID},
+            "CalendarID $Calendar{CalendarID} is created.   "
+        );
+
+        # Create Appointment.
+        my $StartTimeObject = $Kernel::OM->Create('Kernel::System::DateTime');
+        $StartTimeObject->Subtract(
+            Weeks => 1,
+        );
+        my $EndTimeObject = $StartTimeObject->Clone();
+        $EndTimeObject->Add(
+            Hours => 2,
+        );
+
+        my $AppointmentID = $AppointmentObject->AppointmentCreate(
+            CalendarID  => $Calendar{CalendarID},
+            Title       => 'Test Appointment Calendar',
+            Description => 'Calendar description',
+            Location    => 'Straubing',
+            StartTime   => $StartTimeObject->ToString(),
+            EndTime     => $EndTimeObject->ToString(),
+            UserID      => 1,
+            TimezoneID  => 0,
+        );
+        $Self->True(
+            $AppointmentID,
+            "AppointmentID $AppointmentID is created.",
+        );
+
+        $Selenium->VerifiedRefresh();
+
+        # Force sub menus to be visible in order to be able to click one of the links.
+        $Selenium->execute_script("\$('.Cluster ul ul').addClass('ForceVisible');");
+
+        $Selenium->WaitFor( JavaScript => 'return $(".Cluster ul ul").css("opacity") == 1;' );
+        sleep 1;
+
+        # Click on 'Link'.
+        $Selenium->find_element("//a[contains(\@href, \'Action=AgentLinkObject;SourceObject=Ticket;' )]")->click();
+
+        # Switch to link object window.
+        $Selenium->WaitFor( WindowCount => 2 );
+        $Handles = $Selenium->get_window_handles();
+        $Selenium->switch_to_window( $Handles->[1] );
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("#TargetIdentifier").length;' );
+
+        sleep 1;
+
+        # Select 'Appointment' as link type.
+        $Selenium->InputFieldValueSet(
+            Element => '#TargetIdentifier',
+            Value   => 'Appointment',
+        );
+        $Selenium->WaitFor(
+            JavaScript => 'return typeof($) === "function" && $("#SEARCH\\\\:\\\\:AppointmentCalendarID").length;'
+        );
+
+        # Select created Calendar as filer.
+        $Selenium->InputFieldValueSet(
+            Element => '#SEARCH\\\\:\\\\:AppointmentCalendarID',
+            Value   => $Calendar{CalendarID},
+        );
+        $Selenium->find_element( '#SubmitSearch', 'css' )->VerifiedClick();
+
+        # Link created test appointment.
+        $Selenium->find_element("//input[\@value='$AppointmentID'][\@type='checkbox']")->click();
+        $Selenium->WaitFor(
+            JavaScript => "return \$('input[value=$AppointmentID][type=checkbox]:checked').length;"
+        );
+
+        $Selenium->find_element( "#AddLinks",         "css" )->VerifiedClick();
+        $Selenium->find_element( "#LinkAddCloseLink", "css" )->click();
+
+        # Switch back to the main window.
+        $Selenium->WaitFor( WindowCount => 1 );
+        $Handles = $Selenium->get_window_handles();
+        $Selenium->switch_to_window( $Handles->[0] );
+
+        sleep 2;
+
+        # Verify column settings button is available for both Ticket and Appointment link object widget.
+        # See bug#13702 (https://bugs.otrs.org/show_bug.cgi?id=13702);
+        for my $LinkObject (qw(Appointment Ticket)) {
+            $Selenium->WaitFor(
+                JavaScript =>
+                    "return typeof(\$) === 'function' && \$('#Widget$LinkObject .ActionMenu').length;"
+            );
+            $Selenium->execute_script(
+                "\$('#Widget$LinkObject .ActionMenu').show();"
+            );
+            $Selenium->WaitFor(
+                JavaScript =>
+                    "return \$('a#linkobject-$LinkObject-toggle:visible').length;"
+            );
+            $Selenium->execute_script(
+                "\$('a#linkobject-$LinkObject-toggle').click();"
+            );
+            sleep 2;
+
+            $Selenium->WaitFor(
+                JavaScript =>
+                    "return \$('#linkobject-${LinkObject}_submit:visible').length;"
+            );
+            $Self->True(
+                $Selenium->execute_script(
+                    "return \$('#linkobject-${LinkObject}_submit').length;"
+                ),
+                "$LinkObject link object widget setting is working."
+            );
+        }
 
         # Delete created test tickets.
         for my $TicketID (@TicketIDs) {
@@ -556,9 +700,28 @@ $Selenium->RunTest(
             );
             $Self->True(
                 $Success,
-                "Delete ticket - $TicketID",
+                "TicketID $TicketID is deleted.",
             );
         }
+
+        # Delete created test Appointment.
+        $Success = $AppointmentObject->AppointmentDelete(
+            AppointmentID => $AppointmentID,
+            UserID        => 1,
+        );
+        $Self->True(
+            $Success,
+            "AppointmentID $AppointmentID is deleted."
+        );
+
+        # Delete created test Calendar.
+        $Success = $Kernel::OM->Get('Kernel::System::DB')->Do(
+            SQL => "DELETE FROM calendar WHERE id = $Calendar{CalendarID}",
+        );
+        $Self->True(
+            $Success,
+            "CalendarID $Calendar{CalendarID} is deleted.",
+        );
     }
 );
 

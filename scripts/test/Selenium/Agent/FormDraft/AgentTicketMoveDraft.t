@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -121,8 +121,9 @@ $Selenium->RunTest(
             my $ID    = $FormDraftCase->{Fields}->{$Field}->{ID};
             my $Value = $FormDraftCase->{Fields}->{$Field}->{Value};
 
-            $Selenium->execute_script(
-                "\$('#$ID').val('$Value').trigger('redraw.InputField').trigger('change');"
+            $Selenium->InputFieldValueSet(
+                Element => "#$ID",
+                Value   => $Value,
             );
             $Selenium->WaitFor(
                 JavaScript =>
@@ -132,10 +133,10 @@ $Selenium->RunTest(
         }
 
         # Create FormDraft and submit.
-        $Selenium->find_element( "#FormDraftSave", 'css' )->click();
+        $Selenium->execute_script("\$('#FormDraftSave').click();");
         $Selenium->WaitFor(
             JavaScript =>
-                'return typeof($) === "function" && $("#FormDraftTitle").length && $("#SaveFormDraft").length'
+                'return typeof($) === "function" && $("#FormDraftTitle").length && $("#SaveFormDraft").length;'
         );
         $Selenium->find_element( "#FormDraftTitle", 'css' )->send_keys($Title);
         $Selenium->find_element( "#SaveFormDraft",  'css' )->click();
@@ -175,8 +176,9 @@ $Selenium->RunTest(
                 JavaScript =>
                     "return typeof(\$) === 'function' && \$('#$ID').length"
             );
-            $Selenium->execute_script(
-                "\$('#$ID').val('$Value').trigger('redraw.InputField').trigger('change');"
+            $Selenium->InputFieldValueSet(
+                Element => "#$ID",
+                Value   => $Value,
             );
             $Selenium->WaitFor(
                 JavaScript =>
@@ -186,10 +188,10 @@ $Selenium->RunTest(
         }
 
         # Try to create FormDraft with same name, expecting error.
-        $Selenium->find_element( "#FormDraftSave", 'css' )->click();
+        $Selenium->execute_script("\$('#FormDraftSave').click();");
         $Selenium->WaitFor(
             JavaScript =>
-                'return typeof($) === "function" && $("#FormDraftTitle").length && $("#SaveFormDraft").length'
+                'return typeof($) === "function" && $("#FormDraftTitle").length && $("#SaveFormDraft").length;'
         );
         $Selenium->find_element( "#FormDraftTitle", 'css' )->send_keys($Title);
         $Selenium->find_element( "#SaveFormDraft",  'css' )->click();
@@ -212,7 +214,7 @@ $Selenium->RunTest(
         $Selenium->WaitFor( WindowCount => 1 );
         $Selenium->switch_to_window( $Handles->[0] );
 
-        my $ArticleObject = $Kernel::OM->Get('Kernel::System::Ticket::Article');
+        my $ArticleObject        = $Kernel::OM->Get('Kernel::System::Ticket::Article');
         my $ArticleBackendObject = $ArticleObject->BackendForChannel( ChannelName => 'Phone' );
 
         # Create test email Article.
@@ -262,7 +264,7 @@ $Selenium->RunTest(
             index(
                 $Selenium->get_page_source(),
                 "Please note that this draft is outdated because the ticket was modified since this draft was created."
-                ) > -1,
+            ) > -1,
             'Outdated notification is present',
         );
 
@@ -279,8 +281,9 @@ $Selenium->RunTest(
                 "Initial FormDraft value for $FormDraftCase->{Module} field $FieldValue is correct - $Value"
             );
 
-            $Selenium->execute_script(
-                "\$('#$ID').val('$Update').trigger('redraw.InputField').trigger('change');"
+            $Selenium->InputFieldValueSet(
+                Element => "#$ID",
+                Value   => $Update,
             );
             $Selenium->WaitFor(
                 JavaScript =>

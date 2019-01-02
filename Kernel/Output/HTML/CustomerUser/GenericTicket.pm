@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Output::HTML::CustomerUser::GenericTicket;
@@ -76,7 +76,7 @@ sub Run {
 
     # get all attributes
     my %TicketSearch = ();
-    my @Params = split /;/, $Param{Config}->{Attributes};
+    my @Params       = split /;/, $Param{Config}->{Attributes};
     STRING:
     for my $String (@Params) {
         next STRING if !$String;
@@ -88,7 +88,7 @@ sub Run {
             my $Object = $Lookup{$Key}->{Object}->new( %{$Self} );
             my $Method = $Lookup{$Key}->{Method};
             $Value = $Object->$Method( $Lookup{$Key}->{Input} => $Value );
-            $Key = $Lookup{$Key}->{Return};
+            $Key   = $Lookup{$Key}->{Return};
         }
 
         # build link and search attributes

@@ -35,18 +35,16 @@ sub read {
     # Mbox reader, works as a iterator.
     # @return   [String] Contents of mbox
     my $self = shift;
+    return undef unless -T $self->{'handle'};
 
     my $readhandle = $self->{'handle'};
     my $readbuffer = '';
-
-    return undef unless -T $self->{'handle'};
-
     eval {
         $readhandle = $self->{'handle'}->fdopen(fileno(STDIN), 'r') unless eof $readhandle;
 
         while( my $r = <$readhandle> ) {
             # Read an email from the mailbox file
-            last if( length $readbuffer && substr($r, 0, 5) eq 'From ' );
+            last if( $readbuffer && substr($r, 0, 5) eq 'From ' );
             $readbuffer .= $r;
         }
     };
@@ -86,15 +84,15 @@ C<new()> is a constructor of Sisimai::Mail::STDIN
 
 =head2 C<B<path()>>
 
-C<path()> returns "undef"
+C<path()> returns "<STDIN>"
 
-    print $mailbox->path;   # undef
+    print $mailbox->path;   # "<STDIN>"
 
 =head2 C<B<name()>>
 
-C<name()> returns "undef"
+C<name()> returns "<STDIN>"
 
-    print $mailbox->name;   # undef
+    print $mailbox->name;   # "<STDIN>"
 
 =head2 C<B<size()>>
 
@@ -130,7 +128,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2016 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2016,2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

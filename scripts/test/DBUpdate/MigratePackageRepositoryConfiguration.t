@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 ## no critic (Modules::RequireExplicitPackage)
@@ -21,7 +21,7 @@ $Kernel::OM->ObjectParamAdd(
 my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
 
 my @FrameworkVersionParts = split /\./, $Kernel::OM->Get('Kernel::Config')->Get('Version');
-my $FrameworkVersion = $FrameworkVersionParts[0];
+my $FrameworkVersion      = $FrameworkVersionParts[0];
 
 my @Tests = (
     {
@@ -127,7 +127,9 @@ for my $Test (@Tests) {
         );
     }
 
-    my $UpgradeSuccess = $Kernel::OM->Create('scripts::DBUpdateTo6::MigratePackageRepositoryConfiguration')->Run();
+    my $UpgradeSuccess = $Kernel::OM->Create('scripts::DBUpdateTo6::MigratePackageRepositoryConfiguration')->Run(
+        ContinueOnModified => 1,
+    );
     $Self->Is(
         $UpgradeSuccess,
         $Test->{Success},

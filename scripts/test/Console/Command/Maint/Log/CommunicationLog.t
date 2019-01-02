@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -61,7 +61,7 @@ for my $TestCommunication (@Communications) {
             'Kernel::System::DateTime',
             ObjectParams => {
                 String => $TestCommunication->{Date}
-                }
+            }
         );
         $HelperObject->FixedTimeSet($TestDateTimeObject);
     }
@@ -71,7 +71,7 @@ for my $TestCommunication (@Communications) {
         ObjectParams => {
             Transport => $TestCommunication->{Transport},
             Direction => $TestCommunication->{Direction},
-            }
+        }
     );
 
     if ( $TestCommunication->{Status} ) {

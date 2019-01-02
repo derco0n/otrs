@@ -13,43 +13,53 @@ sub match {
     # @since v4.0.0
     my $class = shift;
     my $argv1 = shift // return undef;
-    my $regex = qr{(?>
-         [<][>][ ]invalid[ ]sender
-        |address[ ]rejected
-        |batv[ ](?:
-             failed[ ]to[ ]verify   # SoniWall
-            |validation[ ]failure   # SoniWall
-            )
-        |backscatter[ ]protection[ ]detected[ ]an[ ]invalid[ ]or[ ]expired[ ]email[ ]address    # MDaemon
-        |bogus[ ]mail[ ]from        # IMail - block empty sender
-        |closed[ ]mailing[ ]list    # Exim test mail
-        |denied[ ]\[bouncedeny\]    # McAfee
-        |domain[ ]of[ ]sender[ ]address[ ].+[ ]does[ ]not[ ]exist
-        |empty[ ]envelope[ ]senders[ ]not[ ]allowed
-        |error:[ ]no[ ]third-party[ ]dsns               # SpamWall - block empty sender
-        |fully[ ]qualified[ ]email[ ]address[ ]required # McAfee
-        |invalid[ ]domain,[ ]see[ ][<]url:.+[>]
-        |Message[ ]rejected:[ ]Email[ ]address[ ]is[ ]not[ ]verified
-        |mx[ ]records[ ]for[ ].+[ ]violate[ ]section[ ].+
-        |name[ ]service[ ]error[ ]for[ ]    # Malformed MX RR or host not found
-        |Null[ ]Sender[ ]is[ ]not[ ]allowed
-        |recipient[ ]not[ ]accepted[.][ ][(]batv:[ ]no[ ]tag
-        |returned[ ]mail[ ]not[ ]accepted[ ]here
-        |rfc[ ]1035[ ]violation:[ ]recursive[ ]cname[ ]records[ ]for
-        |rule[ ]imposed[ ]mailbox[ ]access[ ]for        # MailMarshal
-        |sender[ ](?:
-             verify[ ]failed        # Exim callout
-            |not[ ]pre[-]approved
-            |rejected
-            |domain[ ]is[ ]empty
-            )
-        |syntax[ ]error:[ ]empty[ ]email[ ]address
-        |the[ ]message[ ]has[ ]been[ ]rejected[ ]by[ ]batv[ ]defense
-        |transaction[ ]failed[ ]unsigned[ ]dsn[ ]for
-        )
-    }xi;
+    my $isnot = [
+        '5.1.0 address rejected',
+        'recipient address rejected',
+        'sender ip address rejected',
+    ];
+    my $index = [
+        '<> invalid sender',
+        'address rejected',
+        'administrative prohibition',
+        'batv failed to verify',    # SoniWall
+        'batv validation failure',  # SoniWall
+        'backscatter protection detected an invalid or expired email address',  # MDaemon
+        'bogus mail from',          # IMail - block empty sender
+        'connections not accepted from servers without a valid sender domain',
+        'denied [bouncedeny]',      # McAfee
+        'delivery not authorized, message refused',
+        'does not exist e2110',
+        'domain of sender address ',
+        'emetteur invalide',
+        'empty envelope senders not allowed',
+        'error: no third-party dsns',   # SpamWall - block empty sender
+        'from: domain is invalid. please provide a valid from:',
+        'fully qualified email address required',   # McAfee
+        'invalid domain, see <url:',
+        'mail from not owned by user',
+        'message rejected: email address is not verified',
+        'mx records for ',
+        'null sender is not allowed',
+        'recipient not accepted. (batv: no tag',
+        'returned mail not accepted here',
+        'rfc 1035 violation: recursive cname records for',
+        'rule imposed mailbox access for',  # MailMarshal
+        'sender email address rejected',
+        'sender is spammer',
+        'sender not pre-approved',
+        'sender rejected',
+        'sender domain is empty',
+        'sender verify failed', # Exim callout
+        'syntax error: empty email address',
+        'the message has been rejected by batv defense',
+        'transaction failed unsigned dsn for',
+        'unroutable sender address',
+        'you are sending to/from an address that has been blacklisted',
+    ];
 
-    return 1 if $argv1 =~ $regex;
+    return 0 if grep { rindex($argv1, $_) > -1 } @$isnot;
+    return 1 if grep { rindex($argv1, $_) > -1 } @$index;
     return 0;
 }
 
@@ -63,30 +73,29 @@ sub true {
     my $class = shift;
     my $argvs = shift // return undef;
 
-    return undef unless ref $argvs eq 'Sisimai::Data';
-    my $statuscode = $argvs->deliverystatus // '';
-    my $reasontext = __PACKAGE__->text;
+    my $tempreason = Sisimai::SMTP::Status->name($argvs->deliverystatus) || 'undefined';
+    my $diagnostic = lc $argvs->diagnosticcode;
 
-    return undef unless length $statuscode;
-    return 1 if $argvs->reason eq $reasontext;
+    return 1 if $argvs->reason eq 'rejected';
+    return 1 if $tempreason eq 'rejected';  # Delivery status code points "rejected".
 
-    require Sisimai::SMTP::Status;
-    my $diagnostic = $argvs->diagnosticcode // '';
-    my $v = 0;
+    # Check the value of Diagnosic-Code: header with patterns
+    if( $argvs->smtpcommand eq 'MAIL' ) {
+        # The session was rejected at 'MAIL FROM' command
+        return 1 if __PACKAGE__->match($diagnostic);
 
-    if( Sisimai::SMTP::Status->name($statuscode) eq $reasontext ) {
-        # Delivery status code points C<rejected>.
-        $v = 1;
-
-    } else {
-        # Check the value of Diagnosic-Code: header with patterns
-        if( $argvs->smtpcommand eq 'MAIL' ) {
-            # Matched with a pattern in this class
-            $v = 1 if __PACKAGE__->match($diagnostic);
+    } elsif( $argvs->smtpcommand eq 'DATA' ) {
+        # The session was rejected at 'DATA' command
+        if( $tempreason ne 'userunknown' ) {
+            # Except "userunknown"
+            return 1 if __PACKAGE__->match($diagnostic);
         }
+    } elsif( $tempreason =~ /\A(?:onhold|undefined|securityerror|systemerror)\z/ ) {
+        # Try to match with message patterns when the temporary reason
+        # is "onhold", "undefined", "securityerror", or "systemerror"
+        return 1 if __PACKAGE__->match($diagnostic);
     }
-
-    return $v;
+    return 0;
 }
 
 1;
@@ -142,10 +151,11 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2016 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 
 This software is distributed under The BSD 2-Clause License.
 
 =cut
+

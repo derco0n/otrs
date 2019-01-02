@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 ## no critic (Modules::RequireExplicitPackage)
@@ -107,8 +107,9 @@ $Selenium->RunTest(
         # update generic preferences
         for my $Test (@Tests) {
 
-            $Selenium->execute_script(
-                "\$('#$Test->{ID}').val('$Test->{Value}').trigger('redraw.InputField').trigger('change');"
+            $Selenium->InputFieldValueSet(
+                Element => "#$Test->{ID}",
+                Value   => $Test->{Value},
             );
 
             # save the setting, wait for the ajax call to finish and check if success sign is shown

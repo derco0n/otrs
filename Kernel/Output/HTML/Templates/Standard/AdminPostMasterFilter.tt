@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 [% RenderBlockStart("Overview") %]
@@ -43,7 +43,7 @@
 [% RenderBlockEnd("ActionOverview") %]
 [% RenderBlockStart("ActionAdd") %]
                     <li>
-                        <a href="[% Env("Baselink") %]Action=[% Env("Action") %];Subaction=AddAction" class="CallForAction Fullsize Center"><span><i class="fa fa-plus-square"></i>[% Translate("Add filter") | html %]</span></a>
+                        <a href="[% Env("Baselink") %]Action=[% Env("Action") %];Subaction=AddAction" class="CallForAction Fullsize Center"><span><i class="fa fa-plus-square"></i>[% Translate("Add PostMaster Filter") | html %]</span></a>
                     </li>
 [% RenderBlockEnd("ActionAdd") %]
                 </ul>
@@ -54,10 +54,10 @@
 [% RenderBlockStart("Filter") %]
         <div class="WidgetSimple">
             <div class="Header">
-                <h2><label for="FilterPostMasterFilters">[% Translate("Filter for Postmaster Filters") | html %]</label></h2>
+                <h2><label for="FilterPostMasterFilters">[% Translate("Filter for PostMaster Filters") | html %]</label></h2>
             </div>
             <div class="Content">
-                <input type="text" id="FilterPostMasterFilters" class="FilterBox" placeholder="[% Translate("Just start typing to filter...") | html %]" name="FilterPostMasterFilters" value="" title="[% Translate("Filter for postmaster filters") | html %]">
+                <input type="text" id="FilterPostMasterFilters" class="FilterBox" placeholder="[% Translate("Just start typing to filter...") | html %]" name="FilterPostMasterFilters" value="" title="[% Translate("Filter for PostMaster filters") | html %]">
             </div>
         </div>
 [% RenderBlockEnd("Filter") %]
@@ -190,7 +190,7 @@
                         </div>
 
                         <label for="MatchValue[% loop.count %]">[% Translate("for value") | html %]:</label>
-                        <input type="text" name="MatchValue[% loop.count %]" id="MatchValue[% loop.count %]" value="[% Data.item("MatchValue$loop.count") | html %]" class="W33pc [% Data.item('MatchValue' _ loop.count  _ 'Invalid') | html %]" maxlength="100"/>
+                        <input type="text" name="MatchValue[% loop.count %]" id="MatchValue[% loop.count %]" value="[% Data.item("MatchValue$loop.count") | html %]" class="W33pc [% Data.item('MatchValue' _ loop.count  _ 'Invalid') | html %]" maxlength="200"/>
                         <div id="MatchValue[% loop.count %]ServerError" class="TooltipErrorMessage">
                             <p>[% Translate("The field needs to be a valid regular expression or a literal word.") | html %]</p>
                         </div>
@@ -222,7 +222,7 @@
                         </div>
 
                         <label class="RightLabel" for="SetValue[% loop.count %]">[% Translate("with value") | html %]:</label>
-                        <input type="text" name="SetValue[% loop.count %]" id="SetValue[% loop.count %]" value="[% Data.item("SetValue$loop.count") | html %]" class="W33pc [% Data.item('SetValue' _ loop.count _ 'Invalid') | html %]" maxlength="100"/>
+                        <input type="text" name="SetValue[% loop.count %]" id="SetValue[% loop.count %]" value="[% Data.item("SetValue$loop.count") | html %]" class="W33pc [% Data.item('SetValue' _ loop.count _ 'Invalid') | html %]" maxlength="200"/>
                         <div id="SetValue[% loop.count %]ServerError" class="TooltipErrorMessage">
                             <p>[% Translate("The field needs to be a literal word.") | html %]</p>
                         </div>

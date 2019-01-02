@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::DateTime;
@@ -124,8 +124,8 @@ Creates a DateTime object. Do not use new() directly, instead use the object man
     #   yyyy-mm-ddThh:mm:ss+ttzz
     #   yyyy-mm-ddThh:mm:ss-tt:zz
     #   yyyy-mm-ddThh:mm:ss-ttzz
-    #   yyyy-mm-ddThh:mm:ss [timezone]  # time zone will be deduced from the string
-    #   yyyy-mm-ddThh:mm:ss[timezone]   # time zone will be deduced from the string
+    #   yyyy-mm-ddThh:mm:ss [timezone]  # time zone will be deduced from an optional string
+    #   yyyy-mm-ddThh:mm:ss[timezone]   # i.e. 2018-04-20T07:37:10UTC
 
 =cut
 
@@ -1704,6 +1704,12 @@ sub _StringToHash {
         # Check if the rest 'OffsetOrTZ' is an offset or timezone.
         #   If isn't an offset consider it a timezone
         if ( $OffsetOrTZ !~ m/(\+|\-)\d{2}:?\d{2}/i ) {
+
+            # Make sure the time zone is valid. Otherwise, assume UTC.
+            if ( !$Self->IsTimeZoneValid( TimeZone => $OffsetOrTZ ) ) {
+                $OffsetOrTZ = 'UTC';
+            }
+
             return {
                 %{$DateTimeHash},
                 TimeZone => $OffsetOrTZ,
@@ -1983,10 +1989,10 @@ sub _OpNotEquals {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

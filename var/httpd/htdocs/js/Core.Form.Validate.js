@@ -1,9 +1,9 @@
 // --
-// Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+// Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 // --
 // This software comes with ABSOLUTELY NO WARRANTY. For details, see
-// the enclosed file COPYING for license information (AGPL). If you
-// did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+// the enclosed file COPYING for license information (GPL). If you
+// did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 // --
 
 "use strict";
@@ -794,7 +794,10 @@ Core.Form.Validate = (function (TargetNS) {
     TargetNS.Init = function () {
         var FormSelector,
             $ServerErrors,
-            ServerErrorDialogCloseFunction;
+            ServerErrorDialogCloseFunction,
+            ChangedStateID = parseInt($('#ComposeStateID, #NewStateID, #NextStateID').val(), 10),
+            PendingStateIDs = Core.Config.Get('PendingStateIDs') || [],
+            Index;
 
         if (Options.FormClass) {
             FormSelector = 'form.' + Options.FormClass;
@@ -848,6 +851,27 @@ Core.Form.Validate = (function (TargetNS) {
 
             Core.UI.Dialog.ShowAlert(Core.Language.Translate('Error'), Core.Language.Translate('One or more errors occurred!'), ServerErrorDialogCloseFunction);
         }
+
+        // Convert PendingStateIDs array elements to integer.
+        for (Index = 0; Index < PendingStateIDs.length; Index++) {
+            PendingStateIDs[Index] = parseInt(PendingStateIDs[Index], 10);
+        }
+
+        // Remove validation on pending fields for non pending states on load.
+        if (PendingStateIDs.indexOf(ChangedStateID) === -1) {
+            $('#Day').removeClass('Validate_DateInFuture');
+        }
+
+        // Change event on next state selection.
+        $('#ComposeStateID, #NewStateID, #NextStateID').on('change', function() {
+            ChangedStateID = parseInt($(this).val(), 10);
+            if (PendingStateIDs.indexOf(ChangedStateID) > -1) {
+                $('#Day').addClass('Validate_DateInFuture');
+            }
+            else {
+                $('#Day').removeClass('Validate_DateInFuture');
+            }
+        })
     };
 
     /**

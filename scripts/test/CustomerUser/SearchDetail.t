@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -183,7 +183,7 @@ my %ReferenceCustomerUserSearchFields = (
 
 my $CustomerUserObject = $Kernel::OM->Get('Kernel::System::CustomerUser');
 
-my @CustomerUserSearchFields = $CustomerUserObject->CustomerUserSearchFields();
+my @CustomerUserSearchFields       = $CustomerUserObject->CustomerUserSearchFields();
 my %LookupCustomerUserSearchFields = map { $_->{Name} => $_ } @CustomerUserSearchFields;
 
 for my $FieldName ( sort keys %ReferenceCustomerUserSearchFields ) {
@@ -833,7 +833,7 @@ for my $Test (@SearchTests) {
 
         # get defined expected result count (defined in search test case!)
         if ( exists $Test->{ResultData}->{Count} ) {
-            $ExpectedCount = $Test->{ResultData}->{Count}
+            $ExpectedCount = $Test->{ResultData}->{Count};
         }
 
         # check the number of customer user in the returned arrayref
@@ -858,7 +858,7 @@ for my $Test (@SearchTests) {
 
         # check if all ids that belongs to this searchtest are returned
         my @ReferenceCustomerUserLogins = keys %{ $CustomerLoginForSearchTest{$TestCount} };
-        my %ReturnedCustomerUserIDs = map { $_ => 1 } @{$CustomerUserIDs};
+        my %ReturnedCustomerUserIDs     = map { $_ => 1 } @{$CustomerUserIDs};
         for my $CustomerUserLogin (@ReferenceCustomerUserLogins) {
             $Self->True(
                 $ReturnedCustomerUserIDs{$CustomerUserLogin},

@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Modules::AgentAppointmentPluginSearch;
@@ -35,7 +35,7 @@ sub Run {
     my $ParamObject = $Kernel::OM->Get('Kernel::System::Web::Request');
 
     # get needed params
-    my $Search = $ParamObject->GetParam( Param => 'Term' ) || '';
+    my $Search    = $ParamObject->GetParam( Param => 'Term' ) || '';
     my $PluginKey = $ParamObject->GetParam( Param => 'PluginKey' );
     my $MaxResults = int( $ParamObject->GetParam( Param => 'MaxResults' ) || 20 );
 

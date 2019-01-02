@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -28,14 +28,14 @@ my @Tests = (
             Success     => 1,
             Body        => qr|^$|,
             Attachments => [],
-            }
+        }
     },
     {
         Name   => 'no body',
         Body   => undef,
         Result => {
             Success => 0,
-            }
+        }
     },
     {
         Name   => 'single image',
@@ -48,7 +48,7 @@ my @Tests = (
                     ContentType => qr|^image/gif;|,
                 }
             ],
-            }
+        }
     },
     {
         Name   => 'two images',
@@ -65,7 +65,7 @@ my @Tests = (
                     ContentType => qr|^image/gif;|,
                 }
             ],
-            }
+        }
     },
     {
         Name   => 'two images, only one embedded',
@@ -79,7 +79,7 @@ my @Tests = (
                     ContentType => qr|^image/gif;|,
                 },
             ],
-            }
+        }
     },
     {
         Name => 'Win7 snipping tool',
@@ -94,7 +94,7 @@ my @Tests = (
                     ContentType => qr|^image/png;|,
                 },
             ],
-            }
+        }
     },
 );
 

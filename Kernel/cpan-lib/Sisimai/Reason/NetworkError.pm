@@ -13,22 +13,25 @@ sub match {
     # @since v4.1.12
     my $class = shift;
     my $argv1 = shift // return undef;
-    my $regex = qr{(?:
-         could[ ]not[ ]connect[ ]and[ ]send[ ]the[ ]mail[ ]to
-        |DNS[ ]records[ ]for[ ]the[ ]destination[ ]computer[ ]could[ ]not[ ]be[ ]found
-        |Hop[ ]count[ ]exceeded[ ]-[ ]possible[ ]mail[ ]loop
-        |host[ ]is[ ]unreachable
-        |mail[ ]forwarding[ ]loop[ ]for[ ]
-        |malformed[ ]name[ ]server[ ]reply
-        |maximum[ ]forwarding[ ]loop[ ]count[ ]exceeded
-        |message[ ]looping
-        |name[ ]service[ ]error
-        |too[ ]many[ ]hops
-        |unrouteable[ ]mail[ ]domain
-        )
-    }ix;
+    my $index = [
+        'could not connect and send the mail to',
+        'dns records for the destination computer could not be found',
+        'hop count exceeded - possible mail loop',
+        'host is unreachable',
+        'host not found, try again',
+        'mail forwarding loop for ',
+        'malformed name server reply',
+        'malformed or unexpected name server reply',
+        'maximum forwarding loop count exceeded',
+        'message looping',
+        'message probably in a routing loop',
+        'no route to host',
+        'too many hops',
+        'unable to resolve route ',
+        'unrouteable mail domain',
+    ];
 
-    return 1 if $argv1 =~ $regex;
+    return 1 if grep { rindex($argv1, $_) > -1 } @$index;
     return 0;
 }
 
@@ -94,10 +97,11 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2016 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 
 This software is distributed under The BSD 2-Clause License.
 
 =cut
+

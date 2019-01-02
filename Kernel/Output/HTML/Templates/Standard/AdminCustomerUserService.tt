@@ -1,19 +1,19 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 [% RenderBlockStart("Overview") %]
 <div class="MainBox ARIARoleMain LayoutFixedSidebar SidebarFirst">
 
-    <h1 class="InvisibleText">[% Translate("Manage Customer User-Services Relations") | html %]</h1>
+    <h1 class="InvisibleText">[% Translate("Manage Customer User-Service Relations") | html %]</h1>
 
     [% BreadcrumbPath = [
             {
-                Name => Translate('Manage Customer User-Services Relations'),
+                Name => Translate('Manage Customer User-Service Relations'),
                 Link => Data.OverviewLink,
             },
         ]
@@ -84,7 +84,7 @@
                     <li>
                         <form action="">
                             <fieldset>
-                                <input type="text" placeholder="[% Translate("Just start typing to filter...") | html %]" id="FilterServices" class="FilterBox" name="FilterServices" value="" title="[% Translate("Filter for Services") | html %]" />
+                                <input type="text" placeholder="[% Translate("Just start typing to filter...") | html %]" id="FilterServices" class="FilterBox" name="FilterServices" value="" title="[% Translate("Filter for services") | html %]" />
                             </fieldset>
                         </form>
                     </li>

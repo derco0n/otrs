@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -122,6 +122,37 @@ $Selenium->RunTest(
                 $Selenium->VerifiedGet("${ScriptAlias}index.pl?Action=AgentTicketStatusView");
             }
         }
+
+        # Check if sorting and ordering are saved in small view (see bug#13670).
+        # Go to Small view.
+        $Selenium->find_element(
+            "//a[contains(\@href, \'Action=AgentTicketStatusView;Filter=Closed;View=Small;\' )]"
+        )->VerifiedClick();
+
+        # Sort tickets by queue.
+        $Selenium->find_element(
+            "//a[contains(\@href, \'SortBy=Queue;OrderBy=Down\' )]"
+        )->VerifiedClick();
+
+        $Self->True(
+            $Selenium->find_element("//a[contains(\@title, \'Queue, sorted descending' )]"),
+            "Table is sorted by queue, order by descending",
+        );
+
+        # Go to the other view (e.g. Medium).
+        $Selenium->find_element(
+            "//a[contains(\@href, \'Action=AgentTicketStatusView;Filter=Closed;View=Medium;\' )]"
+        )->VerifiedClick();
+
+        # Go back to the Small view to check if sorting and ordering are saved.
+        $Selenium->find_element(
+            "//a[contains(\@href, \'Action=AgentTicketStatusView;Filter=Closed;View=Small;\' )]"
+        )->VerifiedClick();
+
+        $Self->True(
+            $Selenium->find_element("//a[contains(\@title, \'Queue, sorted descending' )]"),
+            "Table is still sorted by queue, order by descending",
+        );
 
         # Delete created test tickets.
         my $Success;

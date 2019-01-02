@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -79,7 +79,7 @@ $Selenium->RunTest(
             "Ticket ID $TicketID is created",
         );
 
-        my $ArticleObject = $Kernel::OM->Get('Kernel::System::Ticket::Article');
+        my $ArticleObject             = $Kernel::OM->Get('Kernel::System::Ticket::Article');
         my $ArticleEmailChannelObject = $ArticleObject->BackendForChannel( ChannelName => 'Email' );
 
         # Create test email Article.
@@ -171,9 +171,15 @@ $Selenium->RunTest(
             elsif ( $FormDraftCase->{Fields}->{$Field}->{Type} eq 'Attachment' ) {
 
                 # Make the file upload field visible.
+                $Selenium->VerifiedRefresh();
                 $Selenium->execute_script(
                     "\$('#FileUpload').css('display', 'block')"
                 );
+                $Selenium->WaitFor(
+                    JavaScript =>
+                        'return typeof($) === "function" && $("#FileUpload:visible").length;'
+                );
+                sleep 1;
 
                 # Upload a file.
                 $Selenium->find_element( "#FileUpload", 'css' )
@@ -201,7 +207,7 @@ $Selenium->RunTest(
         }
 
         # Create FormDraft and submit.
-        $Selenium->find_element( "#FormDraftSave", 'css' )->click();
+        $Selenium->execute_script("\$('#FormDraftSave').click();");
         $Selenium->WaitFor(
             JavaScript =>
                 'return typeof($) === "function" && $("#FormDraftTitle").length;'
@@ -236,7 +242,8 @@ $Selenium->RunTest(
         );
 
         # Try to create FormDraft with same name, expecting error.
-        $Selenium->find_element( "#FormDraftSave", 'css' )->click();
+        $Selenium->VerifiedRefresh();
+        $Selenium->execute_script("\$('#FormDraftSave').click();");
         $Selenium->WaitFor(
             JavaScript =>
                 'return typeof($) === "function" && $("#FormDraftTitle").length;'
@@ -310,7 +317,7 @@ $Selenium->RunTest(
             index(
                 $Selenium->get_page_source(),
                 "Please note that this draft is outdated because the ticket was modified since this draft was created."
-                ) > -1,
+            ) > -1,
             'Outdated notification is present',
         );
 
@@ -352,9 +359,15 @@ $Selenium->RunTest(
                 );
 
                 # Add a second file.
+                $Selenium->VerifiedRefresh();
                 $Selenium->execute_script(
                     "\$('#FileUpload').css('display', 'block')"
                 );
+                $Selenium->WaitFor(
+                    JavaScript =>
+                        'return typeof($) === "function" && $("#FileUpload:visible").length;'
+                );
+                sleep 1;
 
                 # Upload a file.
                 $Selenium->find_element( "#FileUpload", 'css' )

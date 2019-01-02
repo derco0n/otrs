@@ -1,11 +1,10 @@
-/**
- * This file containts the CSS Styles for the header
- * with it's toolbar, the userbar and the whole main navigation
- *
- * @project     OTRS (http://www.otrs.org) - Agent Frontend
- * @copyright   OTRS AG
- * @license     AGPL (http://www.gnu.org/licenses/agpl.txt)
- */
+/*
+Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
+
+This software comes with ABSOLUTELY NO WARRANTY. For details, see
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
+*/
 
 /**
  * @package     Skin "Default"
@@ -29,10 +28,10 @@
  * @subsection  Logo
  */
 #Logo {
-    top: -4px;
-    right: 38px;
-    width: 244px;
-    height: 100%;
+    top: 25px;
+    right: 24px;
+    width: 300px;
+    height: 55px;
     background: url(../img/logo_bg.png) no-repeat;
     background-size: contain;
     position: absolute;
@@ -435,14 +434,17 @@ body.Visible-ScreenXL #ToolBar li.UserAvatar div a:hover {
 }
 
 #Navigation > li > a:after {
-    width: 0px;
+    width: 100%;
     height: 3px;
     position: absolute;
     bottom: 0px;
     left: 0px;
     background: #f92;
     content: "";
-    transition: width ease 0.3s;
+    transform: scale(0, 1);
+    transform-origin: 0;
+    transition: transform 300ms ease;
+    will-change: transform;
 }
 
 #Navigation > li > a#GlobalSearchNav {
@@ -483,7 +485,7 @@ body.Visible-ScreenXL #ToolBar li.UserAvatar div a:hover {
 #Navigation > li > a:active:after,
 #Navigation > li > a:focus:after,
 #Navigation > li.Selected > a:after {
-    width: 100%;
+    transform: scale(1, 1);
 }
 
 #Navigation > .Selected {

@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 ## no critic (Modules::RequireExplicitPackage)
@@ -78,10 +78,16 @@ $Selenium->RunTest(
         );
 
         # edit checked stored values
-        $Selenium->execute_script("\$('#UserRefreshTime').val('2').trigger('redraw.InputField').trigger('change');");
+        $Selenium->InputFieldValueSet(
+            Element => '#UserRefreshTime',
+            Value   => 2,
+        );
         $Selenium->find_element( '#UserRefreshTimeUpdate', 'css' )->VerifiedClick();
 
-        $Selenium->execute_script("\$('#UserShowTickets').val('20').trigger('redraw.InputField').trigger('change');");
+        $Selenium->InputFieldValueSet(
+            Element => '#UserShowTickets',
+            Value   => 20,
+        );
         $Selenium->find_element( '#UserShowTicketsUpdate', 'css' )->VerifiedClick();
 
         # check edited values
@@ -102,8 +108,9 @@ $Selenium->RunTest(
             )
         {
             # change CustomerPreference language
-            $Selenium->execute_script(
-                "\$('#UserLanguage').val('$Language').trigger('redraw.InputField').trigger('change');"
+            $Selenium->InputFieldValueSet(
+                Element => '#UserLanguage',
+                Value   => $Language,
             );
             $Selenium->find_element( '#UserLanguageUpdate', 'css' )->VerifiedClick();
 

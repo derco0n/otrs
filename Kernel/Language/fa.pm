@@ -4,8 +4,8 @@
 # Copyright (C) 2009 Afshar Mohebbi <afshar.mohebbi at gmail.com>
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Language::fa;
@@ -26,7 +26,7 @@ sub Data {
     $Self->{DateFormatShort}     = '%D.%M.%Y';
     $Self->{DateInputFormat}     = '%D.%M.%Y';
     $Self->{DateInputFormatLong} = '%D.%M.%Y - %T';
-    $Self->{Completeness}        = 0.715271786022433;
+    $Self->{Completeness}        = 0.701751373626374;
 
     # csv separator
     $Self->{Separator}         = '';
@@ -103,7 +103,6 @@ sub Data {
         'Calendar Management' => '',
         'Add Calendar' => '',
         'Edit Calendar' => '',
-        'Go back' => 'برگرد',
         'Calendar Overview' => '',
         'Add new Calendar' => '',
         'Import Appointments' => '',
@@ -113,6 +112,7 @@ sub Data {
         'Overwrite existing entities' => 'بازنویسی نهادهای موجود',
         'Upload calendar configuration' => '',
         'Import Calendar' => '',
+        'Filter for Calendars' => '',
         'Filter for calendars' => '',
         'Depending on the group field, the system will allow users the access to the calendar according to their permission level.' =>
             '',
@@ -156,6 +156,7 @@ sub Data {
 
         # Template: AdminAppointmentImport
         'Appointment Import' => '',
+        'Go back' => 'برگرد',
         'Uploaded file must be in valid iCal format (.ics).' => '',
         'If desired Calendar is not listed here, please make sure that you have at least \'create\' permissions.' =>
             '',
@@ -170,7 +171,6 @@ sub Data {
         'Appointment Notification Management' => '',
         'Add Notification' => 'افزودن اعلان',
         'Edit Notification' => 'ویرایش اعلان',
-        'Add notification' => 'افزودن اعلان',
         'Export Notifications' => 'ارسال اطلاعات',
         'Filter for Notifications' => '',
         'Filter for notifications' => '',
@@ -200,7 +200,7 @@ sub Data {
         'Recipients' => 'دریافت کنندگان',
         'Send to' => 'فرستادن به',
         'Send to these agents' => 'ارسال به این عوامل',
-        'Send to all group members' => 'ارسال به تمام اعضای گروه',
+        'Send to all group members (agents only)' => '',
         'Send to all role members' => 'ارسال به تمام نقشهای اعضا',
         'Send on out of office' => 'ارسال در خارج از دفتر',
         'Also send if the user is currently out of office.' => 'همچنین ارسال در صورتی که کاربر در حال حاضر خارج از دفتر.',
@@ -243,6 +243,7 @@ sub Data {
 
         # Template: AdminAppointmentNotificationEventTransportEmailSettings
         'Additional recipient email addresses' => 'دریافت کننده اضافی آدرس ایمیل ',
+        'This field must have less then 200 characters.' => '',
         'Article visible for customer' => '',
         'An article will be created if the notification is sent to the customer or an additional email address.' =>
             'یک مقاله ایجاد خواهد شد اگر اطلاع رسانی به مشتریان و یا یک آدرس ایمیل دیگر ارسال می شود.',
@@ -321,9 +322,10 @@ sub Data {
 
         # Template: AdminCommunicationLog
         'Communication Log' => '',
-        'Time range' => '',
+        'Time Range' => '',
         'Show only communication logs created in specific time range.' =>
             '',
+        'Filter for Communications' => '',
         'Filter for communications' => '',
         'In this screen you can see an overview about incoming and outgoing communications.' =>
             '',
@@ -354,9 +356,9 @@ sub Data {
 
         # Template: AdminCommunicationLogAccounts
         'Account Status' => '',
-        'Back' => 'بازگشت',
+        'Back to overview' => '',
+        'Filter for Accounts' => '',
         'Filter for accounts' => '',
-        'Filter for log entries' => '',
         'You can change the sort and order of those columns by clicking on the column header.' =>
             '',
         'Account status for: %s' => '',
@@ -382,6 +384,8 @@ sub Data {
 
         # Template: AdminCommunicationLogZoom
         'Detail view for %s communication started at %s' => '',
+        'Filter for Log Entries' => '',
+        'Filter for log entries' => '',
         'Show only entries with specific priority and higher:' => '',
         'Communication Log Overview (%s)' => '',
         'No communication objects found.' => '',
@@ -486,15 +490,17 @@ sub Data {
             '',
         'You can manage these groups via the configuration setting "CustomerGroupAlwaysGroups".' =>
             'شما می‌توانید این گروه‌ها را از طریق تنظیم پیکربندی "CustomerGroupAlwaysGroups" مدیریت نمایید.',
+        'Filter for groups' => '',
         'Select the customer user - group permissions.' => '',
         'If nothing is selected, then there are no permissions in this group (tickets will not be available for the customer user).' =>
             '',
         'Customer User Default Groups:' => '',
 
         # Template: AdminCustomerUserService
-        'Manage Customer User-Services Relations' => '',
+        'Manage Customer User-Service Relations' => '',
         'Edit default services' => 'ویرایش خدمات پیش‌فرض',
         'Filter for Services' => 'فیلتر برای خدمات',
+        'Filter for services' => '',
         'Services' => 'خدمات',
 
         # Template: AdminDynamicField
@@ -622,12 +628,12 @@ sub Data {
         'Send' => 'ارسال',
 
         # Template: AdminGenericAgent
-        'Generic Agent' => 'کارشناس عمومی',
-        'Edit job' => 'ویرایش کار',
-        'Add job' => 'افزودن کار',
-        'Run job' => 'اجرای کار',
-        'Filter for Generic Agent Jobs' => '',
-        'Filter for generic agent jobs' => '',
+        'Generic Agent Job Management' => '',
+        'Edit Job' => '',
+        'Add Job' => '',
+        'Run Job' => '',
+        'Filter for Jobs' => '',
+        'Filter for jobs' => '',
         'Last run' => 'آخرین اجرا',
         'Run Now!' => 'اجرا',
         'Delete this task' => 'حذف این وظیفه',
@@ -868,7 +874,6 @@ sub Data {
         'Invoker Details' => 'Invoker اطلاعات',
         'The name is typically used to call up an operation of a remote web service.' =>
             'نام معمولا برای پاسخ یک عملیات از یک وب سرویس از راه دور.',
-        'Please provide a unique name for this web service invoker.' => 'لطفا یک نام منحصر به فرد برای این invoker وب سرویس ارائه کنید .',
         'Invoker backend' => 'باطن Invoker',
         'This OTRS invoker backend module will be called to prepare the data to be sent to the remote system, and to process its response data.' =>
             'این invoker ماژول باطن OTRS خواهد شد به نام برای آماده سازی داده ها به سیستم از راه دور ارسال می شود، و برای پردازش داده ها پاسخ آن است.',
@@ -989,18 +994,17 @@ sub Data {
         'Operation Details' => 'جزئیات عملیات',
         'The name is typically used to call up this web service operation from a remote system.' =>
             ' نام بطور معمول از یک سیستم از راه دور برای تماس با این وب سرویس استفاده میشود . ',
-        'Mapping for incoming request data' => 'نگاشت برای درخواست داده های ورودی',
-        'The request data will be processed by this mapping, to transform it to the kind of data OTRS expects.' =>
-            'داده درخواست خواهد شد این نقشه برداری پردازش، آن را تبدیل به نوع OTRS داده انتظار دارد.',
         'Operation backend' => 'باطن عمل',
         'This OTRS operation backend module will be called internally to process the request, generating data for the response.' =>
             'این عملیات ماژول باطن OTRS صورت داخلی نامیده خواهد شد به پردازش درخواست، تولید داده ها را برای پاسخ.',
+        'Mapping for incoming request data' => 'نگاشت برای درخواست داده های ورودی',
+        'The request data will be processed by this mapping, to transform it to the kind of data OTRS expects.' =>
+            'داده درخواست خواهد شد این نقشه برداری پردازش، آن را تبدیل به نوع OTRS داده انتظار دارد.',
         'Mapping for outgoing response data' => 'نگاشت برای پاسخ خروجی داده ',
         'The response data will be processed by this mapping, to transform it to the kind of data the remote system expects.' =>
             'پاسخ داده خواهد شد این نقشه برداری پردازش، آن را تبدیل به نوع داده سیستم از راه دور انتظار.',
         'Include Ticket Data' => '',
-        'Include ticket data by response. Only available for TicketCreate and TicketUpdate operations.' =>
-            '',
+        'Include ticket data in response.' => '',
 
         # Template: AdminGenericInterfaceTransportHTTPREST
         'Network Transport' => '',
@@ -1154,7 +1158,6 @@ sub Data {
             'پس از این که تنظیمات را ذخیره کنید به شما خواهد شد دوباره به صفحه ویرایش هدایت می شوید.',
         'If you want to return to overview please click the "Go to overview" button.' =>
             'اگر می خواهید بازگشت به نمای کلی لطفا با کلیک بر \ "برو به بررسی اجمالی " را فشار دهید.',
-        'Web Service List' => 'فهرست وب سرویس',
         'Remote system' => 'سیستم از راه دور',
         'Provider transport' => 'ارائه دهنده حمل و نقل ',
         'Requester transport' => ' درخواست حمل و نقل',
@@ -1199,7 +1202,6 @@ sub Data {
         'Group Management' => 'مدیریت گروه‌ها',
         'Add Group' => 'ایجاد گروه',
         'Edit Group' => 'ویرایش گروه',
-        'Add group' => 'افزودن گروه',
         'The admin group is to get in the admin area and the stats group to get stats area.' =>
             'گروه admin برای دسترسی به بخش مدیریت سیستم و گروه stats برای دسترسی به بخش گزارشات است.',
         'Create new groups to handle access permissions for different groups of agent (e. g. purchasing department, support department, sales department, ...). ' =>
@@ -1208,7 +1210,6 @@ sub Data {
 
         # Template: AdminLog
         'System Log' => 'وقایع ثبت شده سیستم',
-        'Filter for Log Entries' => '',
         'Here you will find log information about your system.' => 'در اینجا اطلاعات ثبت شده‌ای در رابطه با سیستم پیدا خواهید کرد.',
         'Hide this message' => 'پنهان کردن این پیغام',
         'Recent Log Entries' => 'وقایع ثبت شده جدید',
@@ -1302,7 +1303,7 @@ sub Data {
 
         # Template: AdminOTRSBusinessInstalled
         'Manage %s' => 'مدیریت %s',
-        'Downgrade to OTRS Free' => 'کاهش دادن به OTRS رایگان',
+        'Downgrade to ((OTRS)) Community Edition' => '',
         'Read documentation' => 'خواندن اسناد',
         '%s makes contact regularly with cloud.otrs.com to check on available updates and the validity of the underlying contract.' =>
             '%s باعث می شود تماس به طور منظم با cloud.otrs.com برای بررسی در دسترس به روز رسانی و اعتبار قرارداد زمینه ای است.',
@@ -1332,8 +1333,8 @@ sub Data {
         '%s will be available soon. Please check again in a few days.' =>
             '%s به زودی در دسترس خواهد بود. لطفا پس از چند روز دوباره بررسی کنید.',
         'Please have a look at %s for more information.' => 'لطفا نگاهی داشته باشید به  %s برای اطلاعات بیشتر.',
-        'Your OTRS Free is the base for all future actions. Please register first before you continue with the upgrade process of %s!' =>
-            'OTRS رایگان خود را پایه ای برای تمام اقدامات آینده است. لطفا ابتدا ثبت نام کنید تا با روند ارتقاء ادامه %s !',
+        'Your ((OTRS)) Community Edition is the base for all future actions. Please register first before you continue with the upgrade process of %s!' =>
+            '',
         'Before you can benefit from %s, please contact %s to get your %s contract.' =>
             'قبل از اینکه شما می توانید از آن بهره مند %s ، لطفا با %s به خود %s قرارداد.',
         'Connection to cloud.otrs.com via HTTPS couldn\'t be established. Please make sure that your OTRS can connect to cloud.otrs.com via port 443.' =>
@@ -1363,8 +1364,8 @@ sub Data {
         'Vendor' => 'عرضه‌کننده',
         'Please uninstall the packages first using the package manager and try again.' =>
             'لطفا ابتدا با استفاده از بسته های مدیر بسته حذف و دوباره امتحان کنید.',
-        'You are about to downgrade to OTRS Free and will lose the following features and all data related to these:' =>
-            'شما در حال جمع و جور کردن به OTRS رایگان هستند و ویژگی های زیر است و تمام اطلاعات مربوط به این از دست دادن:',
+        'You are about to downgrade to ((OTRS)) Community Edition and will lose the following features and all data related to these:' =>
+            '',
         'Chat' => 'گپ',
         'Report Generator' => 'گزارش ژنراتور',
         'Timeline view in ticket zoom' => 'نمایش جدول زمانی در زوم بلیط',
@@ -1385,11 +1386,9 @@ sub Data {
             'پشتیبانی PGP فعال است، اما پیکربندی های مربوطه دارای خطا است. لطفا پیکربندی با استفاده از دکمه زیر را بررسی کنید.',
         'Configure it here!' => 'پیکربندی آن را در اینجا!',
         'Check PGP configuration' => 'بررسی پیکربندی PGP',
-        'Add PGP key' => 'افزودن کلید PGP',
         'In this way you can directly edit the keyring configured in SysConfig.' =>
             'از این طریق شما می‌توانید مستقیما کلید‌های خود را درسیستم تنظیم نمائید',
         'Introduction to PGP' => 'معرفی به PGP',
-        'Result' => 'نتیجه',
         'Identifier' => 'شناسه',
         'Bit' => 'Bit',
         'Fingerprint' => 'اثر انگشت',
@@ -1405,7 +1404,7 @@ sub Data {
         'Reinstall package' => 'نصب مجدد بسته',
         'Do you really want to reinstall this package? Any manual changes will be lost.' =>
             'آیا واقعا می‌خواهید این بسته را مجددا نصب نمایید؟ تمام تغییرات دستی از بین خواهد رفت.',
-        'Go to upgrading instructions' => '',
+        'Go to updating instructions' => '',
         'package information' => '',
         'Package installation requires a patch level update of OTRS.' => '',
         'Package update requires a patch level update of OTRS.' => '',
@@ -1422,7 +1421,7 @@ sub Data {
             '',
         'How can I do a patch level update if I don’t have a contract?' =>
             '',
-        'Please find all relevant information within the upgrading instructions at %s.' =>
+        'Please find all relevant information within the updating instructions at %s.' =>
             '',
         'In case you would have further questions we would be glad to answer them.' =>
             'در مورد شما می سوال بیشتر دارند ما خوشحال خواهد بود به آنها پاسخ دهد.',
@@ -1494,9 +1493,8 @@ sub Data {
         'PostMaster Filter Management' => 'مدیریت فیلتر پستی',
         'Add PostMaster Filter' => 'افزودن فیلتر پستی',
         'Edit PostMaster Filter' => 'ویرایش فیلتر پستی',
-        'Add filter' => 'افزودن فیلتر',
-        'Filter for Postmaster Filters' => '',
-        'Filter for postmaster filters' => '',
+        'Filter for PostMaster Filters' => '',
+        'Filter for PostMaster filters' => '',
         'To dispatch or filter incoming emails based on email headers. Matching using Regular Expressions is also possible.' =>
             'برای توزیع یا پالایش ایمیل‌ها وارده بر اساس هدرهای ایمیل. تطابق بر اساس عبارات منظم نیز مجاز است.',
         'If you want to match only the email address, use EMAILADDRESS:info@example.com in From, To or Cc.' =>
@@ -1534,6 +1532,7 @@ sub Data {
         # Template: AdminProcessManagement
         'Process Management' => 'مدیریت فرآیند',
         'Filter for Processes' => 'فیلتر برای پردازش',
+        'Filter for processes' => '',
         'Create New Process' => 'خلق فرآیند جدید',
         'Deploy All Processes' => 'استقرار تمام فرآیندها',
         'Here you can upload a configuration file to import a process to your system. The file needs to be in .yml format as exported by process management module.' =>
@@ -1692,7 +1691,7 @@ sub Data {
         'Remove this Parameter' => 'حذف این پارامتر',
 
         # Template: AdminQueue
-        'Manage Queues' => 'مدیریت صف‌های درخواست',
+        'Queue Management' => '',
         'Add Queue' => 'افزودن صف درخواست',
         'Edit Queue' => 'ویرایش صف درخواست',
         'Filter for Queues' => 'فیلتر برای صف‌های درخواست',
@@ -1724,6 +1723,8 @@ sub Data {
         'System address' => 'آدرس سیستم',
         'Will be the sender address of this queue for email answers.' => 'آدرس ارسال کننده این لیست برای پاسخ به ایمیل استفاده خواهد شد.',
         'Default sign key' => 'کلید امضای پیش‌فرض',
+        'To use a sign key, PGP keys or S/MIME certificates need to be added with identifiers for selected queue system address.' =>
+            '',
         'Salutation' => 'عنوان',
         'The salutation for email answers.' => 'عنوان برای پاسخ‌های ایمیلی',
         'Signature' => 'امضاء',
@@ -1742,6 +1743,7 @@ sub Data {
         # Template: AdminQueueTemplates
         'Manage Template-Queue Relations' => 'مدیریت روابط الگو صف',
         'Filter for Templates' => 'فیلتر برای قالب',
+        'Filter for templates' => '',
         'Templates' => 'قالب ها',
 
         # Template: AdminRegistration
@@ -1842,7 +1844,6 @@ sub Data {
 
         # Template: AdminRoleGroup
         'Manage Role-Group Relations' => 'مدیریت روابط نقش-گروه',
-        'Add role' => 'افزودن نقش',
         'Roles' => 'نقش‌ها',
         'Select the role:group permissions.' => 'نقش را انتخاب کنید: دسترسی‌های گروه.',
         'If nothing is selected, then there are no permissions in this group (tickets will not be available for the role).' =>
@@ -1863,8 +1864,9 @@ sub Data {
 
         # Template: AdminRoleUser
         'Manage Agent-Role Relations' => 'مدیریت روابط کارشناس-نقش',
-        'Add agent' => 'افزودن کارشناس',
+        'Add Agent' => 'افزودن کارشناس',
         'Filter for Agents' => 'فیلتر برای کارشناسان',
+        'Filter for agents' => '',
         'Agents' => 'کارشناسان',
         'Manage Role-Agent Relations' => 'مدیریت روابط نقش-کارشناس',
 
@@ -1887,10 +1889,8 @@ sub Data {
         'SMIME support is enabled, but the relevant configuration contains errors. Please check the configuration using the button below.' =>
             'پشتیبانی SMIME فعال است، اما پیکربندی های مربوطه دارای خطا است. لطفا پیکربندی با استفاده از دکمه زیر را بررسی کنید.',
         'Check SMIME configuration' => 'بررسی پیکربندی SMIME',
-        'Add certificate' => 'افزودن گواهینامه',
-        'Add private key' => 'افزودن کلید خصوصی',
         'Filter for Certificates' => '',
-        'Filter for S/MIME certs' => 'فیلتر برای S / MIME گواهیهای',
+        'Filter for certificates' => 'فیلتر برای گواهی',
         'To show certificate details click on a certificate icon.' => 'برای نشان دادن جزئیات گواهی  بر روی آیکون گواهی کلیک کنید .',
         'To manage private certificate relations click on a private key icon.' =>
             'برای مدیریت روابط گواهی خصوصی بر روی آیکون کلید خصوصی را کلیک کنید.',
@@ -1909,6 +1909,7 @@ sub Data {
         'Related Certificates for' => 'گواهینامه های مرتبط برای',
         'Delete this relation' => 'حذف این رابطه',
         'Available Certificates' => 'گواهینامه ها موجود',
+        'Filter for S/MIME certs' => 'فیلتر برای S / MIME گواهیهای',
         'Relate this certificate' => 'مربوط به این مجوز',
 
         # Template: AdminSMIMECertRead
@@ -1920,7 +1921,6 @@ sub Data {
         'Salutation Management' => 'مدیریت عنوان‌ها',
         'Add Salutation' => 'افزودن عنوان',
         'Edit Salutation' => 'ویرایش عنوان',
-        'Add salutation' => 'افزودن عنوان',
         'Filter for Salutations' => '',
         'Filter for salutations' => '',
         'e. g.' => 'به عنوان مثال',
@@ -1956,15 +1956,13 @@ sub Data {
         'Service Management' => 'مدیریت خدمات',
         'Add Service' => 'افزودن خدمت',
         'Edit Service' => 'ویرایش خدمت',
-        'Add service' => 'افزودن خدمت',
-        'Filter for services' => '',
         'Service name maximum length is 200 characters (with Sub-service).' =>
             '',
         'Sub-service of' => 'زیرمجموعه‌ای از خدمت',
 
         # Template: AdminSession
         'Session Management' => 'مدیریت Session‌ها',
-        'Detail Session View for' => '',
+        'Detail Session View for %s (%s)' => '',
         'All sessions' => 'تمام sessionها',
         'Agent sessions' => 'session کارشناسان',
         'Customer sessions' => 'session مشترکین',
@@ -1977,13 +1975,12 @@ sub Data {
         'Session' => 'Session',
         'User' => 'کاربر',
         'Kill' => 'کشتن',
-        'Detail View for SessionID' => 'نمای جزئیات برای SessionID',
+        'Detail View for SessionID: %s - %s' => '',
 
         # Template: AdminSignature
         'Signature Management' => 'مدیریت امضاء',
         'Add Signature' => 'افزودن امضاء',
         'Edit Signature' => 'ویرایش امضاء',
-        'Add signature' => 'افزودن امضاء',
         'Filter for Signatures' => '',
         'Filter for signatures' => '',
         'Example signature' => 'امضای نمونه',
@@ -1999,6 +1996,8 @@ sub Data {
         'This state is present in a SysConfig setting, confirmation for updating settings to point to the new type is needed!' =>
             '',
         'State type' => 'نوع وضعیت',
+        'It\'s not possible to invalidate this entry because there is no other merge states in system!' =>
+            '',
         'This state is used in the following config settings:' => '',
 
         # Template: AdminSupportDataCollector
@@ -2120,6 +2119,7 @@ sub Data {
         # Template: AdminSystemConfigurationView
         'View a custom List of Settings' => '',
         'View single Setting: %s' => '',
+        'Go back to Deployment Details' => '',
 
         # Template: AdminSystemMaintenance
         'System Maintenance Management' => 'سیستم مدیریت نگهداری و تعمیرات',
@@ -2148,10 +2148,9 @@ sub Data {
         'Kill all Sessions, except for your own' => 'کشتن تمام جلسات، به جز مال خود را',
 
         # Template: AdminTemplate
-        'Manage Templates' => 'مدیریت قالب',
+        'Template Management' => '',
         'Add Template' => 'افزودن قالب',
         'Edit Template' => 'ویرایش قالب',
-        'Add template' => 'اضافه کردن قالب',
         'A template is a default text which helps your agents to write faster tickets, answers or forwards.' =>
             'قالب یک متن پیش فرض است که کمک می کند تا عوامل خود را برای ارسال سریعتر بلیط، پاسخ و یا جلو است.',
         'Don\'t forget to add new templates to queues.' => 'فراموش نکنید که برای اضافه کردن قالب جدید به صف.',
@@ -2174,7 +2173,6 @@ sub Data {
         'Type Management' => 'مدیریت نوع‌ها',
         'Add Type' => 'افزودن نوع',
         'Edit Type' => 'ویرایش درخواست',
-        'Add ticket type' => 'افزودن نوع درخواست',
         'Filter for Types' => '',
         'Filter for types' => '',
         'A type with this name already exists!' => 'یک نوع با این نام وجود دارد.',
@@ -2184,7 +2182,6 @@ sub Data {
 
         # Template: AdminUser
         'Agent Management' => 'مدیریت کارشناس',
-        'Add Agent' => 'افزودن کارشناس',
         'Edit Agent' => 'ویرایش کارشناس',
         'Edit personal preferences for this agent' => '',
         'Agents will be needed to handle tickets.' => 'کارشناسان نیاز دارند که به درخواست‌ها رسیدگی کنند.',
@@ -2436,12 +2433,12 @@ sub Data {
 
         # Template: AgentOTRSBusinessBlockScreen
         'Unauthorized usage of %s detected' => 'استفاده غیر مجاز از %s شناسایی',
-        'If you decide to downgrade to OTRS Free, you will lose all database tables and data related to %s.' =>
-            'اگر شما تصمیم به جمع و جور کردن به OTRS رایگان، شما تمام جداول پایگاه داده و داده های مربوط به از دست دادن %s .',
+        'If you decide to downgrade to ((OTRS)) Community Edition, you will lose all database tables and data related to %s.' =>
+            '',
 
         # Template: AgentPreferences
         'Edit your preferences' => 'تنظیمات شخصی خودتان را ویرایش نمایید',
-        'Personal preferences' => '',
+        'Personal Preferences' => '',
         'Preferences' => 'تنظیمات',
         'Please note: you\'re currently editing the preferences of %s.' =>
             '',
@@ -2469,7 +2466,6 @@ sub Data {
         'Reset to default' => '',
 
         # Template: AgentPreferencesOverview
-        'Personal Preferences' => '',
         'Choose from the groups on the right to find the settings you\'d wish to change.' =>
             '',
         'Did you know?' => '',
@@ -2836,9 +2832,7 @@ sub Data {
         'Powered by %s™' => '',
 
         # Template: CustomerFooterJS
-        'Your browser was not able to communicate with OTRS properly, there seems to be something wrong with your network connection. You could either try reloading this page manually or wait until your browser has re-established the connection on its own.' =>
-            'مرورگر خود را قادر به برقراری ارتباط با OTRS به درستی نمی به نظر می رسد، به چیزی اشتباه است با اتصال به شبکه شما وجود دارد. شما می توانید این صفحه بارگذاری دستی امتحان کنید یا صبر کنید تا مرورگر شما دوباره برقرار اتصال در خود را دارد.',
-        'There was an error in communication with the server. Server might be experiencing some temporary problems, please reload this page to check if they have been resolved.' =>
+        '%s detected possible network issues. You could either try reloading this page manually or wait until your browser has re-established the connection on its own.' =>
             '',
         'The connection has been re-established after a temporary connection loss. Due to this, elements on this page could have stopped to work correctly. In order to be able to use all elements correctly again, it is strongly recommended to reload this page.' =>
             'اتصال شده است دوباره برقرار پس از از دست دادن اتصال موقت. با توجه به این، از عناصر این صفحه می تواند متوقف کرده اند به درستی کار کند. به منظور قادر به استفاده از تمام عناصر به درستی دوباره، آن است که شدت توصیه می شود به بارگذاری مجدد این صفحه.',
@@ -2863,6 +2857,7 @@ sub Data {
         'Your 2 Factor Token' => ' 2 فاکتور رمزشما',
         'Log In' => 'ورود',
         'Not yet registered?' => 'هنوز ثبت نام نشده‌اید؟',
+        'Back' => 'بازگشت',
         'Request New Password' => 'درخواست رمز عبور جدید',
         'Your User Name' => 'نام کاربری شما',
         'A new password will be sent to your email address.' => 'رمز عبور جدید برای آدرس ایمیل شما ارسال خواهد شد.',
@@ -2957,6 +2952,7 @@ sub Data {
         'View notifications' => '',
         'Notifications' => '',
         'Notifications (OTRS Business Solution™)' => '',
+        'Personal preferences' => '',
         'Logout' => 'خروج ',
         'You are logged in as' => 'شما با این عنوان وارد شده‌اید',
 
@@ -2968,7 +2964,14 @@ sub Data {
         'General Specifications and Mail Settings' => 'مشخصات عمومی و تنظیمات ایمیل',
         'Finish' => 'پایان',
         'Welcome to %s' => 'خوش آمدید به %s',
+        'Germany' => '',
         'Phone' => 'تلفن',
+        'United States' => '',
+        'Mexico' => '',
+        'Hungary' => '',
+        'Brazil' => '',
+        'Singapore' => '',
+        'Hong Kong' => '',
         'Web site' => 'وب سایت',
 
         # Template: InstallerConfigureMail
@@ -3429,7 +3432,7 @@ sub Data {
         'Auto Response added!' => '',
 
         # Perl Module: Kernel/Modules/AdminCommunicationLog.pm
-        'Invalid CommunicationID ' => '',
+        'Invalid CommunicationID!' => '',
         'All communications' => '',
         'Last 1 hour' => '',
         'Last 3 hours' => '',
@@ -3586,11 +3589,9 @@ sub Data {
         '1 week' => '',
 
         # Perl Module: Kernel/Modules/AdminGenericInterfaceInvokerDefault.pm
-        'Need InvokerType' => 'نیاز InvokerType',
-        'InvokerType %s is not registered' => 'InvokerType %s ثبت نشده است',
-        'Need InvokerType!' => '',
-        'Need Invoker' => 'نیاز Invoker',
         'Could not determine config for invoker %s' => 'می تواند پیکربندی برای invoker مشخص نیست %s',
+        'InvokerType %s is not registered' => 'InvokerType %s ثبت نشده است',
+        'MappingType %s is not registered' => '',
 
         # Perl Module: Kernel/Modules/AdminGenericInterfaceInvokerEvent.pm
         'Need Invoker!' => '',
@@ -3618,11 +3619,8 @@ sub Data {
         'Outgoing response data before mapping' => '',
 
         # Perl Module: Kernel/Modules/AdminGenericInterfaceOperationDefault.pm
-        'Need OperationType' => 'نیاز OperationType',
-        'Operation %s is not registered' => 'عملیات %s ثبت نشده است',
-        'OperationType %s is not registered' => 'OperationType %s ثبت نشده است',
-        'Need Operation' => 'نیاز به عمل جراحی است',
         'Could not determine config for operation %s' => 'می تواند پیکربندی برای عملیات مشخص نیست %s',
+        'OperationType %s is not registered' => 'OperationType %s ثبت نشده است',
 
         # Perl Module: Kernel/Modules/AdminGenericInterfaceTransportHTTPREST.pm
         'Need valid Subaction!' => '',
@@ -4598,6 +4596,10 @@ sub Data {
         'You have Out of Office enabled, would you like to disable it?' =>
             'شما گزینه خارج از دفتردارید،می خواهید غیرفعالش کنید؟ ',
 
+        # Perl Module: Kernel/Output/HTML/Notification/PackageManagerCheckNotVerifiedPackages.pm
+        'The installation of packages which are not verified by the OTRS Group is activated. These packages could threaten your whole system! It is recommended not to use unverified packages.' =>
+            '',
+
         # Perl Module: Kernel/Output/HTML/Notification/SystemConfigurationInvalidCheck.pm
         'You have %s invalid setting(s) deployed. Click here to show invalid settings.' =>
             '',
@@ -4798,6 +4800,10 @@ sub Data {
         'Can\'t read file!' => 'نمی توانید فایل خوانده شده!',
         '<p>If you continue to install this package, the following issues may occur:</p><ul><li>Security problems</li><li>Stability problems</li><li>Performance problems</li></ul><p>Please note that issues that are caused by working with this package are not covered by OTRS service contracts.</p>' =>
             '',
+        '<p>The installation of packages which are not verified by the OTRS Group is not possible by default.</p>' =>
+            '',
+        '<p>You can activate the installation of not verified packages in the <a href="%sAction=AdminSystemConfiguration;Subaction=View;Setting=Package%3A%3AAllowNotVerifiedPackages" target="_blank">System Configuration</a>.</p>' =>
+            '',
 
         # Perl Module: Kernel/System/ProcessManagement/DB/Process.pm
         'The process "%s" and all of its data has been imported successfully.' =>
@@ -4948,9 +4954,6 @@ sub Data {
         'Tables with a different storage engine than the default engine were found.' =>
             'جداول با یک موتور ذخیره سازی متفاوت با موتور به طور پیش فرض پیدا شد.',
 
-        # Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/TableCheck.pm
-        'Table check found some problems.' => '',
-
         # Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/Version.pm
         'MySQL 5.x or higher is required.' => '5.x خروجی زیر و یا بالاتر مورد نیاز است.',
 
@@ -5062,6 +5065,7 @@ sub Data {
         'Process Tickets' => 'بلیط روند',
         'Months Between First And Last Ticket' => 'ماهها از اولین تا  آخرین درخواست',
         'Tickets Per Month (avg)' => 'درخواست در هر ماه (AVG)',
+        'Open Tickets' => 'درخواست باز',
 
         # Perl Module: Kernel/System/SupportDataCollector/Plugin/OTRS/DefaultSOAPUser.pm
         'Default SOAP Username And Password' => 'به طور پیش فرض SOAP نام کاربری و رمز',
@@ -5077,10 +5081,6 @@ sub Data {
         'Email Sending Queue' => '',
         'Emails queued for sending' => '',
 
-        # Perl Module: Kernel/System/SupportDataCollector/Plugin/OTRS/ErrorLog.pm
-        'Error Log' => 'ورود به خطا',
-        'There are error reports in your system log.' => 'گزارش خطا در ورود به سیستم شما وجود دارد.',
-
         # Perl Module: Kernel/System/SupportDataCollector/Plugin/OTRS/FQDN.pm
         'FQDN (domain name)' => 'FQDN (نام دامنه)',
         'Please configure your FQDN setting.' => 'لطفا تنظیمات FQDN خود را پیکربندی کنید.',
@@ -5094,6 +5094,10 @@ sub Data {
         # Perl Module: Kernel/System/SupportDataCollector/Plugin/OTRS/LegacyConfigBackups.pm
         'Legacy Configuration Backups' => '',
         'No legacy configuration backup files found.' => '',
+        'Legacy configuration backup files found in %s, but they might still be required by some packages.' =>
+            '',
+        'Legacy configuration backup files are no longer needed for the installed packages, please remove them from %s.' =>
+            '',
 
         # Perl Module: Kernel/System/SupportDataCollector/Plugin/OTRS/PackageDeployment.pm
         'Package Installation Status' => 'وضعیت بسته نصب و راه اندازی',
@@ -5135,7 +5139,6 @@ sub Data {
         'There are invalid users with locked tickets.' => 'کاربران نامعتبر با درخواست قفل شده وجود دارد.',
 
         # Perl Module: Kernel/System/SupportDataCollector/Plugin/OTRS/Ticket/OpenTickets.pm
-        'Open Tickets' => 'درخواست باز',
         'You should not have more than 8,000 open tickets in your system.' =>
             'نباید بیش از 8000 درخواست باز در سیستم شما وجود داشته باشد.',
 
@@ -5257,6 +5260,10 @@ sub Data {
 
         # Perl Module: Kernel/System/Ticket.pm
         'Reset of unlock time.' => 'تنظیم مجدد از زمان باز کردن.',
+
+        # Perl Module: Kernel/System/Ticket/Article/Backend/Chat.pm
+        'Chat Participant' => '',
+        'Chat Message Text' => '',
 
         # Perl Module: Kernel/System/Web/InterfaceAgent.pm
         'Login failed! Your user name or password was entered incorrectly.' =>
@@ -5432,6 +5439,7 @@ sub Data {
 
         # JS File: Core.Agent.Admin.GenericAgent
         'Remove selection' => 'حذف انتخاب',
+        'Do you really want to delete this generic agent job?' => '',
         'Delete this Event Trigger' => 'حذف این رویداد راه انداز',
         'Duplicate event.' => 'تکرار رویداد.',
         'This event is already attached to the job, Please use a different one.' =>
@@ -5448,6 +5456,8 @@ sub Data {
         'Delete error handling module' => '',
 
         # JS File: Core.Agent.Admin.GenericInterfaceInvoker
+        'It is not possible to add a new event trigger because the event is not set.' =>
+            '',
         'Delete this Invoker' => 'حذف این Invoker',
 
         # JS File: Core.Agent.Admin.GenericInterfaceInvokerEvent
@@ -5480,6 +5490,9 @@ sub Data {
         # JS File: Core.Agent.Admin.NotificationEvent
         'Do you really want to delete this notification language?' => 'آیا شما واقعا حذف این زبان اطلاع رسانی را میخواهید؟',
         'Do you really want to delete this notification?' => 'آیا واقعا میخواهید این اطلاعات را حذف کنید؟',
+
+        # JS File: Core.Agent.Admin.PGP
+        'Do you really want to delete this key?' => '',
 
         # JS File: Core.Agent.Admin.PackageManager
         'There is a package upgrade process running, click here to see status information about the upgrade progress.' =>
@@ -5691,9 +5704,8 @@ sub Data {
 
         # JS File: Core.App
         'Error: Browser Check failed!' => '',
-        'Connection error' => 'خطای اتصال',
         'Reload page' => 'بارگذاری مجدد صفحه',
-        'Communication error' => '',
+        'Reload page (%ss)' => '',
 
         # JS File: Core.Debug
         'Namespace %s could not be initialized, because %s could not be found.' =>
@@ -5888,6 +5900,7 @@ Thanks for your help!
         'Admin Area.' => 'بخش مدیریت.',
         'Admin Notification' => 'اعلام مدیر سیستم',
         'Admin area navigation for the agent interface.' => '',
+        'Admin modules overview.' => '',
         'Admin.' => 'مدیر',
         'Administration' => '',
         'Agent Customer Search' => '',
@@ -5895,6 +5908,7 @@ Thanks for your help!
         'Agent Name' => 'نام نماینده',
         'Agent Name + FromSeparator + System Address Display Name' => 'نام نماینده + FromSeparator + سیستم نام آدرس ها',
         'Agent Preferences.' => 'تنظیمات عامل.',
+        'Agent Statistics.' => '',
         'Agent User Search' => '',
         'Agent User Search.' => '',
         'Agent interface article notification module to check PGP.' => 'ماژول اعلان مطلب برای کارشناس به جهت کنترل PGP',
@@ -5962,12 +5976,12 @@ Thanks for your help!
             'مشتریان اجازه می دهد تا مجموعه ای از SLA بلیط در رابط مشتری.',
         'Allows customers to set the ticket priority in the customer interface.' =>
             'به مشتریان اجازه می دهد به تنظیم اولویت درخواست در رابط مشتری.',
-        'Allows customers to set the ticket queue in the customer interface. If this is set to \'No\', QueueDefault should be configured.' =>
-            'مشتریان اجازه می دهد به مجموعه ای صف بلیط در رابط مشتری. اگر این تنظیم شده است «نه»، QueueDefault باید پیکربندی شوند.',
+        'Allows customers to set the ticket queue in the customer interface. If this is not enabled, QueueDefault should be configured.' =>
+            '',
         'Allows customers to set the ticket service in the customer interface.' =>
             'اجازه می دهد به مشتریان تا قراردهند  مجموعه خدمات درخواست در رابط مشتری.',
-        'Allows customers to set the ticket type in the customer interface. If this is set to \'No\', TicketTypeDefault should be configured.' =>
-            'مشتریان اجازه می دهد تا مجموعه ای از نوع بلیط در رابط مشتری. اگر این تنظیم شده است «نه»، TicketTypeDefault باید پیکربندی شوند.',
+        'Allows customers to set the ticket type in the customer interface. If this is not enabled, TicketTypeDefault should be configured.' =>
+            '',
         'Allows default services to be selected also for non existing customers.' =>
             'اجازه می دهد تا خدمات به طور پیش فرض به همچنین برای مشتریان غیر موجود انتخاب شود.',
         'Allows defining services and SLAs for tickets (e. g. email, desktop, network, ...), and escalation attributes for SLAs (if ticket service/SLA feature is enabled).' =>
@@ -6031,8 +6045,6 @@ Thanks for your help!
         'Arabic (Saudi Arabia)' => 'عربی (عربستان سعودی)',
         'ArticleTree' => 'ArticleTree',
         'Attachment Name' => 'نام فایل پیوست',
-        'Attachments ↔ Templates' => '',
-        'Auto Responses ↔ Queues' => '',
         'Automated line break in text messages after x number of chars.' =>
             'خط خودکار در پیام های متنی از تعداد X از کاراکتر.',
         'Automatically change the state of a ticket with an invalid owner once it is unlocked. Maps from a state type to a new ticket state.' =>
@@ -6221,17 +6233,20 @@ Thanks for your help!
             '',
         'Croatian' => 'کرواتی',
         'Custom RSS Feed' => 'سفارشی خوراک RSS',
+        'Custom RSS feed.' => '',
         'Custom text for the page shown to customers that have no tickets yet (if you need those text translated add them to a custom translation module).' =>
             'متن دلخواه برای صفحه نشان داده شده به مشتریان است که هیچ بلیط هنوز (اگر شما نیاز به آن متن ترجمه آنها را به یک ماژول ترجمه سفارشی اضافه کنید).',
         'Customer Administration' => 'اداره مشتری',
         'Customer Companies' => 'شرکت/سازمان‌های مشترک',
         'Customer IDs' => '',
         'Customer Information Center Search.' => ' جستجو مرکز اطلاعات مشتری.',
+        'Customer Information Center search.' => '',
         'Customer Information Center.' => 'مرکز اطلاعات مشتری.',
         'Customer Ticket Print Module.' => 'درخواست مشتری چاپ ماژول.',
         'Customer User Administration' => 'مشتری اداره کاربری',
         'Customer User Information' => '',
         'Customer User Information Center Search.' => '',
+        'Customer User Information Center search.' => '',
         'Customer User Information Center.' => '',
         'Customer Users ↔ Customers' => '',
         'Customer Users ↔ Groups' => '',
@@ -6253,6 +6268,7 @@ Thanks for your help!
             'کلمات توقف قابل تنظیم برای صفحه اول متن. این کلمات از صفحه اول جستجو حذف خواهند شد.',
         'Czech' => 'چک',
         'Danish' => 'دانمارکی',
+        'Dashboard overview.' => '',
         'Data used to export the search result in CSV format.' => 'داده استفاده شده برای ارسال نتایج جستجو به قالب CSV',
         'Date / Time' => 'زمان تاریخ',
         'Default (Slim)' => 'به طور پیش فرض (لاغر)',
@@ -6294,6 +6310,8 @@ Thanks for your help!
         'Define the start day of the week for the date picker for the indicated calendar.' =>
             'تعریف روز شروع هفته را برای جمع کننده اطلاعات تقویم نشان داد.',
         'Define the start day of the week for the date picker.' => 'تعریف روز شروع هفته برای جمع کننده اطلاعات.',
+        'Define which avatar default image should be used for the article view if no gravatar is assigned to the mail address. Check http://gravatar.com/site/implement/images/ for further information.' =>
+            '',
         'Define which avatar default image should be used for the current agent if no gravatar is assigned to the mail address of the agent. Check http://gravatar.com/site/implement/images/ for further information.' =>
             '',
         'Define which avatar engine should be used for the agent avatar on the header and the sender images in AgentTicketZoom. If \'None\' is selected, initials will be displayed instead. Please note that selecting anything other than \'None\' will transfer the encrypted email address of the particular user to an external service.' =>
@@ -6412,6 +6430,8 @@ Thanks for your help!
             'تعریف می کند اگر عوامل باید مجاز به ورود در صورتی که هیچ راز به اشتراک گذاشته شده ذخیره شده در تنظیمات خود را و در نتیجه با استفاده از احراز هویت دو عامل است.',
         'Defines if customers should be allowed to login if they have no shared secret stored in their preferences and therefore are not using two-factor authentication.' =>
             'تعریف می کند اگر مشتریان باید مجاز به ورود در صورتی که هیچ راز به اشتراک گذاشته شده ذخیره شده در تنظیمات خود را و در نتیجه با استفاده از احراز هویت دو عامل است.',
+        'Defines if the communication between this system and OTRS Group servers that provide cloud services is possible. If set to \'Disable cloud services\', some functionality will be lost such as system registration, support data sending, upgrading to and use of OTRS Business Solution™, OTRS Verify™, OTRS News and product News dashboard widgets, among others.' =>
+            '',
         'Defines if the enhanced mode should be used (enables use of table, replace, subscript, superscript, paste from word, etc.) in customer interface.' =>
             'تعریف می کند اگر حالت پیشرفته استفاده شود (را قادر می سازد استفاده از جدول، جایگزین، زیرنویس، بالانویس، چسباندن از Word، و غیره) در رابط مشتری می باشد.',
         'Defines if the enhanced mode should be used (enables use of table, replace, subscript, superscript, paste from word, etc.).' =>
@@ -6490,8 +6510,10 @@ Thanks for your help!
         'Defines the config options for the autocompletion feature.' => 'تعریف می کند که گزینه های پیکربندی برای قابلیت تکمیل خودکار است.',
         'Defines the config parameters of this item, to be shown in the preferences view.' =>
             'تعریف می کند که پارامترهای پیکربندی از این آیتم، به  نظردر تنظیمات نشان داده میشود.',
-        'Defines the config parameters of this item, to be shown in the preferences view. \'PasswordRegExp\' allows to match passwords against a regular expression. Define the minimum number of characters using \'PasswordMinSize\'. Define if at least 2 lowercase and 2 uppercase letter characters are needed by setting the appropriate option to \'1\'. \'PasswordMin2Characters\' defines if the password needs to contain at least 2 letter characters (set to 0 or 1). \'PasswordNeedDigit\' controls the need of at least 1 digit (set to 0 or 1 to control). \'PasswordMaxLoginFailed\' allows to set an agent to invalid-temporarily if max failed logins reached.' =>
-            'تعریف می کند که پارامترهای پیکربندی از این آیتم، به در نظر تنظیمات نشان داده شود. "PasswordRegExp اجازه می دهد تا برای مطابقت با کلمه عبور در مقابل یک عبارت منظم. تعریف حداقل تعداد کاراکتر با استفاده از \'PasswordMinSize. تعریف اگر حداقل 2 حروف کوچک و 2 نامه حروف بزرگ با تنظیم گزینه مناسب به \'1\' مورد نیاز است. تعریف: PasswordMin2Characters اگر رمز عبور نیاز به حداقل 2 نویسه (مجموعه را به 0 یا 1). "PasswordNeedDigit \'کنترل نیاز به حداقل 1 رقمی (مجموعه ای به 0 یا 1 به کنترل). "PasswordMaxLoginFailed اجازه می دهد تا به مجموعه ای از یک عامل برای نامعتبر به طور موقت اگر حداکثر باری رسیده شکست خورده است.',
+        'Defines the config parameters of this item, to be shown in the preferences view. \'PasswordRegExp\' allows to match passwords against a regular expression. Define the minimum number of characters using \'PasswordMinSize\'. Define if at least 2 lowercase and 2 uppercase letter characters are needed by setting the appropriate option to \'1\'. \'PasswordMin2Characters\' defines if the password needs to contain at least 2 letter characters (set to 0 or 1). \'PasswordNeedDigit\' controls the need of at least 1 digit (set to 0 or 1 to control). \'PasswordMaxLoginFailed\' allows to set an agent to invalid-temporarily if max failed logins reached. Please note: setting \'Active\' to 0 will only prevent agents from editing settings of this group in their personal preferences, but will still allow administrators to edit the settings of another user\'s behalf. Use \'PreferenceGroup\' to control in which area these settings should be shown in the user interface.' =>
+            '',
+        'Defines the config parameters of this item, to be shown in the preferences view. Please note: setting \'Active\' to 0 will only prevent agents from editing settings of this group in their personal preferences, but will still allow administrators to edit the settings of another user\'s behalf. Use \'PreferenceGroup\' to control in which area these settings should be shown in the user interface.' =>
+            '',
         'Defines the connections for http/ftp, via a proxy.' => 'تعریف می کند که ارتباطات به HTTP / FTP، از طریق یک پروکسی است.',
         'Defines the customer preferences key where the shared secret key is stored.' =>
             'تعریف می کند کلید ترجیحات مشتری که در آن کلید رمز مشترک ذخیره شده است.',
@@ -6792,6 +6814,8 @@ Thanks for your help!
             'تعریف می کند که ماژول برای نمایش اطلاع رسانی در رابط عامل، اگر عامل در حالی که داشتن تعمیر و نگهداری سیستم فعال وارد سایت شوید.',
         'Defines the module to display a notification in the agent interface, if the agent session limit prior warning is reached.' =>
             'تعریف می کند که ماژول برای نمایش اطلاع رسانی در رابط عامل، اگر عامل محدود جلسه هشدار قبلی رسیده است.',
+        'Defines the module to display a notification in the agent interface, if the installation of not verified packages is activated (only shown to admins).' =>
+            '',
         'Defines the module to display a notification in the agent interface, if the system is used by the admin user (normally you shouldn\'t work as admin).' =>
             'ماژول برای نمایش اطلاع رسانی در رابط عامل، در صورتی که سیستم توسط کاربر مدیریت استفاده را تعریف می کند (به طور معمول شما باید به عنوان مدیر کار نمی کند).',
         'Defines the module to display a notification in the agent interface, if there are invalid sysconfig settings deployed.' =>
@@ -6912,6 +6936,8 @@ Thanks for your help!
             'تعریف می کند که جدا کننده بین عوامل نام واقعی و با توجه به آدرس ایمیل صف.',
         'Defines the shown columns and the position in the AgentCustomerUserAddressBook result screen.' =>
             '',
+        'Defines the shown links in the footer area of the customer and public interface of this OTRS system. The value in "Key" is the external URL, the value in "Content" is the shown label.' =>
+            '',
         'Defines the standard permissions available for customers within the application. If more permissions are needed, you can enter them here. Permissions must be hard coded to be effective. Please ensure, when adding any of the afore mentioned permissions, that the "rw" permission remains the last entry.' =>
             'تعریف می کند که مجوز استاندارد برای مشتریان داخل نرم افزار. اگر مجوزهای بیشتری مورد نیاز است، شما می توانید آنها را در اینجا وارد کنید. مجوز باید سخت کدگذاری موثر باشد. لطفا اطمینان حاصل شود، در هنگام اضافه کردن هر یک از مجوز مزبور، که \ "RW " اجازه آخرین ورود باقی مانده است.',
         'Defines the standard size of PDF pages.' => ' اندازه استاندارد برای صفحات PDF. تعریف می کند ',
@@ -6960,7 +6986,8 @@ Thanks for your help!
         'Defines the user identifier for the customer panel.' => 'تعریف می کند که شناسه کاربر برای پنل مشتری می باشد.',
         'Defines the username to access the SOAP handle (bin/cgi-bin/rpc.pl).' =>
             'تعریف می کند که نام کاربری برای دسترسی به دسته SOAP (بن / cgi-bin در / rpc.pl). میباشد',
-        'Defines the users avatar.' => '',
+        'Defines the users avatar. Please note: setting \'Active\' to 0 will only prevent agents from editing settings of this group in their personal preferences, but will still allow administrators to edit the settings of another user\'s behalf. Use \'PreferenceGroup\' to control in which area these settings should be shown in the user interface.' =>
+            '',
         'Defines the valid state types for a ticket.' => 'انواع وضعیت معتبر برای یک بلیط.را تعریف میکند.',
         'Defines the valid states for unlocked tickets. To unlock tickets the script "bin/otrs.Console.pl Maint::Ticket::UnlockTimeout" can be used.' =>
             'تعریف می کند که ایالات معتبر برای بلیط باز شده است. برای باز کردن قفل بلیط اسکریپت \ "بن / otrs.Console.pl سیستم maint :: بلیط :: UnlockTimeout " می تواند استفاده شود.',
@@ -7036,11 +7063,10 @@ Thanks for your help!
             'غیر فعال کردن HTTP هدر "Content-Security-Policy" اجازه می دهد تا بارگذاری محتویات اسکریپت های خارجی. غیر فعال کردن این هدر HTTP می تواند یک مسئله امنیتی! فقط آن را غیر فعال کنید، اگر شما می دانید آنچه شما انجام می دهند!',
         'Disable HTTP header "X-Frame-Options: SAMEORIGIN" to allow OTRS to be included as an IFrame in other websites. Disabling this HTTP header can be a security issue! Only disable it, if you know what you are doing!' =>
             'غیر فعال کردن HTTP هدر \ "X-قاب گزینه ها: SAMEORIGIN " اجازه می دهد OTRS به عنوان یک iframe در وب سایت های دیگر گنجانده شده است. غیر فعال کردن این هدر HTTP می تواند یک مسئله امنیتی! فقط آن را غیر فعال کنید، اگر شما می دانید آنچه شما انجام می دهند!',
+        'Disable cloud services' => '',
         'Disables sending reminder notifications to the responsible agent of a ticket (Ticket::Responsible needs to be enabled).' =>
             '',
-        'Disables the communication between this system and OTRS Group servers that provides cloud services. If enabled, some functionality will be lost such as system registration, support data sending, upgrading to and use of OTRS Business Solution™, OTRS Verify™, OTRS News and product News dashboard widgets, among others.' =>
-            '',
-        'Disables the redirection to the last screen overview / dashboard after a ticket is created.' =>
+        'Disables the redirection to the last screen overview / dashboard after a ticket is closed.' =>
             '',
         'Disables the web installer (http://yourhost.example.com/otrs/installer.pl), to prevent the system from being hijacked. If not enabled, the system can be reinstalled and the current basic configuration will be used to pre-populate the questions within the installer script. If enabled, it also disables the GenericAgent, PackageManager and SQL Box.' =>
             '',
@@ -7269,6 +7295,7 @@ Thanks for your help!
             '',
         'Frontend module registration for the agent interface.' => 'ظاهر ثبت نام ماژول برای رابط عامل.',
         'Frontend module registration for the customer interface.' => 'ظاهر ثبت نام ماژول برای رابط مشتری.',
+        'Frontend module registration for the public interface.' => '',
         'Full value' => 'ارزش کامل',
         'Fulltext index regex filters to remove parts of the text.' => 'متن فیلتر شاخص عبارت منظم به حذف بخش هایی از متن.',
         'Fulltext search' => 'جستجوی متن',
@@ -7301,8 +7328,8 @@ Thanks for your help!
             'کلمات توقف آلمانی برای شاخص متن. این کلمات از صفحه اول جستجو حذف خواهند شد.',
         'Gives customer users group based access to tickets from customer users of the same customer (ticket CustomerID is a CustomerID of the customer user).' =>
             '',
-        'Gives end users the possibility to override the separator character for CSV files, defined in the translation files.' =>
-            'به کاربران این امکان را به نادیده گرفتن کاراکتر جدا برای فایل های CSV، تعریف شده در فایل های ترجمه.',
+        'Gives end users the possibility to override the separator character for CSV files, defined in the translation files. Please note: setting \'Active\' to 0 will only prevent agents from editing settings of this group in their personal preferences, but will still allow administrators to edit the settings of another user\'s behalf. Use \'PreferenceGroup\' to control in which area these settings should be shown in the user interface.' =>
+            '',
         'Global Search Module.' => 'بازارهای ماژول جستجو.',
         'Go to dashboard!' => 'برو به داشبورد!',
         'Google Authenticator' => 'Google Authenticator را',
@@ -7311,8 +7338,8 @@ Thanks for your help!
         'Graph: Stacked Area Chart' => 'نمودار: نمودار محیطی پشتهای',
         'Greek' => 'یونانی',
         'Hebrew' => 'عبری',
-        'Helps to extend your articles full-text search (From, To, Cc, Subject and Body search). Runtime will do full-text searches on live data (it works fine for up to 50.000 tickets). StaticDB will strip all articles and will build an index after article creation, increasing fulltext searches about 50%. To create an initial index use "bin/otrs.Console.pl Maint::Ticket::FulltextIndexRebuild".' =>
-            'کمک می کند تا به گسترش مقالات خود را جستجو متن کامل (از، به، CC، موضوع و جستجو بدن). در زمان اجرا خواهد جستجو متن کامل بر روی داده های زنده انجام (خوب کار می کند تا 50.000 بلیط). StaticDB همه مقالات نوار و شاخص پس از ایجاد مقاله ساخت، افزایش جستجو متن در حدود 50٪. برای ایجاد یک استفاده شاخص اولیه \ "بن / otrs.Console.pl سیستم maint :: بلیط :: FulltextIndexRebuild ".',
+        'Helps to extend your articles full-text search (From, To, Cc, Subject and Body search). It will strip all articles and will build an index after article creation, increasing fulltext searches about 50%. To create an initial index use "bin/otrs.Console.pl Maint::Ticket::FulltextIndexRebuild".' =>
+            '',
         'High Contrast' => '',
         'High contrast skin for visually impaired users.' => '',
         'Hindi' => 'هندی',
@@ -7429,6 +7456,8 @@ Thanks for your help!
             '',
         'If this regex matches, no message will be send by the autoresponder.' =>
             'اگر این عبارت منظم مسابقات، هیچ پیام خواهد شد توسط پاسخگوی خودکار ارسال می کند.',
+        'If this setting is enabled, it is possible to install packages which are not verified by OTRS Group. These packages could threaten your whole system!' =>
+            '',
         'If this setting is enabled, local modifications will not be highlighted as errors in the package manager and support data collector.' =>
             '',
         'If you\'re going to be out of office, you may wish to let other users know by setting the exact dates of your absence.' =>
@@ -7465,6 +7494,7 @@ Thanks for your help!
         'Ivory (Slim)' => 'عاج (لاغر)',
         'Japanese' => 'ژاپنی',
         'JavaScript function for the search frontend.' => 'جاوا اسکریپت تابع برای ظاهر جستجو.',
+        'Korean' => '',
         'Language' => 'زبان',
         'Large' => 'بزرگ',
         'Last Screen Overview' => '',
@@ -7480,13 +7510,13 @@ Thanks for your help!
         'Link Object.' => 'شی لینک.',
         'Link agents to groups.' => 'برقراری ارتباط بین کارشناسان و گروه‌ها',
         'Link agents to roles.' => 'برقراری ارتباط بین کارشناسان و نقش‌ها',
-        'Link attachments to templates.' => 'فایل پیوست لینک به قالب.',
         'Link customer users to customers.' => '',
         'Link customer users to groups.' => '',
         'Link customer users to services.' => '',
         'Link customers to groups.' => '',
         'Link queues to auto responses.' => 'برقراری ارتباط بین صف‌های درخواست و پاسخ‌های خودکار',
         'Link roles to groups.' => 'برقراری ارتباط بین نقش‌ها و گروه‌ها',
+        'Link templates to attachments.' => '',
         'Link templates to queues.' => 'قالب لینک به صف.',
         'Link this ticket to other objects' => 'پیوند این درخواست به موضوع دیگر',
         'Links 2 tickets with a "Normal" type link.' => 'لینک 2 درخواست با یک \ "عادی " لینک نوع.',
@@ -7522,10 +7552,12 @@ Thanks for your help!
         'List view' => 'نمایش لیستی',
         'Lithuanian' => 'زبان لیتوانی',
         'Loader module registration for the agent interface.' => '',
+        'Loader module registration for the customer interface.' => '',
         'Lock / unlock this ticket' => 'قفل / باز کردن این درخواست',
         'Locked Tickets' => 'درخواست‌های تحویل گرفته شده',
         'Locked Tickets.' => 'درخواست قفل شده است.',
         'Locked ticket.' => 'سابقه::تحویل گرفتن درخواست',
+        'Logged in users.' => '',
         'Logged-In Users' => '',
         'Logout of customer panel.' => 'خروج از پنل مشتری.',
         'Look into a ticket!' => 'مشاهده درخواست',
@@ -7552,8 +7584,6 @@ Thanks for your help!
         'Manage tasks triggered by event or time based execution.' => 'مدیریت وظایف موجب شده توسط رویداد یا زمان اجرای .',
         'Mark as Spam!' => 'به‌عنوان هرزنامه علامت بزن',
         'Mark this ticket as junk!' => 'علامت گذاری به عنوان این درخواست به عنوان آشغال!',
-        'Marks articles for index rebuild right after the article\'s update.' =>
-            '',
         'Max size (in characters) of the customer information table (phone and email) in the compose screen.' =>
             'حداکثر اندازه (در شخصیت) از جدول اطلاعات مربوط به مشتری (تلفن و ایمیل) در صفحه نوشتن.',
         'Max size (in rows) of the informed agents box in the agent interface.' =>
@@ -7650,6 +7680,7 @@ Thanks for your help!
         'New Year\'s Eve' => 'شب سال نو',
         'New process ticket' => 'درخواست فرآیند جدید',
         'News about OTRS releases!' => 'اخبار در مورد انتشار OTRS!',
+        'News about OTRS.' => '',
         'Next possible ticket states after adding a phone note in the ticket phone inbound screen of the agent interface.' =>
             'بعدی ایالات بلیط ممکن است پس از اضافه کردن یک یادداشت تلفن در گوشی بلیط صفحه نمایش بین المللی به درون رابط عامل.',
         'Next possible ticket states after adding a phone note in the ticket phone outbound screen of the agent interface.' =>
@@ -7690,10 +7721,12 @@ Thanks for your help!
         'Other Customers' => '',
         'Out Of Office' => 'بیرون از دفتر',
         'Out Of Office Time' => 'زمان بیرون بودن از محل کار',
+        'Out of Office users.' => '',
         'Overloads (redefines) existing functions in Kernel::System::Ticket. Used to easily add customizations.' =>
             'اضافه بار (باز تعریف) توابع موجود در هسته :: :: سیستم بلیط. استفاده به راحتی سفارشی اضافه کنید.',
         'Overview Escalated Tickets.' => 'درخواست تشدید هفتگی.',
         'Overview Refresh Time' => 'نمای کلی زمان بازسازی',
+        'Overview of all Tickets per assigned Queue.' => '',
         'Overview of all appointments.' => '',
         'Overview of all escalated tickets.' => 'نمای کلی از تمام بلیط افزایش یافت.',
         'Overview of all open Tickets.' => 'نمایی کلی از تمام درخواست‌های باز',
@@ -7704,16 +7737,16 @@ Thanks for your help!
         'PGP Keys' => 'کلیدهای PGP',
         'Package event module file a scheduler task for update registration.' =>
             'بسته ماژول رویداد پرونده وظیفه زمانبند برای ثبت نام به روز رسانی.',
-        'Parameters for the CreateNextMask object in the preference view of the agent interface.' =>
-            'پارامترهای CreateNextMask در نظر اولویت از رابط عامل شی.',
-        'Parameters for the CustomQueue object in the preference view of the agent interface.' =>
-            'پارامترهای CustomQueue در نظر اولویت از رابط عامل شی.',
-        'Parameters for the CustomService object in the preference view of the agent interface.' =>
-            'پارامترهای شی CustomService در نظر اولویت از رابط عامل.',
-        'Parameters for the RefreshTime object in the preference view of the agent interface.' =>
-            'پارامترهای RefreshTime در نظر اولویت از رابط عامل شی.',
-        'Parameters for the column filters of the small ticket overview.' =>
-            'پارامترهای فیلتر ستون از نمای کلی درخواست کوچک است.',
+        'Parameters for the CreateNextMask object in the preference view of the agent interface. Please note: setting \'Active\' to 0 will only prevent agents from editing settings of this group in their personal preferences, but will still allow administrators to edit the settings of another user\'s behalf. Use \'PreferenceGroup\' to control in which area these settings should be shown in the user interface.' =>
+            '',
+        'Parameters for the CustomQueue object in the preference view of the agent interface. Please note: setting \'Active\' to 0 will only prevent agents from editing settings of this group in their personal preferences, but will still allow administrators to edit the settings of another user\'s behalf. Use \'PreferenceGroup\' to control in which area these settings should be shown in the user interface.' =>
+            '',
+        'Parameters for the CustomService object in the preference view of the agent interface. Please note: setting \'Active\' to 0 will only prevent agents from editing settings of this group in their personal preferences, but will still allow administrators to edit the settings of another user\'s behalf. Use \'PreferenceGroup\' to control in which area these settings should be shown in the user interface.' =>
+            '',
+        'Parameters for the RefreshTime object in the preference view of the agent interface. Please note: setting \'Active\' to 0 will only prevent agents from editing settings of this group in their personal preferences, but will still allow administrators to edit the settings of another user\'s behalf. Use \'PreferenceGroup\' to control in which area these settings should be shown in the user interface.' =>
+            '',
+        'Parameters for the column filters of the small ticket overview. Please note: setting \'Active\' to 0 will only prevent agents from editing settings of this group in their personal preferences, but will still allow administrators to edit the settings of another user\'s behalf. Use \'PreferenceGroup\' to control in which area these settings should be shown in the user interface.' =>
+            '',
         'Parameters for the dashboard backend of the customer company information of the agent interface. "Group" is used to restrict the access to the plugin (e. g. Group: admin;group1;group2;). "Default" determines if the plugin is enabled by default or if the user needs to enable it manually. "CacheTTLLocal" is the cache time in minutes for the plugin.' =>
             '',
         'Parameters for the dashboard backend of the customer id list overview of the agent interface . "Limit" is the number of entries shown by default. "Group" is used to restrict the access to the plugin (e. g. Group: admin;group1;group2;). "Default" determines if the plugin is enabled by default or if the user needs to enable it manually. "CacheTTLLocal" is the cache time in minutes for the plugin.' =>
@@ -7760,14 +7793,14 @@ Thanks for your help!
             '',
         'Parameters for the pages (in which the communication log entries are shown) of the communication log overview.' =>
             '',
-        'Parameters for the pages (in which the dynamic fields are shown) of the dynamic fields overview.' =>
-            'پارامترهای صفحات (که در آن زمینه های پویا نشان داده شده است) از نمای کلی زمینه های پویا.',
-        'Parameters for the pages (in which the tickets are shown) of the medium ticket overview.' =>
-            'پارامترهای صفحات (که در آن درخواست نشان داده شده است) از نمای کلی درخواست متوسط.',
-        'Parameters for the pages (in which the tickets are shown) of the small ticket overview.' =>
-            'پارامترهای صفحات (که در آن درخواست نشان داده شده است) از نمای کلی درخواست کوچک است.',
-        'Parameters for the pages (in which the tickets are shown) of the ticket preview overview.' =>
-            'پارامترهای صفحات (که در آن درخواست نشان داده شده است) از دید کلی پیش نمایش درخواست',
+        'Parameters for the pages (in which the dynamic fields are shown) of the dynamic fields overview. Please note: setting \'Active\' to 0 will only prevent agents from editing settings of this group in their personal preferences, but will still allow administrators to edit the settings of another user\'s behalf. Use \'PreferenceGroup\' to control in which area these settings should be shown in the user interface.' =>
+            '',
+        'Parameters for the pages (in which the tickets are shown) of the medium ticket overview. Please note: setting \'Active\' to 0 will only prevent agents from editing settings of this group in their personal preferences, but will still allow administrators to edit the settings of another user\'s behalf. Use \'PreferenceGroup\' to control in which area these settings should be shown in the user interface.' =>
+            '',
+        'Parameters for the pages (in which the tickets are shown) of the small ticket overview. Please note: setting \'Active\' to 0 will only prevent agents from editing settings of this group in their personal preferences, but will still allow administrators to edit the settings of another user\'s behalf. Use \'PreferenceGroup\' to control in which area these settings should be shown in the user interface.' =>
+            '',
+        'Parameters for the pages (in which the tickets are shown) of the ticket preview overview. Please note: setting \'Active\' to 0 will only prevent agents from editing settings of this group in their personal preferences, but will still allow administrators to edit the settings of another user\'s behalf. Use \'PreferenceGroup\' to control in which area these settings should be shown in the user interface.' =>
+            '',
         'Parameters of the example SLA attribute Comment2.' => 'پارامترهای مثال SLA نسبت Comment2.',
         'Parameters of the example queue attribute Comment2.' => 'پارامترهای مثال صف نسبت Comment2.',
         'Parameters of the example service attribute Comment2.' => 'پارامترهای خدمات به عنوان مثال ویژگی Comment2.',
@@ -7819,6 +7852,7 @@ Thanks for your help!
         'Public Calendar' => '',
         'Public calendar.' => '',
         'Queue view' => 'نمای صف درخواست',
+        'Queues ↔ Auto Responses' => '',
         'Rebuild the ticket index for AgentTicketQueue.' => 'بازسازی شاخص بلیط برای AgentTicketQueue.',
         'Recognize if a ticket is a follow-up to an existing ticket using an external ticket number.' =>
             'تشخیص اگر یک بلیط یک پیگیری بلیط های موجود برای استفاده از تعداد بلیط های خارجی است.',
@@ -7829,7 +7863,7 @@ Thanks for your help!
         'Removed subscription for user "%s".' => 'عضویت حذف شده برای کاربر"%s".',
         'Removes old system configuration deployments (Sunday mornings).' =>
             '',
-        'Removes old ticket number counters (Sunday mornings).' => '',
+        'Removes old ticket number counters (each 10 minutes).' => '',
         'Removes the ticket watcher information when a ticket is archived.' =>
             'حذف درخواست نگهبان اطلاعات زمانی که درخواست بایگانی شده است.',
         'Renew existing SMIME certificates from customer backend. Note: SMIME and SMIME::FetchFromCustomer needs to be enabled in SysConfig and customer backend needs to be configured to fetch UserSMIMECertificate attribute.' =>
@@ -7941,8 +7975,8 @@ Thanks for your help!
         'Sends registration information to OTRS group.' => 'ارسال اطلاعات ثبت نام به گروه OTRS.',
         'Sends reminder notifications of unlocked ticket after reaching the reminder date (only sent to ticket owner).' =>
             'می فرستد اطلاعیه یادآور بلیط قفل پس از رسیدن به تاریخ یادآوری (فقط به صاحب بلیط ارسال).',
-        'Sends the notifications which are configured in the admin interface under "Notfication (Event)".' =>
-            'می فرستد اطلاعیه که در رابط مدیریت تحت \ پیکربندی "اعلان (رویداد) ".',
+        'Sends the notifications which are configured in the admin interface under "Ticket Notifications".' =>
+            '',
         'Sent "%s" notification to "%s" via "%s".' => '',
         'Sent auto follow-up to "%s".' => '',
         'Sent auto reject to "%s".' => '',
@@ -8181,6 +8215,7 @@ Thanks for your help!
             'نمایش یک انتخاب مسئول در تلفن و ایمیل بلیط در رابط عامل.',
         'Show article as rich text even if rich text writing is disabled.' =>
             'مشاهده مقاله به عنوان متن غنی حتی اگر نوشتن متن غنی غیر فعال است.',
+        'Show command line output.' => '',
         'Show queues even when only locked tickets are in.' => 'نمایش صف حتی زمانی که بلیط تنها قفل شده در هستند.',
         'Show the current owner in the customer interface.' => 'نمایش مالک فعلی در رابط مشتری.',
         'Show the current queue in the customer interface.' => 'نمایش صف فعلی در رابط مشتری.',
@@ -8204,6 +8239,16 @@ Thanks for your help!
             'یک لینک در منوی نشان می دهد به اضافه کردن یک یادداشت در نظر زوم بلیط رابط عامل. کنترل دسترسی اضافی برای نشان دادن یا این لینک نشان می دهد را نمی توان با استفاده از کلید \ "گروه " و محتوا مانند \ ":؛: GROUP2 \ move_into GROUP1 RW" انجام می شود. به خوشه آیتم های منو برای کلید \ "CLUSTERNAME " و برای محتوای هر نام شما می خواهید برای دیدن در UI استفاده کنید. استفاده از \ "ClusterPriority " برای پیکربندی سفارش از یک خوشه خاص در نوار ابزار.',
         'Shows a link in the menu to add a note to a ticket in every ticket overview of the agent interface.' =>
             'نشان می دهد یک لینک در منو به اضافه کردن یک یادداشت یک بلیط به در هر مروری بلیط رابط عامل.',
+        'Shows a link in the menu to add a phone call inbound in the ticket zoom view of the agent interface. Additional access control to show or not show this link can be done by using Key "Group" and Content like "rw:group1;move_into:group2". To cluster menu items use for Key "ClusterName" and for the Content any name you want to see in the UI. Use "ClusterPriority" to configure the order of a certain cluster within the toolbar.' =>
+            '',
+        'Shows a link in the menu to add a phone call outbound in the ticket zoom view of the agent interface. Additional access control to show or not show this link can be done by using Key "Group" and Content like "rw:group1;move_into:group2". To cluster menu items use for Key "ClusterName" and for the Content any name you want to see in the UI. Use "ClusterPriority" to configure the order of a certain cluster within the toolbar.' =>
+            '',
+        'Shows a link in the menu to change the customer who requested the ticket in the ticket zoom view of the agent interface. Additional access control to show or not show this link can be done by using Key "Group" and Content like "rw:group1;move_into:group2". To cluster menu items use for Key "ClusterName" and for the Content any name you want to see in the UI. Use "ClusterPriority" to configure the order of a certain cluster within the toolbar.' =>
+            '',
+        'Shows a link in the menu to change the owner of a ticket in the ticket zoom view of the agent interface. Additional access control to show or not show this link can be done by using Key "Group" and Content like "rw:group1;move_into:group2". To cluster menu items use for Key "ClusterName" and for the Content any name you want to see in the UI. Use "ClusterPriority" to configure the order of a certain cluster within the toolbar.' =>
+            '',
+        'Shows a link in the menu to change the responsible agent of a ticket in the ticket zoom view of the agent interface. Additional access control to show or not show this link can be done by using Key "Group" and Content like "rw:group1;move_into:group2". To cluster menu items use for Key "ClusterName" and for the Content any name you want to see in the UI. Use "ClusterPriority" to configure the order of a certain cluster within the toolbar.' =>
+            '',
         'Shows a link in the menu to close a ticket in every ticket overview of the agent interface.' =>
             'یک لینک در منوی نشان می دهد برای بستن یک بلیط در هر مروری بلیط رابط عامل.',
         'Shows a link in the menu to close a ticket in the ticket zoom view of the agent interface. Additional access control to show or not show this link can be done by using Key "Group" and Content like "rw:group1;move_into:group2". To cluster menu items use for Key "ClusterName" and for the Content any name you want to see in the UI. Use "ClusterPriority" to configure the order of a certain cluster within the toolbar.' =>
@@ -8224,16 +8269,10 @@ Thanks for your help!
             'یک لینک در منوی نشان می دهد به حرکت یک بلیط در هر مروری بلیط رابط عامل.',
         'Shows a link in the menu to print a ticket or an article in the ticket zoom view of the agent interface. Additional access control to show or not show this link can be done by using Key "Group" and Content like "rw:group1;move_into:group2". To cluster menu items use for Key "ClusterName" and for the Content any name you want to see in the UI. Use "ClusterPriority" to configure the order of a certain cluster within the toolbar.' =>
             'نشان می دهد یک لینک در منو به چاپ یک بلیط یا یک مقاله در نظر زوم بلیط رابط عامل. کنترل دسترسی اضافی برای نشان دادن یا این لینک نشان می دهد را نمی توان با استفاده از کلید \ "گروه " و محتوا مانند \ ":؛: GROUP2 \ move_into GROUP1 RW" انجام می شود. به خوشه آیتم های منو برای کلید \ "CLUSTERNAME " و برای محتوای هر نام شما می خواهید برای دیدن در UI استفاده کنید. استفاده از \ "ClusterPriority " برای پیکربندی سفارش از یک خوشه خاص در نوار ابزار.',
-        'Shows a link in the menu to see the customer who requested the ticket in the ticket zoom view of the agent interface. Additional access control to show or not show this link can be done by using Key "Group" and Content like "rw:group1;move_into:group2". To cluster menu items use for Key "ClusterName" and for the Content any name you want to see in the UI. Use "ClusterPriority" to configure the order of a certain cluster within the toolbar.' =>
-            'یک لینک در منوی نشان می دهد برای دیدن مشتری که بلیط در نظر زوم بلیط رابط عامل درخواست شده است. کنترل دسترسی اضافی برای نشان دادن یا این لینک نشان می دهد را نمی توان با استفاده از کلید \ "گروه " و محتوا مانند \ ":؛: GROUP2 \ move_into GROUP1 RW" انجام می شود. به خوشه آیتم های منو برای کلید \ "CLUSTERNAME " و برای محتوای هر نام شما می خواهید برای دیدن در UI استفاده کنید. استفاده از \ "ClusterPriority " برای پیکربندی سفارش از یک خوشه خاص در نوار ابزار.',
         'Shows a link in the menu to see the history of a ticket in every ticket overview of the agent interface.' =>
             'یک لینک در منوی نشان می دهد برای دیدن تاریخ یک بلیط در هر مروری بلیط رابط عامل.',
-        'Shows a link in the menu to see the owner of a ticket in the ticket zoom view of the agent interface. Additional access control to show or not show this link can be done by using Key "Group" and Content like "rw:group1;move_into:group2". To cluster menu items use for Key "ClusterName" and for the Content any name you want to see in the UI. Use "ClusterPriority" to configure the order of a certain cluster within the toolbar.' =>
-            'یک لینک در منوی نشان می دهد برای دیدن صاحب یک بلیط در نظر زوم بلیط رابط عامل. کنترل دسترسی اضافی برای نشان دادن یا این لینک نشان می دهد را نمی توان با استفاده از کلید \ "گروه " و محتوا مانند \ ":؛: GROUP2 \ move_into GROUP1 RW" انجام می شود. به خوشه آیتم های منو برای کلید \ "CLUSTERNAME " و برای محتوای هر نام شما می خواهید برای دیدن در UI استفاده کنید. استفاده از \ "ClusterPriority " برای پیکربندی سفارش از یک خوشه خاص در نوار ابزار.',
         'Shows a link in the menu to see the priority of a ticket in the ticket zoom view of the agent interface. Additional access control to show or not show this link can be done by using Key "Group" and Content like "rw:group1;move_into:group2". To cluster menu items use for Key "ClusterName" and for the Content any name you want to see in the UI. Use "ClusterPriority" to configure the order of a certain cluster within the toolbar.' =>
             'یک لینک در منوی نشان می دهد برای دیدن اولویت یک بلیط در نظر زوم بلیط رابط عامل. کنترل دسترسی اضافی برای نشان دادن یا این لینک نشان می دهد را نمی توان با استفاده از کلید \ "گروه " و محتوا مانند \ ":؛: GROUP2 \ move_into GROUP1 RW" انجام می شود. به خوشه آیتم های منو برای کلید \ "CLUSTERNAME " و برای محتوای هر نام شما می خواهید برای دیدن در UI استفاده کنید. استفاده از \ "ClusterPriority " برای پیکربندی سفارش از یک خوشه خاص در نوار ابزار.',
-        'Shows a link in the menu to see the responsible agent of a ticket in the ticket zoom view of the agent interface. Additional access control to show or not show this link can be done by using Key "Group" and Content like "rw:group1;move_into:group2". To cluster menu items use for Key "ClusterName" and for the Content any name you want to see in the UI. Use "ClusterPriority" to configure the order of a certain cluster within the toolbar.' =>
-            'یک لینک در منوی نشان می دهد برای دیدن عامل مسئول یک بلیط در نظر زوم بلیط رابط عامل. کنترل دسترسی اضافی برای نشان دادن یا این لینک نشان می دهد را نمی توان با استفاده از کلید \ "گروه " و محتوا مانند \ ":؛: GROUP2 \ move_into GROUP1 RW" انجام می شود. به خوشه آیتم های منو برای کلید \ "CLUSTERNAME " و برای محتوای هر نام شما می خواهید برای دیدن در UI استفاده کنید. استفاده از \ "ClusterPriority " برای پیکربندی سفارش از یک خوشه خاص در نوار ابزار.',
         'Shows a link in the menu to send an outbound email in the ticket zoom view of the agent interface. Additional access control to show or not show this link can be done by using Key "Group" and Content like "rw:group1;move_into:group2". To cluster menu items use for Key "ClusterName" and for the Content any name you want to see in the UI. Use "ClusterPriority" to configure the order of a certain cluster within the toolbar.' =>
             'یک لینک در منوی نشان می دهد به ارسال یک ایمیل عازم ناحیه دور دست در نظر زوم بلیط رابط عامل. کنترل دسترسی اضافی برای نشان دادن یا این لینک نشان می دهد را نمی توان با استفاده از کلید \ "گروه " و محتوا مانند \ ":؛: GROUP2 \ move_into GROUP1 RW" انجام می شود. به خوشه آیتم های منو برای کلید \ "CLUSTERNAME " و برای محتوای هر نام شما می خواهید برای دیدن در UI استفاده کنید. استفاده از \ "ClusterPriority " برای پیکربندی سفارش از یک خوشه خاص در نوار ابزار.',
         'Shows a link in the menu to set a ticket as junk in every ticket overview of the agent interface. Additional access control to show or not show this link can be done by using Key "Group" and Content like "rw:group1;move_into:group2".' =>
@@ -8287,8 +8326,10 @@ Thanks for your help!
         'Shows all both ro and rw tickets in the service view.' => 'همه هر دو بلیط RO و RW در نظر خدمات.',
         'Shows all open tickets (even if they are locked) in the escalation view of the agent interface.' =>
             'نشان می دهد تمام بلیط باز (حتی اگر آنها قفل شده است) در نظر تشدید رابط عامل.',
-        'Shows all the articles of the ticket (expanded) in the zoom view.' =>
-            'تمام مقالات بلیط (استایرن) در نظر زوم را نشان می دهد.',
+        'Shows all the articles of the ticket (expanded) in the agent zoom view.' =>
+            '',
+        'Shows all the articles of the ticket (expanded) in the customer zoom view.' =>
+            '',
         'Shows all the customer identifiers in a multi-select field (not useful if you have a lot of customer identifiers).' =>
             'همه شناسه های مشتری در یک میدان چند را انتخاب کنید (مفید می کنید اگر شما یک مقدار زیادی از شناسه مشتری).',
         'Shows all the customer user identifiers in a multi-select field (not useful if you have a lot of customer user identifiers).' =>
@@ -8434,7 +8475,9 @@ Thanks for your help!
         'Starts a wildcard search of the active object after the link object mask is started.' =>
             'جستجوی کلمات از جسم فعال پس از ماسک لینک شی آغاز شده است.',
         'Stat#' => 'شماره گزارش',
-        'States' => 'وضعیت‌ها',
+        'States' => 'وضعیت',
+        'Statistic Reports overview.' => '',
+        'Statistics overview.' => '',
         'Status view' => 'نمای وضعیت',
         'Stopped response time escalation.' => '',
         'Stopped solution time escalation.' => '',
@@ -8449,6 +8492,7 @@ Thanks for your help!
         'System Configuration Deployment' => '',
         'System Configuration Group' => '',
         'System Maintenance' => 'تعمیر و نگهداری سیستم',
+        'Templates ↔ Attachments' => '',
         'Templates ↔ Queues' => '',
         'Textarea' => 'ناحیه متنی',
         'Thai' => 'تایلندی',
@@ -8474,6 +8518,8 @@ Thanks for your help!
         'The headline shown in the customer interface.' => 'تیتر نشان داده شده در رابط مشتری.',
         'The identifier for a ticket, e.g. Ticket#, Call#, MyTicket#. The default is Ticket#.' =>
             'شناسه یک بلیط برای، به عنوان مثال بلیط #، تماس #، MyTicket #. به طور پیش فرض بلیط # است.',
+        'The logo shown in the header of the agent interface for the skin "High Contrast". See "AgentLogo" for further description.' =>
+            '',
         'The logo shown in the header of the agent interface for the skin "default". See "AgentLogo" for further description.' =>
             'آرم نشان داده شده در هدر از رابط عامل برای پوست \ "به طور پیش فرض ". \ "AgentLogo " برای توضیحات بیشتر را مشاهده کنید.',
         'The logo shown in the header of the agent interface for the skin "ivory". See "AgentLogo" for further description.' =>
@@ -8486,8 +8532,8 @@ Thanks for your help!
             'آرم نشان داده شده است در هدر رابط عامل. URL به تصویر می تواند یک آدرس نسبی به دایرکتوری تصویر پوست، و یا یک URL کامل به یک وب سرور از راه دور.',
         'The logo shown in the header of the customer interface. The URL to the image can be a relative URL to the skin image directory, or a full URL to a remote web server.' =>
             'آرم نشان داده شده است در هدر رابط مشتری. URL به تصویر می تواند یک آدرس نسبی به دایرکتوری تصویر پوست، و یا یک URL کامل به یک وب سرور از راه دور.',
-        'The logo shown on top of the login box of the agent interface. The URL to the image must be relative URL to the skin image directory.' =>
-            'آرم در بالای جعبه ورود به سیستم رابط عامل نشان داده شده است. URL به تصویر باید آدرس نسبی به دایرکتوری تصویر پوست باشد.',
+        'The logo shown on top of the login box of the agent interface. The URL to the image can be a relative URL to the skin image directory, or a full URL to a remote web server.' =>
+            '',
         'The maximal number of articles expanded on a single page in AgentTicketZoom.' =>
             'حداکثر تعداد مقالات در یک صفحه در AgentTicketZoom گسترش یافته است.',
         'The maximal number of articles shown on a single page in AgentTicketZoom.' =>
@@ -8575,8 +8621,10 @@ Thanks for your help!
             'نمایش پستی از لیست FeatureAddons OTRS در سامانه مدیریت بسته.',
         'Toolbar Item for a shortcut. Additional access control to show or not show this link can be done by using Key "Group" and Content like "rw:group1;move_into:group2".' =>
             'مورد نوار ابزار برای یک میانبر. کنترل دسترسی اضافی برای نشان دادن یا این لینک نشان می دهد را نمی توان با استفاده از کلید \ "گروه " و محتوا مانند \ ":؛: GROUP2 \ move_into GROUP1 RW" انجام می شود.',
-        'Transport selection for appointment notifications.' => '',
-        'Transport selection for ticket notifications.' => 'انتخاب حمل و نقل اطلاعیه درخواست',
+        'Transport selection for appointment notifications. Please note: setting \'Active\' to 0 will only prevent agents from editing settings of this group in their personal preferences, but will still allow administrators to edit the settings of another user\'s behalf. Use \'PreferenceGroup\' to control in which area these settings should be shown in the user interface.' =>
+            '',
+        'Transport selection for ticket notifications. Please note: setting \'Active\' to 0 will only prevent agents from editing settings of this group in their personal preferences, but will still allow administrators to edit the settings of another user\'s behalf. Use \'PreferenceGroup\' to control in which area these settings should be shown in the user interface.' =>
+            '',
         'Tree view' => 'نمای درختی',
         'Triggers add or update of automatic calendar appointments based on certain ticket times.' =>
             '',
@@ -8683,6 +8731,7 @@ Thanks for your help!
         'A popup of this screen is already open. Do you want to close it and load this one instead?',
         'A preview of this website can\'t be provided because it didn\'t allow to be embedded.',
         'Add',
+        'Add Event Trigger',
         'Add all',
         'Add entry',
         'Add key',
@@ -8731,10 +8780,8 @@ Thanks for your help!
         'Close',
         'Close preview',
         'Close this dialog',
-        'Communication error',
         'Complex %s with %s arguments',
         'Confirm',
-        'Connection error',
         'Could not open popup window. Please disable any popup blockers for this application.',
         'Current selection',
         'Currently not possible',
@@ -8779,6 +8826,8 @@ Thanks for your help!
         'Do you really want to delete "%s"?',
         'Do you really want to delete this certificate?',
         'Do you really want to delete this dynamic field? ALL associated data will be LOST!',
+        'Do you really want to delete this generic agent job?',
+        'Do you really want to delete this key?',
         'Do you really want to delete this link?',
         'Do you really want to delete this notification language?',
         'Do you really want to delete this notification?',
@@ -8822,6 +8871,7 @@ Thanks for your help!
         'Invalid date (need a past date)!',
         'Invalid date!',
         'It is going to be deleted from the field, please try again.',
+        'It is not possible to add a new event trigger because the event is not set.',
         'It is not possible to set this entry to invalid. All affected configuration settings have to be changed beforehand.',
         'It was not possible to delete this draft.',
         'It was not possible to generate the Support Bundle.',
@@ -8892,6 +8942,7 @@ Thanks for your help!
         'Process state',
         'Queues',
         'Reload page',
+        'Reload page (%ss)',
         'Remove',
         'Remove Entity from canvas',
         'Remove active filters for this widget.',

@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::ProcessManagement::DB::Process;
@@ -1456,7 +1456,7 @@ EOF
                 Type     => 'Local',
             );
 
-            return $FileLocation
+            return $FileLocation;
         }
     }
 }
@@ -1621,7 +1621,7 @@ sub ProcessImport {
 
                 # check if EntityID matched the format (it could be that a process from 3.3.x is been
                 #    imported)
-                if ( $NewEntityID !~ m{\A $PartName - [0-9a-f]{32}? \z}msx ) {
+                if ( $NewEntityID !~ m{\A $PartName - [0-9a-f]{32} \z}msx ) {
 
                     # generate new EntityIDs
                     $NewEntityID = $Self->{EntityObject}->EntityIDGenerate(
@@ -1634,7 +1634,7 @@ sub ProcessImport {
             }
 
             # make sure that all entity mapping parts are defined as hash references
-            $EntityMapping{ $PartNameMap{$PartName} } //= {}
+            $EntityMapping{ $PartNameMap{$PartName} } //= {};
         }
     }
     else {
@@ -2188,10 +2188,10 @@ sub _ProcessImportRollBack {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

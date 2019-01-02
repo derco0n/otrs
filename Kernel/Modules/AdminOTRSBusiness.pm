@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Modules::AdminOTRSBusiness;
@@ -13,6 +13,7 @@ use warnings;
 use utf8;
 
 use Kernel::System::VariableCheck qw(:all);
+use Kernel::Language qw(Translatable);
 
 our $ObjectManagerDisabled = 1;
 
@@ -37,13 +38,15 @@ sub Run {
 
     if ($CloudServicesDisabled) {
 
-        my $Output = $LayoutObject->Header( Title => 'Error' );
+        my $Output = $LayoutObject->Header(
+            Title => Translatable('Error'),
+        );
         $Output .= $LayoutObject->Output(
             TemplateFile => 'CloudServicesDisabled',
             Data         => \%Param
         );
         $Output .= $LayoutObject->Footer();
-        return $Output
+        return $Output;
     }
 
     # get needed objects
@@ -366,7 +369,7 @@ sub UninstallScreen {
             Name => 'DowngradeNotPossible',
             Data => {
                 Packages => $Dependencies,
-                }
+            }
         );
     }
     else {

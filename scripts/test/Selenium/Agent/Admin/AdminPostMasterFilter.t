@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -113,17 +113,40 @@ $Selenium->RunTest(
             $Count++;
         }
 
+        # Check filter value length.
+        # See bug#13889 for more information.
+        my $PostMasterValueLong = 'A' x 200;
+        $Selenium->find_element( "#MatchValue1", 'css' )->send_keys($PostMasterValueLong);
+        $Self->Is(
+            $Selenium->find_element( "#MatchValue1", 'css' )->get_value(),
+            $PostMasterValueLong,
+            "Check max length for MatchValue",
+        );
+        $Selenium->find_element( "#MatchValue1", 'css' )->clear();
+
+        $Selenium->find_element( "#SetValue1", 'css' )->send_keys($PostMasterValueLong);
+        $Self->Is(
+            $Selenium->find_element( "#SetValue1", 'css' )->get_value(),
+            $PostMasterValueLong,
+            "Check max length for SetValue1",
+        );
+        $Selenium->find_element( "#SetValue1", 'css' )->clear();
+
         # Add first test PostMasterFilter.
         my $PostMasterName     = "postmasterfilter" . $Helper->GetRandomID();
         my $PostMasterBody     = "Selenium test for PostMasterFilter";
         my $PostMasterPriority = "2 low";
 
         $Selenium->find_element( "#EditName", 'css' )->send_keys($PostMasterName);
-        $Selenium->execute_script("\$('#MatchHeader1').val('Body').trigger('redraw.InputField').trigger('change');");
+        $Selenium->InputFieldValueSet(
+            Element => '#MatchHeader1',
+            Value   => 'Body',
+        );
         $Selenium->find_element( "#MatchNot1",   'css' )->click();
         $Selenium->find_element( "#MatchValue1", 'css' )->send_keys($PostMasterBody);
-        $Selenium->execute_script(
-            "\$('#SetHeader1').val('X-OTRS-Priority').trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#SetHeader1',
+            Value   => 'X-OTRS-Priority',
         );
 
         $Selenium->find_element( "#SetValue1", 'css' )->send_keys($PostMasterPriority);
@@ -137,13 +160,16 @@ $Selenium->RunTest(
         );
 
         # Check new test PostMasterFilter values.
+        $Selenium->VerifiedRefresh();
         $Selenium->find_element( $PostMasterName, 'link_text' )->VerifiedClick();
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("#EditName").length;' );
 
         $Self->Is(
             $Selenium->find_element( '#EditName', 'css' )->get_value(),
             $PostMasterName,
             "#EditName stored value",
         );
+
         $Self->Is(
             $Selenium->find_element( '#MatchHeader1', 'css' )->get_value(),
             "Body",
@@ -186,7 +212,10 @@ $Selenium->RunTest(
         # Edit test PostMasterFilter.
         my $EditPostMasterPriority = "4 high";
 
-        $Selenium->execute_script("\$('#StopAfterMatch').val('1').trigger('redraw.InputField').trigger('change');");
+        $Selenium->InputFieldValueSet(
+            Element => '#StopAfterMatch',
+            Value   => 1,
+        );
         $Selenium->find_element( "#MatchNot1", 'css' )->click();
         $Selenium->find_element( "#SetValue1", 'css' )->clear();
         $Selenium->find_element( "#SetValue1", 'css' )->send_keys($EditPostMasterPriority);
@@ -194,6 +223,7 @@ $Selenium->RunTest(
         $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("#PostMasterFilters").length;' );
 
         # Check edited test PostMasterFilter values.
+        $Selenium->VerifiedRefresh();
         $Selenium->find_element( $PostMasterName, 'link_text' )->click();
         $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("#StopAfterMatch").length;' );
 
@@ -225,10 +255,14 @@ $Selenium->RunTest(
             ->VerifiedClick();
 
         $Selenium->find_element( "#EditName", 'css' )->send_keys($PostMasterName);
-        $Selenium->execute_script("\$('#MatchHeader1').val('Body').trigger('redraw.InputField').trigger('change');");
+        $Selenium->InputFieldValueSet(
+            Element => '#MatchHeader1',
+            Value   => 'Body',
+        );
         $Selenium->find_element( "#MatchValue1", 'css' )->send_keys($PostMasterBody);
-        $Selenium->execute_script(
-            "\$('#SetHeader1').val('X-OTRS-Priority').trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#SetHeader1',
+            Value   => 'X-OTRS-Priority',
         );
         $Selenium->find_element( "#SetValue1", 'css' )->send_keys($PostMasterPriority);
         $Selenium->execute_script("\$('#Submit').click();");
@@ -261,8 +295,12 @@ $Selenium->RunTest(
             "$PostMasterName2 second PostMasterFilter found on page",
         );
 
+        $Selenium->VerifiedRefresh();
+
         # Click to edit second PostMasterFilter.
         $Selenium->find_element( $PostMasterName2, 'link_text' )->VerifiedClick();
+
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("#EditName").length;' );
 
         # Try to change name as first PostMasterFilter, verify duplication error.
         $Selenium->find_element( "#EditName", 'css' )->clear();
@@ -307,7 +345,10 @@ $Selenium->RunTest(
         )->click();
 
         # Wait for dialog to appears.
-        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("#DialogButton1").length;' );
+        $Selenium->WaitForjQueryEventBound(
+            CSSSelector => '#DialogButton1',
+            Event       => 'click',
+        );
 
         # Verify delete dialog message.
         my $DeleteMessage = $LanguageObject->Translate("Do you really want to delete this postmaster filter?");
@@ -320,7 +361,9 @@ $Selenium->RunTest(
         $Selenium->find_element( "#DialogButton1", 'css' )->VerifiedClick();
 
         # Wait for the dialog to disappear.
-        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $(".Dialog:visible").length === 0;' );
+        $Selenium->WaitFor(
+            ElementMissing => [ '.Dialog', 'css' ],
+        );
         $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("#PostMasterFilters").length > 0;' );
 
         # Check if second PostMasterFilter is deleted.
@@ -335,13 +378,18 @@ $Selenium->RunTest(
         )->click();
 
         # Wait for dialog to appears.
-        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $(".Dialog:visible").length === 1;' );
+        $Selenium->WaitForjQueryEventBound(
+            CSSSelector => '#DialogButton1',
+            Event       => 'click',
+        );
 
         # Confirm delete action.
         $Selenium->find_element( "#DialogButton1", 'css' )->VerifiedClick();
 
         # Wait for the dialog to disappear.
-        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $(".Dialog:visible").length === 0;' );
+        $Selenium->WaitFor(
+            ElementMissing => [ '.Dialog', 'css' ],
+        );
         $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("#PostMasterFilters").length > 0;' );
 
         # Check if first postmaster filter is deleted.

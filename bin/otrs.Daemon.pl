@@ -1,21 +1,19 @@
 #!/usr/bin/perl -X
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU AFFERO General Public License as published by
-# the Free Software Foundation; either version 3 of the License, or
-# any later version.
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
-# You should have received a copy of the GNU Affero General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-# or see http://www.gnu.org/licenses/agpl.txt.
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -63,7 +61,7 @@ if ( $NodeID !~ m{ \A \d+ \z }xms && $NodeID > 0 && $NodeID < 1000 ) {
 }
 
 # get pid directory
-my $PIDDir = $ConfigObject->Get('Daemon::PID::Path') || $ConfigObject->Get('Home') . '/var/run/';
+my $PIDDir  = $ConfigObject->Get('Daemon::PID::Path') || $ConfigObject->Get('Home') . '/var/run/';
 my $PIDFile = $PIDDir . "Daemon-NodeID-$NodeID.pid";
 my $PIDFH;
 
@@ -206,7 +204,7 @@ sub Start {
 
     my $DaemonChecker = 1;
     my $DaemonSuspend;
-    local $SIG{INT} = sub { $DaemonChecker = 0; $DaemonSuspend = 0; };
+    local $SIG{INT}  = sub { $DaemonChecker = 0; $DaemonSuspend  = 0; };
     local $SIG{TERM} = sub { $DaemonChecker = 0; $DaemonStopWait = 5; $DaemonSuspend = 0; };
     local $SIG{CHLD} = "IGNORE";
     local $SIG{HUP}  = sub {
@@ -263,8 +261,8 @@ sub Start {
                 local $SIG{TERM} = sub { $ChildRun = 0; };
                 local $SIG{CHLD} = "IGNORE";
 
-                # Remove the ZZZAAuto.pm from %INC to force reloading it.
-                delete $INC{'Kernel/Config/Files/ZZZAAuto.pm'};
+                # Force reload configuration files.
+                _ReloadConfigurationFiles();
 
                 local $Kernel::OM = Kernel::System::ObjectManager->new(
                     'Kernel::System::Log' => {
@@ -526,7 +524,7 @@ sub _LogFilesSet {
     return 1 if $RotationType ne 'otrs';
 
     # remove not needed log files if OTRS rotation is enabled
-    my $DaysToKeep = $ConfigObject->Get('Daemon::Log::DaysToKeep') || 1;
+    my $DaysToKeep     = $ConfigObject->Get('Daemon::Log::DaysToKeep') || 1;
     my $DaysToKeepTime = $SystemTime - $DaysToKeep * 24 * 60 * 60;
 
     my @LogFiles = glob "$LogDir/*.log";
@@ -676,6 +674,25 @@ sub _StopDaemonModules {
         print STDOUT "Killing $Module with PID $DaemonModules{$Module}->{PID}\n";
 
         kill 9, $DaemonModules{$Module}->{PID};
+    }
+
+    return 1;
+}
+
+sub _ReloadConfigurationFiles {
+
+    my $ConfigFilesLocation = 'Kernel/Config/Files/';
+    my $ConfigDirectory     = $Kernel::OM->Get('Kernel::Config')->Get('Home') . '/' . $ConfigFilesLocation;
+
+    my %Seen;
+    my @Glob = glob "$ConfigDirectory/*.pm";
+
+    FILENAME:
+    for my $Filename (@Glob) {
+        next FILENAME if !-e $Filename;
+
+        my $Basename = File::Basename::basename($Filename);
+        delete $INC{ $ConfigFilesLocation . $Basename };
     }
 
     return 1;

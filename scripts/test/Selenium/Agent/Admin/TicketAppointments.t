@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -323,10 +323,10 @@ $Selenium->RunTest(
         my $CalendarName = "Calendar $RandomID";
         $Selenium->find_element( '.SidebarColumn ul.ActionList a#Add',   'css' )->VerifiedClick();
         $Selenium->find_element( 'form#CalendarFrom input#CalendarName', 'css' )->send_keys($CalendarName);
-        $Selenium->execute_script(
-            "\$('#GroupID').val($GroupID).trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#GroupID',
+            Value   => $GroupID,
         );
-
         $Selenium->find_element( 'form#CalendarFrom button#Submit', 'css' )->VerifiedClick();
 
         # Get calendar ID.
@@ -450,8 +450,9 @@ $Selenium->RunTest(
                 },
             },
             {
-                Name   => 'PendingTime',
-                Config => {
+                Name           => 'PendingTime',
+                CheckStartDate => 1,
+                Config         => {
                     StartDate    => 'PendingTime',
                     EndDate      => 'Plus_60',
                     QueueID      => $QueueID,
@@ -496,30 +497,34 @@ $Selenium->RunTest(
 
             # Set start date module.
             if ( $Test->{Config}->{StartDate} ) {
-                $Selenium->execute_script(
-                    "\$('#StartDate_1').val('$Test->{Config}->{StartDate}').trigger('redraw.InputField').trigger('change');"
+                $Selenium->InputFieldValueSet(
+                    Element => '#StartDate_1',
+                    Value   => $Test->{Config}->{StartDate},
                 );
             }
 
             # Set end date module.
             if ( $Test->{Config}->{EndDate} ) {
-                $Selenium->execute_script(
-                    "\$('#EndDate_1').val('$Test->{Config}->{EndDate}').trigger('redraw.InputField').trigger('change');"
+                $Selenium->InputFieldValueSet(
+                    Element => '#EndDate_1',
+                    Value   => $Test->{Config}->{EndDate},
                 );
             }
 
             # Set a queue.
             if ( $Test->{Config}->{QueueID} ) {
-                $Selenium->execute_script(
-                    "\$('#QueueID_1').val('$Test->{Config}->{QueueID}').trigger('redraw.InputField').trigger('change');"
+                $Selenium->InputFieldValueSet(
+                    Element => '#QueueID_1',
+                    Value   => $Test->{Config}->{QueueID},
                 );
             }
 
             # Add ticket search parameters.
             if ( $Test->{Config}->{SearchParams} ) {
                 for my $SearchParam ( sort keys %{ $Test->{Config}->{SearchParams} || {} } ) {
-                    $Selenium->execute_script(
-                        "\$('#SearchParams').val('$SearchParam').trigger('redraw.InputField').trigger('change');"
+                    $Selenium->InputFieldValueSet(
+                        Element => '#SearchParams',
+                        Value   => $SearchParam,
                     );
                     $Selenium->find_element( '.AddButton', 'css' )->click();
                     $Selenium->WaitFor( JavaScript => "return \$('#SearchParam_1_$SearchParam').length" );
@@ -560,6 +565,27 @@ $Selenium->RunTest(
                 "$Test->{Name} - Ticket appointment found"
             );
             my $Appointment = $Appointments[0];
+
+            # Check if a dialog submit is possible for an appointment created by rule based on pending time (bug#13902).
+            if ( $Test->{CheckStartDate} ) {
+                $Selenium->VerifiedGet(
+                    "${ScriptAlias}index.pl?Action=AgentAppointmentCalendarOverview;AppointmentID=$Appointment->{AppointmentID}"
+                );
+                $Selenium->WaitFor( JavaScript => "return \$('#EditFormSubmit').length;" );
+
+                $Selenium->find_element( '#EditFormSubmit', 'css' )->click();
+                $Selenium->WaitFor( JavaScript => "return !\$('.Dialog.Modal').length;" );
+
+                $Self->True(
+                    $Selenium->execute_script("return \$('.Dialog.Modal').length === 0;"),
+                    "There was no error in dialog - it is closed successfully"
+                );
+
+                # Go back to calendar edit page.
+                $Selenium->VerifiedGet(
+                    "${ScriptAlias}index.pl?Action=AdminAppointmentCalendarManage;Subaction=Edit;CalendarID=$Calendar{CalendarID}"
+                );
+            }
 
             # Check appointment data.
             for my $Field ( sort keys %{ $Test->{Result} || {} } ) {
@@ -683,11 +709,19 @@ $Selenium->RunTest(
             "Deleted test calendar - $CalendarName",
         );
 
-        # Delete test ticket.
         $Success = $TicketObject->TicketDelete(
             TicketID => $TicketID,
             UserID   => 1,
         );
+
+        # Ticket deletion could fail if apache still writes to ticket history. Try again in this case.
+        if ( !$Success ) {
+            sleep 3;
+            $Success = $TicketObject->TicketDelete(
+                TicketID => $TicketID,
+                UserID   => 1,
+            );
+        }
         $Self->True(
             $Success,
             "Deleted test ticket - $TicketID",

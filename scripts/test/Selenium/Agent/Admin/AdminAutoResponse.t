@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -26,9 +26,13 @@ $Selenium->RunTest(
             Value => 0
         );
 
-        # Create test user and login.
+        # Defined user language for testing if message is being translated correctly.
+        my $Language = "de";
+
+        # create test user and login
         my $TestUserLogin = $Helper->TestUserCreate(
-            Groups => ['admin'],
+            Groups   => ['admin'],
+            Language => $Language,
         ) || die "Did not get test user";
 
         $Selenium->Login(
@@ -56,14 +60,17 @@ $Selenium->RunTest(
         # Click 'Add auto response'.
         $Selenium->find_element("//a[contains(\@href, \'Action=AdminAutoResponse;Subaction=Add' )]")->VerifiedClick();
 
-        my $Count;
+        my $LanguageObject = Kernel::Language->new(
+            UserLanguage => $Language,
+        );
 
         # Check breadcrumb on Add screen.
+        my $Count;
         $Count = 1;
         for my $BreadcrumbText ( 'Auto Response Management', 'Add Auto Response' ) {
             $Self->Is(
                 $Selenium->execute_script("return \$('.BreadCrumb li:eq($Count)').text().trim()"),
-                $BreadcrumbText,
+                $LanguageObject->Translate($BreadcrumbText),
                 "Breadcrumb text '$BreadcrumbText' is found on screen"
             );
 
@@ -117,9 +124,18 @@ $Selenium->RunTest(
             $Selenium->find_element( "#Name",     'css' )->send_keys($AutoResponseName);
             $Selenium->find_element( "#Subject",  'css' )->send_keys($AutoResponseName);
             $Selenium->find_element( "#RichText", 'css' )->send_keys($Text);
-            $Selenium->execute_script("\$('#TypeID').val('1').trigger('redraw.InputField').trigger('change');");
-            $Selenium->execute_script("\$('#AddressID').val('1').trigger('redraw.InputField').trigger('change');");
-            $Selenium->execute_script("\$('#ValidID').val('1').trigger('redraw.InputField').trigger('change');");
+            $Selenium->InputFieldValueSet(
+                Element => '#TypeID',
+                Value   => 1,
+            );
+            $Selenium->InputFieldValueSet(
+                Element => '#AddressID',
+                Value   => 1,
+            );
+            $Selenium->InputFieldValueSet(
+                Element => '#ValidID',
+                Value   => 1,
+            );
             $Selenium->find_element( "#Submit", 'css' )->VerifiedClick();
 
             # Check if test auto response show on AdminAutoResponse screen.
@@ -140,8 +156,8 @@ $Selenium->RunTest(
         # Check breadcrumb on Edit screen.
         $Count = 1;
         for my $BreadcrumbText (
-            'Auto Response Management',
-            'Edit Auto Response: ' . $AutoResponseNames[0]
+            $LanguageObject->Translate('Auto Response Management'),
+            $LanguageObject->Translate('Edit Auto Response') . ': ' . $AutoResponseNames[0]
             )
         {
             $Self->Is(
@@ -164,7 +180,10 @@ $Selenium->RunTest(
         $AutoResponseNames[0] = 'Update' . $AutoResponseNames[0];
         $Selenium->find_element( "#Name", 'css' )->clear();
         $Selenium->find_element( "#Name", 'css' )->send_keys( $AutoResponseNames[0] );
-        $Selenium->execute_script("\$('#ValidID').val('2').trigger('redraw.InputField').trigger('change');");
+        $Selenium->InputFieldValueSet(
+            Element => '#ValidID',
+            Value   => 2,
+        );
         $Selenium->find_element( "#Submit", 'css' )->VerifiedClick();
 
         # Check if edited auto response show on AdminAutoResponse.
@@ -211,6 +230,18 @@ $Selenium->RunTest(
             'none',
             "Auto response '$AutoResponseNames[1]' is not found in the table"
         );
+
+        $Count = 0;
+        for my $ColumnName (qw(Name Type Comment Validity Changed Created)) {
+
+            # Check if column name is translated.
+            $Self->Is(
+                $Selenium->execute_script("return \$('#AutoResponses tr th:eq($Count)').text().trim()"),
+                $LanguageObject->Translate($ColumnName),
+                "Column name $ColumnName is translated",
+            );
+            $Count++;
+        }
 
         # Cleanup
         # Since there are no tickets that rely on our test auto response,

@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::Daemon::DaemonModules::BaseTaskWorker;
@@ -35,9 +35,9 @@ Creates a system error message and sends an email with the error messages form a
 
     my $Success = $TaskWorkerObject->_HandleError(
         TaskName     => 'some name',
-        TaksTye      => 'some type',
+        TaskType      => 'some type',
         LogMessage   => 'some message',       # message to set in the OTRS error log
-        ErrorMessage => 'some message',       # message to be sent ad a body of the email, usually contains
+        ErrorMessage => 'some message',       # message to be sent as a body of the email, usually contains
                                               #     all messages from STDERR including tracebacks
     );
 
@@ -150,10 +150,10 @@ sub _CheckTaskParams {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

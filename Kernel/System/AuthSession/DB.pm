@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::AuthSession::DB;
@@ -189,7 +189,7 @@ sub GetSessionIDData {
         # deserialize data if needed
         if ( $Row[3] ) {
             my $Value = eval {
-                $StorableObject->Deserialize( Data => MIME::Base64::decode_base64( $Row[2] ) )
+                $StorableObject->Deserialize( Data => MIME::Base64::decode_base64( $Row[2] ) );
             };
 
             # workaround for the oracle problem with empty

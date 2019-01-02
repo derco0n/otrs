@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -185,7 +185,10 @@ $Selenium->RunTest(
         );
 
         # Set added test agent to invalid.
-        $Selenium->execute_script("\$('#ValidID').val('2').trigger('redraw.InputField').trigger('change');");
+        $Selenium->InputFieldValueSet(
+            Element => '#ValidID',
+            Value   => 2,
+        );
         $Selenium->find_element( "#Submit", 'css' )->VerifiedClick();
 
         # Test search filter by agent $UserRandomID.
@@ -235,8 +238,9 @@ $Selenium->RunTest(
         );
 
         # Select test created Queue as 'My Queue' and update preference.
-        $Selenium->execute_script(
-            "\$('#QueueID').val('$QueueID').trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#QueueID',
+            Value   => $QueueID,
         );
         $Selenium->execute_script(
             "\$('#QueueID').closest('.WidgetSimple').find('.SettingUpdateBox').find('button').trigger('click');"
@@ -253,8 +257,9 @@ $Selenium->RunTest(
         );
 
         # Select test created Service as 'My Service' and update preference.
-        $Selenium->execute_script(
-            "\$('#ServiceID').val('$ServiceID').trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#ServiceID',
+            Value   => $ServiceID,
         );
         $Selenium->execute_script(
             "\$('#ServiceID').closest('.WidgetSimple').find('.SettingUpdateBox').find('button').trigger('click');"

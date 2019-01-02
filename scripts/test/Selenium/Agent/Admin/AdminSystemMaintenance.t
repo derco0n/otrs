@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -20,7 +20,7 @@ my $CheckBredcrumb = sub {
     my %Param = @_;
 
     my $BreadcrumbText = $Param{BreadcrumbText} || '';
-    my $Count = 1;
+    my $Count          = 1;
 
     for my $BreadcrumbText ( 'System Maintenance Management', $BreadcrumbText ) {
         $Self->Is(
@@ -64,7 +64,7 @@ $Selenium->RunTest(
         );
 
         # Set user's time zone.
-        my $UserTimeZone = 'Europe/Berlin';
+        my $UserTimeZone = 'UTC';
         $UserObject->SetPreferences(
             Key    => 'UserTimeZone',
             Value  => $UserTimeZone,
@@ -159,14 +159,14 @@ $Selenium->RunTest(
             "Error message correctly displayed"
         ) || die "Did not get notification message";
 
-        # get test start time + 2 hour of system time
+        # get test start time + 1 hour of system time
         my $DTStartObj = $DTObj->Clone();
-        $DTStartObj->Add( Hours => 2 );
+        $DTStartObj->Add( Hours => 1 );
         my $DTStart = $DTStartObj->Get();
 
-        # get test end time + 3 hour of system time
+        # get test end time + 2 hour of system time
         my $DTEndObj = $DTObj->Clone();
-        $DTEndObj->Add( Hours => 3 );
+        $DTEndObj->Add( Hours => 2 );
         my $DTEnd = $DTEndObj->Get();
 
         # create real test SystemMaintenance
@@ -229,21 +229,16 @@ $Selenium->RunTest(
             "$Notification - notification is found."
         );
 
-        # Get test start time + 1 hour of system.
-        my $LayoutObject = Kernel::Output::HTML::Layout->new( UserTimeZone => $UserTimeZone );
-        my $DTStartObjStr = $DTObj->Clone();
-        $DTStartObjStr->Add( Hours => 1 );
+        # Get test system maintenance start and end time as formated string.
+        my $LayoutObject    = Kernel::Output::HTML::Layout->new( UserTimeZone => $UserTimeZone );
         my $StartTimeString = $LayoutObject->{LanguageObject}->FormatTimeString(
-            $DTStartObjStr->ToString(),
+            $DTStartObj->ToString(),
             'DateFormat',
             1,
         );
 
-        # Get test end time + 2 hour of system.
-        my $DTEndObjStr = $DTObj->Clone();
-        $DTEndObjStr->Add( Hours => 2 );
         my $EndTimeString = $LayoutObject->{LanguageObject}->FormatTimeString(
-            $DTEndObjStr->ToString(),
+            $DTEndObj->ToString(),
             'DateFormat',
             1,
         );
@@ -361,7 +356,10 @@ $Selenium->RunTest(
         # edit test SystemMaintenance and set it to invalid
         $Selenium->find_element( "#LoginMessage",  'css' )->send_keys( $SysMainLogin,  "-update" );
         $Selenium->find_element( "#NotifyMessage", 'css' )->send_keys( $SysMainNotify, "-update" );
-        $Selenium->execute_script("\$('#ValidID').val('2').trigger('redraw.InputField').trigger('change');");
+        $Selenium->InputFieldValueSet(
+            Element => '#ValidID',
+            Value   => 2,
+        );
         $Selenium->find_element( "#Submit", 'css' )->VerifiedClick();
 
         # check if notification exists after updating

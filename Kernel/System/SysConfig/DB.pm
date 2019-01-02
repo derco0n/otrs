@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::SysConfig::DB;
@@ -12,6 +12,7 @@ use strict;
 use warnings;
 
 use MIME::Base64;
+use Time::HiRes();
 use utf8;
 
 use Kernel::System::VariableCheck qw( :all );
@@ -28,7 +29,7 @@ our @ObjectDependencies = (
 
 =head1 NAME
 
-Kernel::System::SysConfig - Functions to manage system configuration settings interactions with the database.
+Kernel::System::SysConfig::DB - Functions to manage system configuration settings interactions with the database.
 
 =head1 PUBLIC INTERFACE
 
@@ -1214,7 +1215,7 @@ Get default setting list with complete data.
         UserPreferencesGroup     => 'Some Group',
         Navigation               => 'ASimple::Path::Structure',
         Locked                   => 1, # check for locked settings
-        Category                 => 'OTRSFree',                         # optional (requires CategoryFiles)
+        Category                 => 'OTRS',                             # optional (requires CategoryFiles)
         CategoryFiles            => ['Framework.xml', 'Ticket.xml', ],  # optional (requires Category)
         NoCache                  => 0,                                  # (optional) Default 0. If set, system will not generate cache.
     );
@@ -1244,14 +1245,18 @@ Returns:
             ExclusiveLockUserID      => 1,
             ExclusiveLockExpiryTime  => '2016-05-29 11:09:04',
             CreateTime               => "2016-05-29 11:04:04",
+            CreateBy                 => 1,
             ChangeTime               => "2016-05-29 11:04:04",
+            ChangeBy                 => 1,
+            SettingUID               => 'Default4717141789',
         },
         {
             DefaultID => 321,
             Name      => 'FieldName',
             # ...
-            CreateTime => '2010-09-11 10:08:00',
             ChangeTime => '2011-01-01 01:01:01',
+            ChangeBy                 => 1,
+            SettingUID               => 'Default4717141781',
         },
         # ...
     );
@@ -1680,6 +1685,12 @@ sub DefaultSettingLock {
 
     my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
 
+    # Check if there was cache for this type/key pair.
+    my $DefaultSettingListGet = $CacheObject->Get(
+        Type => 'SysConfigDefaultListGet',
+        Key  => 'DefaultSettingListGet',
+    );
+
     if ( $Param{LockAll} ) {
         $CacheObject->CleanUp(
             Type => 'SysConfigDefault',
@@ -1694,6 +1705,56 @@ sub DefaultSettingLock {
     $CacheObject->CleanUp(
         Type => 'SysConfigDefaultListGet',
     );
+
+    # Warm up the cache.
+    if ($DefaultSettingListGet) {
+
+        # Warm up existing cache.
+
+        if (%DefaultSetting) {
+
+            # Update one setting.
+
+            my $Index;
+
+            # Determine index of the element.
+            LOOPINDEX:
+            for my $LoopIndex ( 0 .. scalar @{$DefaultSettingListGet} - 1 ) {
+                next LOOPINDEX if $DefaultSettingListGet->[$LoopIndex]->{DefaultID} ne $DefaultSetting{DefaultID};
+
+                $Index = $LoopIndex;
+                last LOOPINDEX;
+            }
+
+            # Update value.
+            $DefaultSettingListGet->[$Index] = {
+                %{ $DefaultSettingListGet->[$Index] },
+                ExclusiveLockExpiryTime => $ExpiryTime,
+                ExclusiveLockGUID       => $ExclusiveLockGUID,
+                ExclusiveLockUserID     => $Param{UserID},
+            };
+        }
+        else {
+            # Update all settings.
+            for my $Index ( 0 .. scalar @{$DefaultSettingListGet} - 1 ) {
+                $DefaultSettingListGet->[$Index] = {
+                    %{ $DefaultSettingListGet->[$Index] },
+                    ExclusiveLockExpiryTime => $ExpiryTime,
+                    ExclusiveLockGUID       => $ExclusiveLockGUID,
+                    ExclusiveLockUserID     => $Param{UserID},
+                };
+            }
+        }
+
+        # Set new cache value.
+        $CacheObject->Set(
+            Type  => 'SysConfigDefaultListGet',
+            Key   => 'DefaultSettingListGet',
+            Value => $DefaultSettingListGet,
+            TTL   => $Self->{CacheTTL},
+        );
+    }
+
     $CacheObject->Delete(
         Type => 'SysConfigDefaultList',
         Key  => 'DefaultSettingList',
@@ -1944,6 +2005,12 @@ sub DefaultSettingUnlock {
 
     my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
 
+    # Check if there was cache for this type/key pair.
+    my $DefaultSettingListGet = $CacheObject->Get(
+        Type => 'SysConfigDefaultListGet',
+        Key  => 'DefaultSettingListGet',
+    );
+
     for my $Setting (@SettingsLocked) {
         $CacheObject->Delete(
             Type => 'SysConfigDefault',
@@ -1954,6 +2021,55 @@ sub DefaultSettingUnlock {
     $CacheObject->CleanUp(
         Type => 'SysConfigDefaultListGet',
     );
+
+    # Warm up the cache.
+    if ($DefaultSettingListGet) {
+
+        # Warm up existing cache.
+
+        if (%DefaultSetting) {
+
+            # Update one setting.
+
+            my $Index;
+
+            # Determine index of the element.
+            LOOPINDEX:
+            for my $LoopIndex ( 0 .. scalar @{$DefaultSettingListGet} - 1 ) {
+                next LOOPINDEX if $DefaultSettingListGet->[$LoopIndex]->{DefaultID} ne $DefaultSetting{DefaultID};
+
+                $Index = $LoopIndex;
+                last LOOPINDEX;
+            }
+
+            # Update value.
+            $DefaultSettingListGet->[$Index] = {
+                %{ $DefaultSettingListGet->[$Index] },
+                ExclusiveLockExpiryTime => undef,
+                ExclusiveLockGUID       => 0,
+                ExclusiveLockUserID     => undef,
+            };
+        }
+        else {
+            # Update all settings.
+            for my $Index ( 0 .. scalar @{$DefaultSettingListGet} - 1 ) {
+                $DefaultSettingListGet->[$Index] = {
+                    %{ $DefaultSettingListGet->[$Index] },
+                    ExclusiveLockExpiryTime => undef,
+                    ExclusiveLockGUID       => 0,
+                    ExclusiveLockUserID     => undef,
+                };
+            }
+        }
+
+        # Set new cache value.
+        $CacheObject->Set(
+            Type  => 'SysConfigDefaultListGet',
+            Key   => 'DefaultSettingListGet',
+            Value => $DefaultSettingListGet,
+            TTL   => $Self->{CacheTTL},
+        );
+    }
     $CacheObject->Delete(
         Type => 'SysConfigDefaultList',
         Key  => 'DefaultSettingList',
@@ -1966,7 +2082,9 @@ sub DefaultSettingUnlock {
 
 Removes the IsDirty flag from default settings.
 
-    my $Success = $SysConfigDBObject->DefaultSettingDirtyCleanUp();
+    my $Success = $SysConfigDBObject->DefaultSettingDirtyCleanUp(
+        AllSettings => 0,   # (default 0) Reset all dirty settings.
+    );
 
 Returns:
 
@@ -1994,6 +2112,12 @@ sub DefaultSettingDirtyCleanUp {
 
     my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
 
+    # Check if there was cache for this type/key pair.
+    my $DefaultSettingListGet = $CacheObject->Get(
+        Type => 'SysConfigDefaultListGet',
+        Key  => 'DefaultSettingListGet',
+    );
+
     if ( $Param{AllSettings} ) {
         $CacheObject->CleanUp(
             Type => 'SysConfigDefault',
@@ -2010,6 +2134,26 @@ sub DefaultSettingDirtyCleanUp {
     $CacheObject->CleanUp(
         Type => 'SysConfigDefaultListGet',
     );
+
+    # Warm up the cache.
+    if ($DefaultSettingListGet) {
+
+        # Warm up existing cache.
+
+        # Update all settings.
+        for my $Index ( 0 .. scalar @{$DefaultSettingListGet} - 1 ) {
+            $DefaultSettingListGet->[$Index]->{IsDirty} = 0;
+        }
+
+        # Set new cache value.
+        $CacheObject->Set(
+            Type  => 'SysConfigDefaultListGet',
+            Key   => 'DefaultSettingListGet',
+            Value => $DefaultSettingListGet,
+            TTL   => $Self->{CacheTTL},
+        );
+    }
+
     $CacheObject->Delete(
         Type => 'SysConfigDefaultList',
         Key  => 'DefaultSettingList',
@@ -2784,8 +2928,9 @@ sub ModifiedSettingAdd {
     $CacheObject->CleanUp(
         Type => 'SysConfigModified',
     );
-    $CacheObject->CleanUp(
+    $CacheObject->Delete(
         Type => 'SysConfigModifiedList',
+        Key  => 'ModifiedSettingList',
     );
     $CacheObject->CleanUp(
         Type => 'SysConfigNavigation',
@@ -2936,6 +3081,7 @@ sub ModifiedSettingGet {
         Type => $CacheType,
         Key  => $CacheKey,
     );
+
     return %{$Cache} if ref $Cache eq 'HASH';
 
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
@@ -3057,20 +3203,6 @@ Returns:
 sub ModifiedSettingListGet {
     my ( $Self, %Param ) = @_;
 
-    # Define SQL filters to be used in the queries.
-    my %FieldFilters = (
-        IsInvisible            => 'is_invisible',
-        IsReadonly             => 'is_readonly',
-        IsRequired             => 'is_required',
-        IsValid                => 'is_valid',
-        IsDirty                => 'is_dirty',
-        HasConfigLevel         => 'has_configlevel',
-        UserModificationActive => 'user_modification_active',
-        Name                   => 'name',
-        TargetUserID           => 'user_id',
-        ChangeBy               => 'change_by',
-    );
-
     # IsGlobal and TargetUserID are exclusive each other.
     if ( defined $Param{IsGlobal} && defined $Param{TargetUserID} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
@@ -3084,32 +3216,7 @@ sub ModifiedSettingListGet {
     my @Bind;
 
     my $CacheType = 'SysConfigModifiedList';
-    my $CacheKey  = 'ModifiedSettingList';     # this cache key gets more elements
-
-    # Check params have a default value.
-    for my $Key ( sort keys %FieldFilters ) {
-        if ( defined $Param{$Key} ) {
-            push @Filters, " $FieldFilters{$Key} = ? ";
-            push @Bind,    \$Param{$Key};
-
-            $CacheKey .= "::$FieldFilters{$Key}::$Param{$Key}";
-        }
-    }
-
-    # In case of global search user value is needed as null.
-    if ( $Param{IsGlobal} ) {
-        push @Filters, " user_id IS NULL ";
-        $CacheKey .= "::IsGlobal";
-    }
-
-    my $SQLFilter;
-
-    # Loop over filters and set them on SQL and cache key.
-    if (@Filters) {
-        $SQLFilter = ' WHERE ' . join ' AND ', @Filters;
-    }
-
-    $SQLFilter //= '';
+    my $CacheKey  = 'ModifiedSettingList';
 
     my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
 
@@ -3119,61 +3226,109 @@ sub ModifiedSettingListGet {
         Key  => $CacheKey,
     );
 
-    return @{$Cache} if ref $Cache eq 'ARRAY';
+    my @DataRaw;
 
-    my $SQL = '
-        SELECT id, sysconfig_default_id, name, user_id, is_valid, user_modification_active,
-            effective_value, is_dirty, reset_to_default, create_time, create_by, change_time, change_by
-        FROM sysconfig_modified';
+    if ( ref $Cache eq 'ARRAY' ) {
+        @DataRaw = @{$Cache};
+    }
+    else {
+        my $SQL = '
+            SELECT id, sysconfig_default_id, name, user_id, is_valid, user_modification_active,
+                effective_value, is_dirty, reset_to_default, create_time, create_by, change_time, change_by
+            FROM sysconfig_modified';
 
-    $SQL .= $SQLFilter . ' ORDER BY id';
+        $SQL .= ' ORDER BY id';
 
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+        my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
-    # Get modified from database.
-    return if !$DBObject->Prepare(
-        SQL  => $SQL,
-        Bind => \@Bind,
-    );
-
-    my @Data;
-
-    my $YAMLObject = $Kernel::OM->Get('Kernel::System::YAML');
-
-    while ( my @Row = $DBObject->FetchrowArray() ) {
-
-        # De-serialize modified data.
-        my $EffectiveValue = $YAMLObject->Load( Data => $Row[6] );
-
-        my $TimeStamp = $Row[11];
-        $TimeStamp =~ s{:|-|[ ]}{}gmsx;
-
-        my %ModifiedSetting = (
-            ModifiedID             => $Row[0],
-            DefaultID              => $Row[1],
-            Name                   => $Row[2],
-            TargetUserID           => $Row[3],
-            IsValid                => $Row[4],
-            UserModificationActive => $Row[5],
-            EffectiveValue         => $EffectiveValue,
-            IsDirty                => $Row[7] ? 1 : 0,
-            ResetToDefault         => $Row[8] ? 1 : 0,
-            CreateTime             => $Row[9],
-            CreateBy               => $Row[10],
-            ChangeTime             => $Row[11],
-            ChangeBy               => $Row[12],
-            SettingUID             => "Modified$Row[0]$TimeStamp",
+        # Get modified from database.
+        return if !$DBObject->Prepare(
+            SQL  => $SQL,
+            Bind => \@Bind,
         );
 
-        push @Data, \%ModifiedSetting;
+        my $YAMLObject = $Kernel::OM->Get('Kernel::System::YAML');
+
+        while ( my @Row = $DBObject->FetchrowArray() ) {
+
+            # De-serialize modified data.
+            my $EffectiveValue = $YAMLObject->Load( Data => $Row[6] );
+
+            my $TimeStamp = $Row[11];
+            $TimeStamp =~ s{:|-|[ ]}{}gmsx;
+
+            my %ModifiedSetting = (
+                ModifiedID             => $Row[0],
+                DefaultID              => $Row[1],
+                Name                   => $Row[2],
+                TargetUserID           => $Row[3],
+                IsValid                => $Row[4],
+                UserModificationActive => $Row[5],
+                EffectiveValue         => $EffectiveValue,
+                IsDirty                => $Row[7] ? 1 : 0,
+                ResetToDefault         => $Row[8] ? 1 : 0,
+                CreateTime             => $Row[9],
+                CreateBy               => $Row[10],
+                ChangeTime             => $Row[11],
+                ChangeBy               => $Row[12],
+                SettingUID             => "Modified$Row[0]$TimeStamp",
+            );
+
+            push @DataRaw, \%ModifiedSetting;
+        }
+
+        $CacheObject->Set(
+            Type  => $CacheType,
+            Key   => $CacheKey,
+            Value => \@DataRaw,
+            TTL   => $Self->{CacheTTL},
+        );
     }
 
-    $CacheObject->Set(
-        Type  => $CacheType,
-        Key   => $CacheKey,
-        Value => \@Data,
-        TTL   => $Self->{CacheTTL},
-    );
+    # Copy DataRaw to prevent modifications to in memory cache.
+    my @Data = @DataRaw;
+
+    if ( defined $Param{IsInvisible} ) {
+        @Data = grep { $_->{IsInvisible} eq $Param{IsInvisible} } @Data;
+    }
+    if ( defined $Param{IsReadonly} ) {
+        @Data = grep { $_->{IsReadonly} eq $Param{IsReadonly} } @Data;
+    }
+    if ( defined $Param{IsRequired} ) {
+        @Data = grep { $_->{IsRequired} eq $Param{IsRequired} } @Data;
+    }
+    if ( defined $Param{IsValid} ) {
+        @Data = grep { $_->{IsValid} eq $Param{IsValid} } @Data;
+    }
+    if ( defined $Param{IsDirty} ) {
+        @Data = grep { $_->{IsDirty} eq $Param{IsDirty} } @Data;
+    }
+    if ( defined $Param{HasConfigLevel} ) {
+        @Data = grep { $_->{HasConfigLevel} eq $Param{HasConfigLevel} } @Data;
+    }
+    if ( defined $Param{UserModificationActive} ) {
+        @Data = grep { $_->{UserModificationActive} eq $Param{UserModificationActive} } @Data;
+    }
+    if ( defined $Param{Name} ) {
+        @Data = grep { $_->{Name} eq $Param{Name} } @Data;
+    }
+    if ( defined $Param{TargetUserID} ) {
+        @Data = grep { $_->{TargetUserID} && $_->{TargetUserID} eq $Param{TargetUserID} } @Data;
+    }
+    if ( defined $Param{ChangeBy} ) {
+        @Data = grep { $_->{ChangeBy} eq $Param{ChangeBy} } @Data;
+    }
+    if ( defined $Param{Locked} ) {
+        if ( $Param{Locked} ) {
+            @Data = grep { $_->{ExclusiveLockGUID} } @Data;
+        }
+        else {
+            @Data = grep { !$_->{ExclusiveLockGUID} } @Data;
+        }
+    }
+    if ( $Param{IsGlobal} ) {
+        @Data = grep { !$_->{TargetUserID} } @Data;
+    }
 
     return @Data;
 }
@@ -3248,8 +3403,9 @@ sub ModifiedSettingDelete {
 
     my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
 
-    $CacheObject->CleanUp(
+    $CacheObject->Delete(
         Type => 'SysConfigModifiedList',
+        Key  => 'ModifiedSettingList',
     );
     $CacheObject->CleanUp(
         Type => 'SysConfigNavigation',
@@ -3438,8 +3594,9 @@ sub ModifiedSettingUpdate {
     $CacheObject->CleanUp(
         Type => 'SysConfigModified',
     );
-    $CacheObject->CleanUp(
+    $CacheObject->Delete(
         Type => 'SysConfigModifiedList',
+        Key  => 'ModifiedSettingList',
     );
     $CacheObject->CleanUp(
         Type => 'SysConfigNavigation',
@@ -3542,9 +3699,11 @@ sub ModifiedSettingDirtyCleanUp {
     $CacheObject->CleanUp(
         Type => 'SysConfigModified',
     );
-    $CacheObject->CleanUp(
+    $CacheObject->Delete(
         Type => 'SysConfigModifiedList',
+        Key  => 'ModifiedSettingList',
     );
+
     $CacheObject->CleanUp(
         Type => 'SysConfigModifiedVersion',
     );
@@ -4145,7 +4304,7 @@ sub ModifiedSettingVersionDelete {
 
 Check if there are not deployed changes on system configuration.
 
-    my $Result = $SysConfigObject->ConfigurationIsDirty(
+    my $Result = $SysConfigDBObject->ConfigurationIsDirty(
         UserID => 123,      # optional, the user that changes a modified setting
     );
 
@@ -4311,7 +4470,9 @@ sub DeploymentAdd {
         }
     }
 
-    # Create a deployment record without a real value.
+    my $UID = 'OTRSInvalid-' . $Self->_GetUID();
+
+    # Create a deployment record without the real comments.
     return if !$DBObject->Do(
         SQL => '
             INSERT INTO sysconfig_deployment
@@ -4319,7 +4480,8 @@ sub DeploymentAdd {
             VALUES
                 (?, ?, ?, ?, ?)',
         Bind => [
-            \$Param{Comments}, \'Invalid', \$Param{TargetUserID}, \$Param{DeploymentTimeStamp}, \$Param{UserID},
+            \$UID, \${ $Param{EffectiveValueStrg} }, \$Param{TargetUserID}, \$Param{DeploymentTimeStamp},
+            \$Param{UserID},
         ],
     );
 
@@ -4327,10 +4489,10 @@ sub DeploymentAdd {
     my $SQL = '
         SELECT id
         FROM sysconfig_deployment
-        WHERE create_time = ?
+        WHERE comments = ?
             AND create_by = ?';
 
-    my @Bind = ( \$Param{DeploymentTimeStamp}, \$Param{UserID} );
+    my @Bind = ( \$UID, \$Param{UserID} );
 
     if ( $Param{TargetUserID} ) {
         $SQL .= '
@@ -4372,10 +4534,10 @@ sub DeploymentAdd {
     return if !$DBObject->Do(
         SQL => '
             Update sysconfig_deployment
-            SET effective_value = ?
+            SET comments = ?, effective_value = ?
             WHERE id = ?',
         Bind => [
-            \${ $Param{EffectiveValueStrg} }, \$DeploymentID,
+            \$Param{Comments}, \${ $Param{EffectiveValueStrg} }, \$DeploymentID,
         ],
     );
 
@@ -4412,6 +4574,7 @@ Gets deployment information.
 
     my %Deployment = $SysConfigDBObject->DeploymentGet(
         DeploymentID => 123,
+        Valid        => 1,      # optional (this is deprecated and will be removed in next mayor release).
     );
 
 Returns:
@@ -4479,7 +4642,9 @@ sub DeploymentGet {
 
     return if !%Deployment;
 
-    if ( $Deployment{EffectiveValueStrg} eq 'Invalid' ) {
+    my $Valid = defined $Param{Valid} ? $Param{Valid} : 1;
+
+    if ( $Deployment{EffectiveValueStrg} eq 'Invalid' && $Valid ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
             Message  => "The Deployment $Param{DeploymentID} is invalid!",
@@ -4725,6 +4890,7 @@ sub DeploymentDelete {
 
     my %Deployment = $Self->DeploymentGet(
         DeploymentID => $Param{DeploymentID},
+        Valid        => 0,
     );
 
     return 1 if !%Deployment;
@@ -5046,7 +5212,7 @@ sub DeploymentModifiedVersionList {
         return;
     }
 
-    my $Mode = $Param{Mode} // 'Equals';
+    my $Mode        = $Param{Mode} // 'Equals';
     my %ModeMapping = (
         Equals            => '=',
         GreaterThan       => '>',
@@ -5152,6 +5318,88 @@ sub DeploymentUnlock {
     );
 
     return 1;
+}
+
+=head2 DeploymentListCleanup()
+
+Removes invalid deployments from the database.
+
+    my $Success = $SysConfigDBObject->DeploymentListCleanup( );
+
+Returns:
+
+    $Success = 1;       # Returns 1 if all records are valid (or all invalid was removed)
+                        # Returns -1 if there is an invalid deployment that could be in adding process
+                        # Returns false in case of an error
+
+=cut
+
+sub DeploymentListCleanup {
+    my ( $Self, %Param ) = @_;
+
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
+    return if !$DBObject->Prepare(
+        SQL => '
+            SELECT id, create_time
+            FROM sysconfig_deployment
+            WHERE effective_value LIKE \'Invalid%\'
+                OR comments LIKE \'OTRSInvalid-%\'
+            ORDER BY id DESC',
+    );
+
+    my @Deployments;
+    while ( my @Row = $DBObject->FetchrowArray() ) {
+        my %Deployment = (
+            DeploymentID => $Row[0],
+            CreateTime   => $Row[1],
+        );
+        push @Deployments, \%Deployment;
+    }
+
+    my $Success               = 1;
+    my $CurrentDateTimeObject = $Kernel::OM->Create('Kernel::System::DateTime');
+
+    DEPLOYMENT:
+    for my $Deployment (@Deployments) {
+
+        my $DeploymentDateTimeObject = $Kernel::OM->Create(
+            'Kernel::System::DateTime',
+            ObjectParams => {
+                String => $Deployment->{CreateTime},
+            },
+        );
+
+        my $Delta = $CurrentDateTimeObject->Delta( DateTimeObject => $DeploymentDateTimeObject );
+
+        # Remove deployment only if it is old (more than 20 secs)
+        if ( $DeploymentDateTimeObject < $CurrentDateTimeObject && $Delta >= 20 ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Deployment $Deployment->{DeploymentID} is invalid and will be removed!",
+            );
+            my $DeleteSuccess = $Self->DeploymentDelete(
+                DeploymentID => $Deployment->{DeploymentID},
+            );
+            if ( !$DeleteSuccess ) {
+                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => "Could not delete deployment $Deployment->{DeploymentID}",
+                );
+                $Success = 0;
+            }
+            last DEPLOYMENT;
+        }
+
+        # Otherwise just log that there is something wrong with the deployment but do not remove it
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Deployment $Deployment->{DeploymentID} seams to be invalid or its not fully updated",
+        );
+        $Success = -1;
+    }
+
+    return $Success;
 }
 
 =head1 PRIVATE INTERFACE
@@ -5357,14 +5605,45 @@ sub _BulkInsert {
     return 1;
 }
 
+=head2 _GetUID()
+
+Generates a unique identifier.
+
+    my $UID = $TicketNumberObject->_GetUID();
+
+Returns:
+
+    my $UID = 14906327941360ed8455f125d0450277;
+
+=cut
+
+sub _GetUID {
+    my ( $Self, %Param ) = @_;
+
+    my $NodeID = $Kernel::OM->Get('Kernel::Config')->Get('NodeID') || 1;
+    my ( $Seconds, $Microseconds ) = Time::HiRes::gettimeofday();
+    my $ProcessID = $$;
+
+    my $CounterUID = $ProcessID . $Seconds . $Microseconds . $NodeID;
+
+    my $RandomString = $Kernel::OM->Get('Kernel::System::Main')->GenerateRandomString(
+        Length     => 32 - length $CounterUID,
+        Dictionary => [ 0 .. 9, 'a' .. 'f' ],    # hexadecimal
+    );
+
+    $CounterUID .= $RandomString;
+
+    return $CounterUID;
+}
+
 1;
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

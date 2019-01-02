@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::UnitTest;
@@ -48,7 +48,7 @@ sub new {
     bless( $Self, $Type );
 
     $Self->{Debug} = $Param{Debug} || 0;
-    $Self->{ANSI} = $Param{ANSI};
+    $Self->{ANSI}  = $Param{ANSI};
 
     return $Self;
 }
@@ -96,6 +96,28 @@ sub Run {
 
     my @TestsToExecute = @{ $Param{Tests} // [] };
 
+    my $UnitTestBlacklist = $ConfigObject->Get('UnitTest::Blacklist');
+    my @BlacklistedTests;
+    my @SkippedTests;
+    if ( IsHashRefWithData($UnitTestBlacklist) ) {
+
+        CONFIGKEY:
+        for my $ConfigKey ( sort keys %{$UnitTestBlacklist} ) {
+
+            next CONFIGKEY if !$ConfigKey;
+            next CONFIGKEY
+                if !$UnitTestBlacklist->{$ConfigKey} || !IsArrayRefWithData( $UnitTestBlacklist->{$ConfigKey} );
+
+            TEST:
+            for my $Test ( @{ $UnitTestBlacklist->{$ConfigKey} } ) {
+
+                next TEST if !$Test;
+
+                push @BlacklistedTests, $Test;
+            }
+        }
+    }
+
     # Use non-overridden time() function.
     my $StartTime = CORE::time;    ## no critic;
 
@@ -113,6 +135,18 @@ sub Run {
             next FILE;
         }
 
+        # Check blacklisted files.
+        if ( @BlacklistedTests && grep { $File =~ m{\Q$Directory/$_\E$}smx } @BlacklistedTests ) {
+            push @SkippedTests, $File;
+            next FILE;
+        }
+
+        # Check if a file with the same path and name exists in the Custom folder.
+        my $CustomFile = $File =~ s{ \A $Home }{$Home/Custom}xmsr;
+        if ( -e $CustomFile ) {
+            $File = $CustomFile;
+        }
+
         $Self->_HandleFile(
             PostTestScripts => $Param{PostTestScripts},
             File            => $File,
@@ -125,6 +159,14 @@ sub Run {
     my $Host = $ConfigObject->Get('FQDN');
 
     print "=====================================================================\n";
+
+    if (@SkippedTests) {
+        print "Following blacklisted tests were skipped:\n";
+        for my $SkippedTest (@SkippedTests) {
+            print '  ' . $Self->_Color( 'yellow', $SkippedTest ) . "\n";
+        }
+    }
+
     print $Self->_Color( 'yellow', $Host ) . " ran tests in " . $Self->_Color( 'yellow', "${Duration}s" );
     print " for " . $Self->_Color( 'yellow', $Product ) . "\n";
 
@@ -206,15 +248,18 @@ sub _HandleFile {
     # Wait for child process to finish.
     waitpid( $PID, 0 );
 
-    my $ResultData = Storable::retrieve($ResultDataFile);
+    my $ResultData = eval { Storable::retrieve($ResultDataFile) };
 
     if ( !$ResultData ) {
+        print $Self->_Color( 'red', "Could not read result data for $Param{File}.\n" );
         $ResultData->{TestNotOk}++;
     }
 
     $Self->{ResultData}->{ $Param{File} } = $ResultData;
     $Self->{TestCountOk}    += $ResultData->{TestOk}    // 0;
     $Self->{TestCountNotOk} += $ResultData->{TestNotOk} // 0;
+
+    $Self->{SeleniumData} //= $ResultData->{SeleniumData};
 
     $Self->{NotOkInfo} //= [];
     if ( $ResultData->{NotOkInfo} ) {
@@ -284,6 +329,59 @@ sub _SubmitResults {
             }
 
             $ScreenshotCount += $TestScreenshotCount;
+        }
+    }
+
+    # Save Selenium Data information in Support Data results.
+    if ( IsHashRefWithData( $Self->{SeleniumData} ) ) {
+        push @{ $SupportData{Result} },
+            {
+            Value       => $Self->{SeleniumData}->{build}->{version} // 'N/A',
+            Label       => 'Selenium Server',
+            DisplayPath => 'Selenium Test Environment',
+            Status      => 1,
+            },
+            {
+            Value       => $Self->{SeleniumData}->{java}->{version} // 'N/A',
+            Label       => 'Java',
+            DisplayPath => 'Selenium Test Environment',
+            Status      => 1,
+            },
+            {
+            Value       => $Self->{SeleniumData}->{browserName} // 'N/A',
+            Label       => 'Browser Name',
+            DisplayPath => 'Selenium Test Environment',
+            Status      => 1,
+            };
+        if ( $Self->{SeleniumData}->{browserName} && $Self->{SeleniumData}->{browserName} eq 'chrome' ) {
+            push @{ $SupportData{Result} },
+                {
+                Value       => $Self->{SeleniumData}->{version} // 'N/A',
+                Label       => 'Browser Version',
+                DisplayPath => 'Selenium Test Environment',
+                Status      => 1,
+                },
+                {
+                Value       => $Self->{SeleniumData}->{chrome}->{chromedriverVersion} // 'N/A',
+                Label       => 'Chrome Driver',
+                DisplayPath => 'Selenium Test Environment',
+                Status      => 1,
+                };
+        }
+        elsif ( $Self->{SeleniumData}->{browserName} && $Self->{SeleniumData}->{browserName} eq 'firefox' ) {
+            push @{ $SupportData{Result} },
+                {
+                Value       => $Self->{SeleniumData}->{browserVersion} // 'N/A',
+                Label       => 'Browser Version',
+                DisplayPath => 'Selenium Test Environment',
+                Status      => 1,
+                },
+                {
+                Value       => $Self->{SeleniumData}->{'moz:geckodriverVersion'} // 'N/A',
+                Label       => 'Gecko Driver',
+                DisplayPath => 'Selenium Test Environment',
+                Status      => 1,
+                };
         }
     }
 
@@ -418,10 +516,10 @@ sub _Color {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

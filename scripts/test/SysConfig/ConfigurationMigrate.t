@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 ## no critic (Modules::RequireExplicitPackage)
@@ -134,9 +134,11 @@ my $Success = $Kernel::OM->Get('Kernel::System::SysConfig::Migration')->MigrateC
     FilePath        => $TestLocation,
     PackageSettings => [
         'SessionAgentOnlineThreshold',
+        'Ticket::Frontend::AgentTicketQueue###HighlightAge2',
     ],
     PackageLookupNewConfigName => {
-        'SessionAgentOnlineThreshold' => 'ChatEngine::AgentOnlineThreshold'
+        'ChatEngine::AgentOnlineThreshold' => 'SessionAgentOnlineThreshold',
+        'Test###HighlightAge2'             => 'Ticket::Frontend::AgentTicketQueue###HighlightAge2',
     },
     ReturnMigratedSettingsCounts => 1,
 );
@@ -194,7 +196,7 @@ if ( ref $Success eq 'HASH' ) {
         {
             Name        => 'AllSettingsCount',
             IsValue     => $AllSettingsCount,
-            ShouldValue => 50,
+            ShouldValue => 52,
         },
         {
             Name        => 'DisabledSettingsCount',
@@ -204,7 +206,7 @@ if ( ref $Success eq 'HASH' ) {
         {
             Name        => 'MissingSettings',
             IsValue     => scalar @MissingSettings,
-            ShouldValue => 2,
+            ShouldValue => 3,
         },
         {
             Name        => 'UnsuccessfullSettings',
@@ -246,21 +248,29 @@ my @Tests = (
     {
         TestType => 'Renaming',
         Name     => 'Renamed Setting 1',
-        OldName  => 'Ticket::EventModulePost###098-ArticleSearchIndex',
-        NewName  => 'Ticket::EventModulePost###2000-ArticleSearchIndex',
-    },
-    {
-        TestType => 'Renaming',
-        Name     => 'Renamed Setting 2',
         OldName  => 'Frontend::NotifyModule###800-Daemon-Check',
         NewName  => 'Frontend::NotifyModule###8000-Daemon-Check',
     },
     {
         TestType => 'Renaming',
-        Name     => 'Renamed Setting 3',
+        Name     => 'Renamed Setting 2',
         OldName  => 'CustomerCompany::EventModulePost###110-UpdateTickets',
         NewName  => 'CustomerCompany::EventModulePost###2300-UpdateTickets',
     },
+
+    {
+        TestType       => 'EffectiveValue',
+        Name           => 'Effective Value',
+        Key            => 'Ticket::Frontend::AgentTicketQueue###HighlightAge1',
+        EffectiveValue => '1234',
+    },
+    {
+        TestType       => 'EffectiveValue',
+        Name           => 'Effective Value',
+        Key            => 'Ticket::Frontend::AgentTicketQueue###HighlightAge2',
+        EffectiveValue => '5678',
+    },
+
     {
         TestType => 'Disabled',
         Name     => 'Disabled Setting',

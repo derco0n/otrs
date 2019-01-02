@@ -1,9 +1,9 @@
 // --
-// Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+// Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 // --
 // This software comes with ABSOLUTELY NO WARRANTY. For details, see
-// the enclosed file COPYING for license information (AGPL). If you
-// did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+// the enclosed file COPYING for license information (GPL). If you
+// did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 // --
 
 /*eslint-disable no-window*/
@@ -243,7 +243,7 @@ var Core = Core || {};
                     });
 
                 if (SelectedNode) {
-                    $('#ConfigTree').jstree('select_node', SelectedNode);
+                    $('#ConfigTree').jstree('select_node', Core.App.EscapeHTML(SelectedNode));
                 }
 
                 $('#ConfigTree')
@@ -407,7 +407,6 @@ var Core = Core || {};
             if($(this).parent().parent().hasClass("HashItem")) {
                 // update key name
                 Key = $(this).parent().parent().find(".Key").val();
-                Key = Core.App.EscapeHTML(Key);
 
                 FullName = FullName.substr(0, FullName.lastIndexOf("###"));
                 FullName += "###" + Key;
@@ -632,7 +631,6 @@ var Core = Core || {};
                 Result = Value;
             }
         }
-
         return Result;
     }
 
@@ -1467,47 +1465,78 @@ var Core = Core || {};
                     $(this).attr("data-suffix", ID);
                 }
             }
+
             if (ID.indexOf("_Array") >= 0) {
-                $(this).closest('.Array').find(".ArrayItem").each(function() {
-                    Count = 0;
+                if ($(this).closest('.Array').find(".ArrayItem").length > 0) {
+                    $(this).closest('.Array').find(".ArrayItem").each(function() {
+                        Count = 0;
 
-                    $(this).find(
-                        ".SettingContent input:visible:not(.InputField_Search), " +
-                        ".SettingContent select:visible, .SettingContent select.Modernize, " +
-                        ".SettingContent textarea:visible"
-                    ).each(function() {
-                        var OldID = $(this).attr('id');
+                        $(this).find(
+                            ".SettingContent input:visible:not(.InputField_Search), " +
+                            ".SettingContent select:visible, .SettingContent select.Modernize, " +
+                            ".SettingContent textarea:visible"
+                        ).each(function() {
+                            OldID = $(this).attr('id');
 
-                        ID = OldID;
+                            ID = OldID;
 
-                        while (ID.indexOf("_Array") >= 0) {
-                            SubString = ID.match(/(_Array\d+)/)[1];
-                            ID = ID.replace(SubString, "_PLACEHOLDER" + Count);
-                            Count++;
-                        }
-
-                        $ClosestItem = $(this).closest('.ArrayItem');
-
-                        while (Count > 0) {
-                            Count--;
-
-                            Key = $ClosestItem.index() + 1;
-                            ID = ID.replace("_PLACEHOLDER" + Count, "_Array" + Key);
-                            // update id
-                            $(this).attr('id', ID);
-
-                            $ClosestItem = $ClosestItem.parent().closest(".ArrayItem");
-                        }
-
-                        if (OldID != ID && ValueType) {
-
-                            // Run dedicated CheckID() for this ValueType (in a Core.SystemConfiguration.ValueTypeX.js).
-                            if (window["Core"]["SystemConfiguration"][ValueType]["CheckID"]) {
-                                window["Core"]["SystemConfiguration"][ValueType]["CheckID"]($(this), OldID);
+                            while (ID.indexOf("_Array") >= 0) {
+                                SubString = ID.match(/(_Array\d+)/)[1];
+                                ID = ID.replace(SubString, "_PLACEHOLDER" + Count);
+                                Count++;
                             }
-                        }
+
+                            $ClosestItem = $(this).closest('.ArrayItem');
+
+                            while (Count > 0) {
+                                Count--;
+
+                                Key = $ClosestItem.index() + 1;
+                                ID = ID.replace("_PLACEHOLDER" + Count, "_Array" + Key);
+                                // update id
+                                $(this).attr('id', ID);
+
+                                $ClosestItem = $ClosestItem.parent().closest(".ArrayItem");
+                            }
+
+                            if (OldID != ID && ValueType) {
+
+                                // Run dedicated CheckID() for this ValueType (in a Core.SystemConfiguration.ValueTypeX.js).
+                                if (window["Core"]["SystemConfiguration"][ValueType]["CheckID"]) {
+                                    window["Core"]["SystemConfiguration"][ValueType]["CheckID"]($(this), OldID);
+                                }
+                            }
+                        });
                     });
-                });
+                }
+                else {
+                    // Array is empty, there is just button with data-suffix.
+                    OldID = $(this).closest('.Array').find("button").attr('data-suffix');
+
+                    ID = OldID;
+
+                    while (ID.indexOf("_Array") >= 0) {
+                        SubString = ID.match(/(_Array\d+)/)[1];
+                        ID = ID.replace(SubString, "_PLACEHOLDER" + Count);
+                        Count++;
+                    }
+
+                    $ClosestItem = $(this).closest('.ArrayItem');
+
+                    for (Index = 0; Index < Count; Index++) {
+                        Key = $ClosestItem.index();
+                        if (Key < 0) {
+                            Key = 0;
+                        }
+                        Key++;
+
+                        ID = ID.replace("_PLACEHOLDER" + Index, "_Array" + Key);
+                        // update id
+                        $(this).closest('.Array').find("button").attr('data-suffix', ID);
+
+                        $ClosestItem = $ClosestItem.parent().closest(".ArrayItem");
+                    }
+                }
             }
         });
     }
@@ -1615,6 +1644,7 @@ var Core = Core || {};
             Core.Config.Get('CGIHandle'),
             Data,
             function (HTML) {
+                var Counter = 0;
 
                 $(".ContentColumn").html(HTML);
                 TargetNS.Init();
@@ -1644,15 +1674,25 @@ var Core = Core || {};
                 // scroll to top to see all the settings from the current node
                 $('html, body').animate({
                     scrollTop: $('.ContentColumn .WidgetSimple').first().position().top
-                }, 'fast');
+                }, {
+                    duration: 'fast',
+                    always: function () {
+
+                        // This function is called 2 times: one time for html and another for body.
+                        // We want to set the class on element only when both are done.
+                        if (Counter === 1) {
+                            $('ul.SettingsList').addClass('Initialized');
+                        }
+
+                        Counter++;
+                    },
+                });
             }, 'html'
         );
 
-        if ($('#SysConfigFavourites').length) {
-            window.setTimeout(function() {
-                Core.Agent.Admin.SystemConfiguration.InitFavourites();
-            }, 1000);
-        }
+        window.setTimeout(function() {
+            Core.Agent.Admin.SystemConfiguration.InitFavourites();
+        }, 1000);
     }
 
     Core.Init.RegisterNamespace(TargetNS, 'APP_MODULE');

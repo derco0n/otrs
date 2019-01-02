@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::Stats::Dynamic::Ticket;
@@ -118,7 +118,7 @@ sub GetObjectAttributes {
     );
 
     # get current time to fix bug#3830
-    my $Date = $Kernel::OM->Create('Kernel::System::DateTime')->Format( Format => '%Y-%m-%d' );
+    my $Date  = $Kernel::OM->Create('Kernel::System::DateTime')->Format( Format => '%Y-%m-%d' );
     my $Today = sprintf "%s 23:59:59", $Date;
 
     my @ObjectAttributes = (

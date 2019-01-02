@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -100,12 +100,39 @@ $Selenium->RunTest(
         my $NotifEventText     = 'Selenium NotificationEvent test';
         $Selenium->find_element( '#Name',    'css' )->send_keys($NotifEventRandomID);
         $Selenium->find_element( '#Comment', 'css' )->send_keys($NotifEventText);
-        $Selenium->execute_script(
-            "\$('#Events').val('AppointmentNotification').trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#Events',
+            Value   => 'AppointmentNotification',
         );
         $Selenium->find_element( '#en_Subject', 'css' )->send_keys($NotifEventText);
         $Selenium->find_element( '#en_Body',    'css' )->send_keys($NotifEventText);
-        $Selenium->find_element( "#Submit",     'css' )->VerifiedClick();
+
+        # Check 'Additional recipient' length validation from Additional recipient email addresses (see bug#13936).
+        my $FieldValue = "a" x 201;
+
+        # Check TransportEmail checkbox if it is not checked.
+        my $TransportEmailCheck = $Selenium->execute_script("return \$('#TransportEmail').prop('checked');");
+        if ( !$TransportEmailCheck ) {
+            $Selenium->execute_script("\$('#TransportEmail').prop('checked', true);");
+            $Selenium->WaitFor( JavaScript => "return \$('#TransportEmail').prop('checked') === true;" );
+        }
+        $Selenium->find_element( "#RecipientEmail", 'css' )->send_keys($FieldValue);
+        $Selenium->find_element( "#Submit",         'css' )->click();
+        $Selenium->WaitFor( JavaScript => "return \$('#RecipientEmail.Error').length;" );
+
+        $Self->True(
+            $Selenium->execute_script("return \$('#RecipientEmail.Error').length;"),
+            "Validation for 'Additional recipient' field is correct",
+        );
+        $Selenium->find_element( "#RecipientEmail", 'css' )->clear();
+
+        # Set back TransportEmail checkbox if it was not checked.
+        if ( !$TransportEmailCheck ) {
+            $Selenium->execute_script("\$('#TransportEmail').prop('checked', false);");
+            $Selenium->WaitFor( JavaScript => "return \$('#TransportEmail').prop('checked') === false;" );
+        }
+
+        $Selenium->find_element( "#Submit", 'css' )->VerifiedClick();
 
         # check if test NotificationEvent show on AdminNotificationEvent screen
         $Self->True(
@@ -173,7 +200,10 @@ $Selenium->RunTest(
         $Selenium->find_element( "#en_Body",    'css' )->send_keys($EditNotifEventText);
         $Selenium->find_element( "#en_Subject", 'css' )->clear();
         $Selenium->find_element( "#en_Subject", 'css' )->send_keys($EditNotifEventText);
-        $Selenium->execute_script("\$('#ValidID').val('2').trigger('redraw.InputField').trigger('change');");
+        $Selenium->InputFieldValueSet(
+            Element => '#ValidID',
+            Value   => 2,
+        );
         $Selenium->find_element( "#Submit", 'css' )->VerifiedClick();
 
         # check is there notification 'Notification updated!' after notification is added

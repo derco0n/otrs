@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 ## no critic (Modules::RequireExplicitPackage)
@@ -23,10 +23,10 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
-                Click => '.HashItem:nth-of-type(2) .RemoveButton',
+                JqueryClick => '.HashItem:nth-of-type(2) .RemoveButton',
             },
 
             # Check if remove button is hidden(min items)
@@ -34,7 +34,7 @@ my @Tests = (
                 ElementMissing => '.RemoveButton:visible',
             },
             {
-                Click => '.AddHashKey',
+                JqueryClick => '.AddHashKey',
             },
             {
                 Select => '.HashItem:nth-of-type(2) input',
@@ -43,7 +43,7 @@ my @Tests = (
                 Write => 'DynamicField_Address',    # check if keys with "_" works
             },
             {
-                Click => '.AddKey',
+                JqueryClick => '.AddKey',
             },
             {
                 Select => '.HashItem:nth-of-type(2) .Entry',
@@ -55,7 +55,7 @@ my @Tests = (
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => '.HashItem:nth-of-type(1) .Content',
@@ -76,16 +76,16 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
                 ElementMissing => '.HashItem:nth-of-type(1) .RemoveButton',
             },
             {
-                Click => '.HashItem:nth-of-type(2) .RemoveButton',
+                JqueryClick => '.HashItem:nth-of-type(2) .RemoveButton',
             },
             {
-                Click => '.AddHashKey',
+                JqueryClick => '.AddHashKey',
             },
             {
                 Select => '.HashItem:nth-of-type(2) input',
@@ -94,7 +94,7 @@ my @Tests = (
                 Write => 'Name',
             },
             {
-                Click => '.AddKey',
+                JqueryClick => '.AddKey',
             },
             {
                 Select => '.HashItem:nth-of-type(2) .Entry',
@@ -103,13 +103,14 @@ my @Tests = (
                 Write => 'John',
             },
             {
+                # Normal click, it's not jQuery object.
                 Click => '.HashItem:nth-of-type(1) label',
             },
             {
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => 'label',
@@ -127,10 +128,10 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
-                Click => '.HashItem:nth-of-type(1) .RemoveButton',
+                JqueryClick => '.HashItem:nth-of-type(1) .RemoveButton',
             },
             {
                 ElementMissing => '.HashItem:nth-of-type(1) .RemoveButton',
@@ -145,7 +146,7 @@ my @Tests = (
                 Write => 'John',
             },
             {
-                Click => '.AddHashKey',
+                JqueryClick => '.AddHashKey',
             },
             {
                 Select => '.HashItem:nth-of-type(2) input',
@@ -154,16 +155,17 @@ my @Tests = (
                 Write => 'AnyKey',
             },
             {
-                Click => '.AddKey',
+                JqueryClick => '.AddKey',
             },
             {
+                # Normal click, it's not jQuery object.
                 Click => '.HashItem:nth-of-type(2) label',
             },
             {
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => 'label',
@@ -181,16 +183,16 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
                 ElementMissing => '.HashItem:nth-of-type(1) .RemoveButton',
             },
             {
-                Click => '.HashItem:nth-of-type(2) .RemoveButton',
+                JqueryClick => '.HashItem:nth-of-type(2) .RemoveButton',
             },
             {
-                Click => '.AddHashKey',
+                JqueryClick => '.AddHashKey',
             },
             {
                 Select => '.HashItem:nth-of-type(2) input',
@@ -199,7 +201,7 @@ my @Tests = (
                 Write => 'First name',
             },
             {
-                Click => '.AddKey',
+                JqueryClick => '.AddKey',
             },
             {
                 Select => '.HashItem:nth-of-type(2) .Entry',
@@ -226,7 +228,7 @@ my @Tests = (
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => 'input',
@@ -244,10 +246,10 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
-                Click => '.HashItem:nth-of-type(1) .RemoveButton',
+                JqueryClick => '.HashItem:nth-of-type(1) .RemoveButton',
             },
             {
                 ElementMissing => '.HashItem:nth-of-type(1) .RemoveButton',
@@ -262,7 +264,7 @@ my @Tests = (
                 Write => 'John',
             },
             {
-                Click => '.AddHashKey',
+                JqueryClick => '.AddHashKey',
             },
             {
                 Select => '.HashItem:nth-of-type(2) input',
@@ -271,7 +273,7 @@ my @Tests = (
                 Write => 'AnyKey',
             },
             {
-                Click => '.AddKey',
+                JqueryClick => '.AddKey',
             },
             {
                 # Wait to initialize DatePicker
@@ -296,7 +298,7 @@ my @Tests = (
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => 'select',
@@ -314,16 +316,16 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
                 ElementMissing => '.HashItem:nth-of-type(1) .RemoveButton',
             },
             {
-                Click => '.HashItem:nth-of-type(2) .RemoveButton',
+                JqueryClick => '.HashItem:nth-of-type(2) .RemoveButton',
             },
             {
-                Click => '.AddHashKey',
+                JqueryClick => '.AddHashKey',
             },
             {
                 Select => '.HashItem:nth-of-type(2) input',
@@ -332,7 +334,7 @@ my @Tests = (
                 Write => 'First name',
             },
             {
-                Click => '.AddKey',
+                JqueryClick => '.AddKey',
             },
             {
                 Select => '.HashItem:nth-of-type(2) .Entry',
@@ -373,7 +375,7 @@ my @Tests = (
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => 'select',
@@ -391,10 +393,10 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
-                Click => '.HashItem:nth-of-type(1) .RemoveButton',
+                JqueryClick => '.HashItem:nth-of-type(1) .RemoveButton',
             },
             {
                 ElementMissing => '.HashItem:nth-of-type(1) .RemoveButton',
@@ -409,7 +411,7 @@ my @Tests = (
                 Write => 'John',
             },
             {
-                Click => '.AddHashKey',
+                JqueryClick => '.AddHashKey',
             },
             {
                 Select => '.HashItem:nth-of-type(2) input',
@@ -418,7 +420,7 @@ my @Tests = (
                 Write => 'AnyKey',
             },
             {
-                Click => '.AddKey',
+                JqueryClick => '.AddKey',
             },
             {
                 # Wait to initialize DatePicker
@@ -453,7 +455,7 @@ my @Tests = (
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => 'select',
@@ -471,16 +473,16 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
                 ElementMissing => '.HashItem:nth-of-type(1) .RemoveButton',
             },
             {
-                Click => '.HashItem:nth-of-type(2) .RemoveButton',
+                JqueryClick => '.HashItem:nth-of-type(2) .RemoveButton',
             },
             {
-                Click => '.AddHashKey',
+                JqueryClick => '.AddHashKey',
             },
             {
                 Select => '.HashItem:nth-of-type(2) input',
@@ -489,7 +491,7 @@ my @Tests = (
                 Write => 'Name',
             },
             {
-                Click => '.AddKey',
+                JqueryClick => '.AddKey',
             },
             {
                 Select => '.HashItem:nth-of-type(2) .Entry',
@@ -510,7 +512,7 @@ my @Tests = (
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => 'input',
@@ -528,7 +530,7 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
                 Select => '.HashItem:nth-of-type(1) .Content',
@@ -543,10 +545,10 @@ my @Tests = (
                 ExpectAlert => 'Setting value is not valid!',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
-                Click => '.Cancel',
+                JqueryClick => '.Cancel',
             },
             {
                 Select => 'input',
@@ -564,16 +566,16 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
-                Click => '.HashItem:nth-of-type(1) .RemoveButton',
+                JqueryClick => '.HashItem:nth-of-type(1) .RemoveButton',
             },
             {
                 ElementMissing => '.HashItem:nth-of-type(1) .RemoveButton',
             },
             {
-                Click => '.AddHashKey',
+                JqueryClick => '.AddHashKey',
             },
             {
                 Select => '.HashItem:nth-of-type(2) input',
@@ -582,7 +584,7 @@ my @Tests = (
                 Write => 'Name',
             },
             {
-                Click => '.AddKey',
+                JqueryClick => '.AddKey',
             },
             {
                 Select => '.HashItem:nth-of-type(2) .Entry',
@@ -606,7 +608,7 @@ my @Tests = (
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => 'input',
@@ -624,16 +626,16 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
                 ElementMissing => '.HashItem:nth-of-type(1) .RemoveButton',
             },
             {
-                Click => '.HashItem:nth-of-type(2) .RemoveButton',
+                JqueryClick => '.HashItem:nth-of-type(2) .RemoveButton',
             },
             {
-                Click => '.AddHashKey',
+                JqueryClick => '.AddHashKey',
             },
             {
                 Select => '.HashItem:nth-of-type(2) input',
@@ -642,7 +644,7 @@ my @Tests = (
                 Write => 'First name',
             },
             {
-                Click => '.AddKey',
+                JqueryClick => '.AddKey',
             },
             {
                 Select => '.HashItem:nth-of-type(2) .Entry',
@@ -652,9 +654,10 @@ my @Tests = (
             },
             {
                 # Select 2 low
-                JS => "\$('.WidgetSimple[data-name=\"ExampleHashEntity1\"] "
-                    . " select').val('2 low')"
-                    . ".trigger('redraw.InputField').trigger('change');",
+                InputFieldValueSet => {
+                    Element => '.WidgetSimple[data-name=\"ExampleHashEntity1\"] select',
+                    Value   => '2 low',
+                },
             },
             {
                 # Wait until option is selected.
@@ -666,7 +669,7 @@ my @Tests = (
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => 'input',
@@ -684,10 +687,10 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
-                Click => '.HashItem:nth-of-type(1) .RemoveButton',
+                JqueryClick => '.HashItem:nth-of-type(1) .RemoveButton',
             },
             {
                 ElementMissing => '.HashItem:nth-of-type(1) .RemoveButton',
@@ -702,7 +705,7 @@ my @Tests = (
                 Write => 'John',
             },
             {
-                Click => '.AddHashKey',
+                JqueryClick => '.AddHashKey',
             },
             {
                 Select => '.HashItem:nth-of-type(2) input',
@@ -711,7 +714,7 @@ my @Tests = (
                 Write => 'AnyKey',
             },
             {
-                Click => '.AddKey',
+                JqueryClick => '.AddKey',
             },
             {
                 # wait until select is initialized
@@ -719,9 +722,10 @@ my @Tests = (
             },
             {
                 # Select 2 low
-                JS => "\$('.WidgetSimple[data-name=\"ExampleHashEntity2\"] "
-                    . " select').val('2 low')"
-                    . ".trigger('redraw.InputField').trigger('change');",
+                InputFieldValueSet => {
+                    Element => '.WidgetSimple[data-name=\"ExampleHashEntity2\"] select',
+                    Value   => '2 low',
+                },
             },
             {
                 # Wait until option is selected.
@@ -733,7 +737,7 @@ my @Tests = (
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => 'input',
@@ -751,16 +755,16 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
                 ElementMissing => '.HashItem:nth-of-type(1) .RemoveButton',
             },
             {
-                Click => '.HashItem:nth-of-type(2) .RemoveButton',
+                JqueryClick => '.HashItem:nth-of-type(2) .RemoveButton',
             },
             {
-                Click => '.AddHashKey',
+                JqueryClick => '.AddHashKey',
             },
             {
                 Select => '.HashItem:nth-of-type(2) input',
@@ -769,7 +773,7 @@ my @Tests = (
                 Write => 'Name',
             },
             {
-                Click => '.AddKey',
+                JqueryClick => '.AddKey',
             },
             {
                 Select => '.HashItem:nth-of-type(2) .Entry',
@@ -790,7 +794,7 @@ my @Tests = (
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => 'input',
@@ -808,7 +812,7 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
                 Select => '.HashItem:nth-of-type(1) .Content',
@@ -823,10 +827,10 @@ my @Tests = (
                 ExpectAlert => 'Setting value is not valid!',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
-                Click => '.Cancel',
+                JqueryClick => '.Cancel',
             },
         ],
         ExpectedResult => {
@@ -841,16 +845,16 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
-                Click => '.HashItem:nth-of-type(1) .RemoveButton',
+                JqueryClick => '.HashItem:nth-of-type(1) .RemoveButton',
             },
             {
                 ElementMissing => '.HashItem:nth-of-type(1) .RemoveButton',
             },
             {
-                Click => '.AddHashKey',
+                JqueryClick => '.AddHashKey',
             },
             {
                 Select => '.HashItem:nth-of-type(2) input',
@@ -859,7 +863,7 @@ my @Tests = (
                 Write => 'Name',
             },
             {
-                Click => '.AddKey',
+                JqueryClick => '.AddKey',
             },
             {
                 Select => '.HashItem:nth-of-type(2) .Entry',
@@ -883,7 +887,7 @@ my @Tests = (
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => 'input',
@@ -901,10 +905,10 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
-                Click => '.HashItem:nth-of-type(1) .RemoveButton',
+                JqueryClick => '.HashItem:nth-of-type(1) .RemoveButton',
             },
             {
                 ElementMissing => '.HashItem:nth-of-type(1) .RemoveButton',
@@ -919,7 +923,7 @@ my @Tests = (
                 Write => 'Password 1',
             },
             {
-                Click => '.AddHashKey',
+                JqueryClick => '.AddHashKey',
             },
             {
                 Select => '.HashItem:nth-of-type(2) input',
@@ -928,7 +932,7 @@ my @Tests = (
                 Write => 'First name',
             },
             {
-                Click => '.AddKey',
+                JqueryClick => '.AddKey',
             },
             {
                 Select => '.HashItem:nth-of-type(2) .Entry',
@@ -940,7 +944,7 @@ my @Tests = (
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => 'input',
@@ -958,10 +962,10 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
-                Click => '.HashItem:nth-of-type(1) .RemoveButton',
+                JqueryClick => '.HashItem:nth-of-type(1) .RemoveButton',
             },
             {
                 ElementMissing => '.HashItem:nth-of-type(1) .RemoveButton',
@@ -976,7 +980,7 @@ my @Tests = (
                 Write => 'John',
             },
             {
-                Click => '.AddHashKey',
+                JqueryClick => '.AddHashKey',
             },
             {
                 Select => '.HashItem:nth-of-type(2) input',
@@ -985,7 +989,7 @@ my @Tests = (
                 Write => 'AnyKey',
             },
             {
-                Click => '.AddKey',
+                JqueryClick => '.AddKey',
             },
             {
                 Select => '.HashItem:nth-of-type(2) .Entry',
@@ -1000,7 +1004,7 @@ my @Tests = (
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => 'input',
@@ -1018,16 +1022,16 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
-                Click => '.HashItem:nth-of-type(1) .RemoveButton',
+                JqueryClick => '.HashItem:nth-of-type(1) .RemoveButton',
             },
             {
                 ElementMissing => '.HashItem:nth-of-type(1) .RemoveButton',
             },
             {
-                Click => '.AddHashKey',
+                JqueryClick => '.AddHashKey',
             },
             {
                 Select => '.HashItem:nth-of-type(2) input',
@@ -1036,7 +1040,7 @@ my @Tests = (
                 Write => 'First name',
             },
             {
-                Click => '.AddKey',
+                JqueryClick => '.AddKey',
             },
             {
                 Select => '.HashItem:nth-of-type(2) .Entry',
@@ -1050,9 +1054,10 @@ my @Tests = (
             },
             {
                 # Select Kernel::System::Log::File
-                JS => "\$('.WidgetSimple[data-name=\"ExampleHashPerlModule1\"] "
-                    . " select').val('Kernel::System::Log::File')"
-                    . ".trigger('redraw.InputField').trigger('change');",
+                InputFieldValueSet => {
+                    Element => '.WidgetSimple[data-name=\"ExampleHashPerlModule1\"] select',
+                    Value   => 'Kernel::System::Log::File',
+                },
             },
             {
                 # Wait until option is selected.
@@ -1064,7 +1069,7 @@ my @Tests = (
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => 'input',
@@ -1082,10 +1087,10 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
-                Click => '.HashItem:nth-of-type(1) .RemoveButton',
+                JqueryClick => '.HashItem:nth-of-type(1) .RemoveButton',
             },
             {
                 ElementMissing => '.HashItem:nth-of-type(1) .RemoveButton',
@@ -1100,7 +1105,7 @@ my @Tests = (
                 Write => 'John',
             },
             {
-                Click => '.AddHashKey',
+                JqueryClick => '.AddHashKey',
             },
             {
                 Select => '.HashItem:nth-of-type(2) input',
@@ -1109,7 +1114,7 @@ my @Tests = (
                 Write => 'AnyKey',
             },
             {
-                Click => '.AddKey',
+                JqueryClick => '.AddKey',
             },
             {
                 # wait until select is initialized
@@ -1117,9 +1122,10 @@ my @Tests = (
             },
             {
                 # Select 2 low
-                JS => "\$('.WidgetSimple[data-name=\"ExampleHashPerlModule2\"] "
-                    . " select').val('Kernel::System::Log::File')"
-                    . ".trigger('redraw.InputField').trigger('change');",
+                InputFieldValueSet => {
+                    Element => '.WidgetSimple[data-name=\"ExampleHashPerlModule2\"] select',
+                    Value   => 'Kernel::System::Log::File',
+                },
             },
             {
                 # Wait until option is selected.
@@ -1131,7 +1137,7 @@ my @Tests = (
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => 'input',
@@ -1149,19 +1155,19 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
-                Click => '.HashItem:nth-of-type(1) .RemoveButton',
+                JqueryClick => '.HashItem:nth-of-type(1) .RemoveButton',
             },
             {
-                Click => '.HashItem:nth-of-type(1) .RemoveButton',
+                JqueryClick => '.HashItem:nth-of-type(1) .RemoveButton',
             },
             {
                 ElementMissing => '.HashItem:nth-of-type(1) .RemoveButton',
             },
             {
-                Click => '.AddHashKey',
+                JqueryClick => '.AddHashKey',
             },
             {
                 Select => '.HashItem:nth-of-type(2) input',
@@ -1170,7 +1176,7 @@ my @Tests = (
                 Write => 'First name',
             },
             {
-                Click => '.AddKey',
+                JqueryClick => '.AddKey',
             },
             {
                 Select => '.HashItem:nth-of-type(2) .Entry',
@@ -1184,9 +1190,10 @@ my @Tests = (
             },
             {
                 # Select female.
-                JS => "\$('.WidgetSimple[data-name=\"ExampleHashSelect1\"] "
-                    . " select').val('female')"
-                    . ".trigger('redraw.InputField').trigger('change');",
+                InputFieldValueSet => {
+                    Element => '.WidgetSimple[data-name=\"ExampleHashSelect1\"] select',
+                    Value   => 'female',
+                },
             },
             {
                 # Wait until option is selected.
@@ -1198,7 +1205,7 @@ my @Tests = (
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => 'select',
@@ -1219,16 +1226,17 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
                 ElementMissing => '.HashItem:nth-of-type(1) .RemoveButton',
             },
             {
+                # Normal click, it's not jQuery object.
                 Click => '.Hash label',
             },
             {
-                Click => '.AddHashKey',
+                JqueryClick => '.AddHashKey',
             },
             {
                 Select => '.HashItem:nth-of-type(2) input',
@@ -1237,16 +1245,17 @@ my @Tests = (
                 Write => 'AnyKey',
             },
             {
-                Click => '.AddKey',
+                JqueryClick => '.AddKey',
             },
             {
                 Select => 'select',
             },
             {
                 # Select male.
-                JS => "\$('.WidgetSimple[data-name=\"ExampleHashSelect2\"] "
-                    . " select').val('male')"
-                    . ".trigger('redraw.InputField').trigger('change');",
+                InputFieldValueSet => {
+                    Element => '.WidgetSimple[data-name=\"ExampleHashSelect2\"] select',
+                    Value   => 'male',
+                },
             },
             {
                 # Wait until option is selected.
@@ -1258,7 +1267,7 @@ my @Tests = (
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => 'select',
@@ -1279,16 +1288,16 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
-                Click => '.HashItem:nth-of-type(1) .RemoveButton',
+                JqueryClick => '.HashItem:nth-of-type(1) .RemoveButton',
             },
             {
                 ElementMissing => '.HashItem:nth-of-type(1) .RemoveButton',
             },
             {
-                Click => '.AddHashKey',
+                JqueryClick => '.AddHashKey',
             },
             {
                 Select => '.HashItem:nth-of-type(2) input',
@@ -1297,7 +1306,7 @@ my @Tests = (
                 Write => 'First name',
             },
             {
-                Click => '.AddKey',
+                JqueryClick => '.AddKey',
             },
             {
                 Select => '.HashItem:nth-of-type(2) .Entry',
@@ -1318,7 +1327,7 @@ my @Tests = (
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => 'input',
@@ -1336,16 +1345,16 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
                 ElementMissing => '.HashItem:nth-of-type(1) .RemoveButton',
             },
             {
-                Click => '.HashItem:nth-of-type(2) .RemoveButton',
+                JqueryClick => '.HashItem:nth-of-type(2) .RemoveButton',
             },
             {
-                Click => '.AddHashKey',
+                JqueryClick => '.AddHashKey',
             },
             {
                 Select => '.HashItem:nth-of-type(2) input',
@@ -1354,7 +1363,7 @@ my @Tests = (
                 Write => 'Item',
             },
             {
-                Click => '.AddKey',
+                JqueryClick => '.AddKey',
             },
             {
                 Select => 'textarea',
@@ -1378,7 +1387,7 @@ my @Tests = (
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => 'input',
@@ -1396,16 +1405,16 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
-                Click => '.HashItem:nth-of-type(1) .RemoveButton',
+                JqueryClick => '.HashItem:nth-of-type(1) .RemoveButton',
             },
             {
                 ElementMissing => '.HashItem:nth-of-type(1) .RemoveButton',
             },
             {
-                Click => '.AddHashKey',
+                JqueryClick => '.AddHashKey',
             },
             {
                 Select => '.HashItem:nth-of-type(2) input',
@@ -1414,7 +1423,7 @@ my @Tests = (
                 Write => 'First name',
             },
             {
-                Click => '.AddKey',
+                JqueryClick => '.AddKey',
             },
             {
                 Select => '.HashItem:nth-of-type(2) .Entry',
@@ -1428,9 +1437,10 @@ my @Tests = (
             },
             {
                 # Select UTC
-                JS => "\$('.WidgetSimple[data-name=\"ExampleHashTimeZone1\"] "
-                    . " select').val('UTC')"
-                    . ".trigger('redraw.InputField').trigger('change');",
+                InputFieldValueSet => {
+                    Element => '.WidgetSimple[data-name=\"ExampleHashTimeZone1\"] select',
+                    Value   => 'UTC',
+                },
             },
             {
                 # Wait until option is selected.
@@ -1442,7 +1452,7 @@ my @Tests = (
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => 'input',
@@ -1460,13 +1470,13 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
                 ElementMissing => '.HashItem:nth-of-type(1) .RemoveButton',
             },
             {
-                Click => '.HashItem:nth-of-type(2) .RemoveButton',
+                JqueryClick => '.HashItem:nth-of-type(2) .RemoveButton',
             },
             {
                 # make sure that item is deleted
@@ -1482,7 +1492,7 @@ my @Tests = (
                 Write => 'John',
             },
             {
-                Click => '.AddHashKey',
+                JqueryClick => '.AddHashKey',
             },
             {
                 Select => '.HashItem:nth-of-type(2) input',
@@ -1491,7 +1501,7 @@ my @Tests = (
                 Write => 'AnyKey',
             },
             {
-                Click => '.AddKey',
+                JqueryClick => '.AddKey',
             },
             {
                 # wait until select is initialized
@@ -1499,9 +1509,10 @@ my @Tests = (
             },
             {
                 # Select Europe/Berlin
-                JS => "\$('.WidgetSimple[data-name=\"ExampleHashTimeZone2\"] "
-                    . " select').val('Europe/Berlin')"
-                    . ".trigger('redraw.InputField').trigger('change');",
+                InputFieldValueSet => {
+                    Element => '.WidgetSimple[data-name=\"ExampleHashTimeZone2\"] select',
+                    Value   => 'Europe/Berlin',
+                },
             },
             {
                 # Wait until option is selected.
@@ -1513,7 +1524,7 @@ my @Tests = (
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => 'input',
@@ -1580,7 +1591,7 @@ $Selenium->RunTest(
         $Selenium->VerifiedGet("${ScriptAlias}index.pl?Action=AdminSystemConfiguration");
 
         my $OTRSBusinessIsInstalled = $Kernel::OM->Get('Kernel::System::OTRSBusiness')->OTRSBusinessIsInstalled();
-        my $OBTeaserFound = index( $Selenium->get_page_source(), 'supports versioning, rollback and' ) > -1;
+        my $OBTeaserFound           = index( $Selenium->get_page_source(), 'supports versioning, rollback and' ) > -1;
         if ( !$OTRSBusinessIsInstalled ) {
             $Self->True(
                 $OBTeaserFound,
@@ -1613,15 +1624,60 @@ $Selenium->RunTest(
 
                 if ( $CommandType eq 'Click' ) {
                     $Selenium->WaitFor(
-                        Time       => 120,
                         JavaScript => 'return $("' . "$Prefix $Value" . '").length',
                     );
                     $Selenium->WaitFor(
-                        Time       => 120,
                         JavaScript => 'return $("' . $Prefix . '").hasClass("HasOverlay") == 0',
                     );
 
-                    $Selenium->find_element( "$Prefix $Value", "css" )->click();
+                    # Give JS some time to do the stuff.
+                    Time::HiRes::sleep(0.2);
+
+                    $Selenium->execute_script(
+                        '$("' . "$Prefix $Value" . '").click();'
+                    );
+
+                    if ($AlertText) {
+                        $Selenium->WaitFor(
+                            AlertPresent => 1,
+                        );
+
+                        # Verify alert message.
+                        $Self->Is(
+                            $AlertText,
+                            $Selenium->get_alert_text(),
+                            "$Test->{Name} - Check alert text - $AlertText",
+                        );
+
+                        # Accept alert.
+                        $Selenium->accept_alert();
+
+                        # Reset alert text.
+                        $AlertText = '';
+                    }
+                    else {
+                        $Selenium->WaitFor(
+                            Time       => 120,
+                            JavaScript => 'return $("' . $Prefix . '").hasClass("HasOverlay") == 0',
+                        );
+                    }
+                }
+                elsif ( $CommandType eq 'JqueryClick' ) {
+                    $Selenium->WaitFor(
+                        JavaScript => 'return $("' . "$Prefix $Value" . '").length',
+                    );
+                    $Selenium->WaitFor(
+                        JavaScript => 'return $("' . $Prefix . '").hasClass("HasOverlay") == 0',
+                    );
+
+                    $Selenium->WaitForjQueryEventBound(
+                        CSSSelector => "$Prefix $Value",
+                    );
+
+                    $Selenium->execute_script(
+                        '$("' . "$Prefix $Value" . '").click();'
+                    );
+
                     if ($AlertText) {
                         $Selenium->WaitFor(
                             AlertPresent => 1,
@@ -1715,6 +1771,19 @@ $Selenium->RunTest(
 
                     $Selenium->execute_script(
                         $Command->{JS},
+                    );
+                }
+                elsif ( $CommandType eq 'InputFieldValueSet' ) {
+
+                    # Wait for any tasks to complete.
+                    $Selenium->WaitFor(
+                        JavaScript => 'return typeof($) === "function" && $("' . $Prefix
+                            . '").hasClass("HasOverlay") == 0',
+                    );
+
+                    $Selenium->InputFieldValueSet(
+                        Element => $Value->{Element},
+                        Value   => $Value->{Value},
                     );
                 }
                 elsif ( $CommandType eq 'WaitForJS' ) {

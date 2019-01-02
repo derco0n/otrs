@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -61,7 +61,7 @@ $Selenium->RunTest(
 
         # Check breadcrumb on Add screen.
         my $Count = 1;
-        for my $BreadcrumbText ( 'Manage Queues', 'Add Queue' ) {
+        for my $BreadcrumbText ( 'Queue Management', 'Add Queue' ) {
             $Self->Is(
                 $Selenium->execute_script("return \$('.BreadCrumb li:eq($Count)').text().trim()"),
                 $BreadcrumbText,
@@ -98,12 +98,30 @@ $Selenium->RunTest(
         my $RandomID = "Queue" . $Helper->GetRandomID();
 
         $Selenium->find_element( "#Name", 'css' )->send_keys($RandomID);
-        $Selenium->execute_script("\$('#GroupID').val('1').trigger('redraw.InputField').trigger('change');");
-        $Selenium->execute_script("\$('#FollowUpID').val('1').trigger('redraw.InputField').trigger('change');");
-        $Selenium->execute_script("\$('#SalutationID').val('1').trigger('redraw.InputField').trigger('change');");
-        $Selenium->execute_script("\$('#SystemAddressID').val('1').trigger('redraw.InputField').trigger('change');");
-        $Selenium->execute_script("\$('#SignatureID').val('1').trigger('redraw.InputField').trigger('change');");
-        $Selenium->execute_script("\$('#ValidID').val('1').trigger('redraw.InputField').trigger('change');");
+        $Selenium->InputFieldValueSet(
+            Element => '#GroupID',
+            Value   => 1,
+        );
+        $Selenium->InputFieldValueSet(
+            Element => '#FollowUpID',
+            Value   => 1,
+        );
+        $Selenium->InputFieldValueSet(
+            Element => '#SalutationID',
+            Value   => 1,
+        );
+        $Selenium->InputFieldValueSet(
+            Element => '#SystemAddressID',
+            Value   => 1,
+        );
+        $Selenium->InputFieldValueSet(
+            Element => '#SignatureID',
+            Value   => 1,
+        );
+        $Selenium->InputFieldValueSet(
+            Element => '#ValidID',
+            Value   => 1,
+        );
         $Selenium->find_element( "#Comment", 'css' )->send_keys('Selenium test queue');
         $Selenium->find_element( "#Submit",  'css' )->VerifiedClick();
 
@@ -171,7 +189,7 @@ $Selenium->RunTest(
 
         # Check breadcrumb on Edit screen.
         $Count = 1;
-        for my $BreadcrumbText ( 'Manage Queues', 'Edit Queue: ' . $RandomID ) {
+        for my $BreadcrumbText ( 'Queue Management', 'Edit Queue: ' . $RandomID ) {
             $Self->Is(
                 $Selenium->execute_script("return \$('.BreadCrumb li:eq($Count)').text().trim()"),
                 $BreadcrumbText,
@@ -182,9 +200,18 @@ $Selenium->RunTest(
         }
 
         # Set test queue to invalid.
-        $Selenium->execute_script("\$('#GroupID').val('2').trigger('redraw.InputField').trigger('change');");
-        $Selenium->execute_script("\$('#FollowUpLock').val('1').trigger('redraw.InputField').trigger('change');");
-        $Selenium->execute_script("\$('#ValidID').val('2').trigger('redraw.InputField').trigger('change');");
+        $Selenium->InputFieldValueSet(
+            Element => '#GroupID',
+            Value   => 2,
+        );
+        $Selenium->InputFieldValueSet(
+            Element => '#FollowUpLock',
+            Value   => 1,
+        );
+        $Selenium->InputFieldValueSet(
+            Element => '#ValidID',
+            Value   => 2,
+        );
         $Selenium->find_element( "#Comment", 'css' )->clear();
         $Selenium->find_element( "#Submit",  'css' )->VerifiedClick();
 

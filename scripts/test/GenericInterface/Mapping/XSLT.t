@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -128,6 +128,37 @@ my @MappingTests = (
         ConfigSuccess => 1,
     },
     {
+        Name   => 'Test array as data',
+        Config => {
+            Template => qq{<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet version="1.0"
+ xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+ xmlns:otrs="http://otrs.org"
+ extension-element-prefixes="otrs">
+<xsl:import href="$Home/Kernel/GenericInterface/Mapping/OTRSFunctions.xsl" />
+<xsl:output method="xml" encoding="utf-8" indent="yes"/>
+<xsl:template match="/RootElement">
+<NewRootElement>
+    <xsl:for-each select="/RootElement/Array1">
+    <FirstLevelArray>
+        <xsl:text>Amended</xsl:text>
+        <xsl:value-of select="." />
+    </FirstLevelArray>
+    </xsl:for-each>
+</NewRootElement>
+</xsl:template>
+</xsl:stylesheet>},
+        },
+        Data => (
+            'ArrayPart1',
+            'ArrayPart2',
+            'ArrayPart3',
+        ),
+        ResultData    => undef,
+        ResultSuccess => 0,
+        ConfigSuccess => 1,
+    },
+    {
         Name   => 'Test simple overwrite',
         Config => {
             Template => '<?xml version="1.0" encoding="UTF-8"?>
@@ -147,6 +178,30 @@ my @MappingTests = (
         ResultSuccess => 1,
         ConfigSuccess => 1,
     },
+
+    {
+        Name   => 'Test simple overwrite (whitespaces trimmed)',
+        Config => {
+            Template => '<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:output method="xml" encoding="utf-8" indent="yes"/>
+<xsl:template match="/RootElement">
+<NewRootElement><NewKey>
+        NewValue
+</NewKey></NewRootElement>
+</xsl:template>
+</xsl:stylesheet>',
+        },
+        Data => {
+            Key => 'Value',
+        },
+        ResultData => {
+            NewKey => 'NewValue',
+        },
+        ResultSuccess => 1,
+        ConfigSuccess => 1,
+    },
+
     {
         Name   => 'Test replacement with custom functions',
         Config => {

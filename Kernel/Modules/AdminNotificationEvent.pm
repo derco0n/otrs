@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Modules::AdminNotificationEvent;
@@ -215,6 +215,12 @@ sub Run {
                     GetParam => \%GetParam,
                 );
             }
+        }
+
+        # Check for 'Additional recipient' field value length.
+        if ( $GetParam{Data}->{RecipientEmail} && length $GetParam{Data}->{RecipientEmail} > 200 ) {
+            $GetParam{RecipientEmailServerError} = "ServerError";
+            $Error = 1;
         }
 
         # update
@@ -455,6 +461,12 @@ sub Run {
             }
         }
 
+        # Check for 'Additional recipient' field value length.
+        if ( $GetParam{Data}->{RecipientEmail} && length $GetParam{Data}->{RecipientEmail} > 200 ) {
+            $GetParam{RecipientEmailServerError} = "ServerError";
+            $Error = 1;
+        }
+
         # add
         my $ID;
         my $ArticleFilterMissing;
@@ -686,7 +698,7 @@ sub Run {
         # challenge token check for write action
         $LayoutObject->ChallengeTokenCheck();
 
-        my $FormID = $ParamObject->GetParam( Param => 'FormID' ) || '';
+        my $FormID      = $ParamObject->GetParam( Param => 'FormID' ) || '';
         my %UploadStuff = $ParamObject->GetUploadAll(
             Param  => 'FileUpload',
             Source => 'string',
@@ -1241,7 +1253,7 @@ sub _Edit {
     );
 
     my @CommunicationChannelList = $Kernel::OM->Get('Kernel::System::CommunicationChannel')->ChannelList();
-    my %CommunicationChannels = map { $_->{ChannelID} => $_->{DisplayName} } @CommunicationChannelList;
+    my %CommunicationChannels    = map { $_->{ChannelID} => $_->{DisplayName} } @CommunicationChannelList;
 
     $Param{ArticleCommunicationChannelStrg} = $LayoutObject->BuildSelection(
         Data        => \%CommunicationChannels,
@@ -1412,7 +1424,7 @@ sub _Edit {
 
                     # set Email transport selected on add screen
                     if ( $Transport eq 'Email' && !$Param{ID} ) {
-                        $TransportChecked = 'checked="checked"'
+                        $TransportChecked = 'checked="checked"';
                     }
 
                     # get transport settings string from transport object

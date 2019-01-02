@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::State;
@@ -536,8 +536,8 @@ sub StateLookup {
     # check needed stuff
     if ( !$Param{State} && !$Param{StateID} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
-            State   => 'error',
-            Message => 'Need State or StateID!'
+            Priority => 'error',
+            Message  => 'Need State or StateID!'
         );
         return;
     }
@@ -646,13 +646,13 @@ sub StateTypeList {
 
 returns the id or the name of a state type
 
-    my $StateTypeID = $StateTypeObject->StateTypeLookup(
+    my $StateTypeID = $StateObject->StateTypeLookup(
         StateType => 'pending auto',
     );
 
 or
 
-    my $StateType = $StateTypeObject->StateTypeLookup(
+    my $StateType = $StateObject->StateTypeLookup(
         StateTypeID => 1,
     );
 
@@ -706,10 +706,10 @@ sub StateTypeLookup {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

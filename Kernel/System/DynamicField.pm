@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::DynamicField;
@@ -704,7 +704,7 @@ sub DynamicFieldList {
             for my $FieldID ( sort keys %{$Cache} ) {
                 next FIELDID if !$AllowedFieldIDs{$FieldID};
 
-                $FilteredData->{$FieldID} = $Cache->{$FieldID}
+                $FilteredData->{$FieldID} = $Cache->{$FieldID};
             }
         }
 
@@ -953,7 +953,7 @@ sub DynamicFieldListGet {
             next DYNAMICFIELD if !$DynamicFieldConfig->{Name};
             next DYNAMICFIELD if !$Param{FieldFilter}->{ $DynamicFieldConfig->{Name} };
 
-            push @{$FilteredData}, $DynamicFieldConfig,
+            push @{$FilteredData}, $DynamicFieldConfig;
         }
 
         # return filtered data from cache
@@ -1049,7 +1049,7 @@ sub DynamicFieldListGet {
         next DYNAMICFIELD if !$DynamicFieldConfig->{Name};
         next DYNAMICFIELD if !$Param{FieldFilter}->{ $DynamicFieldConfig->{Name} };
 
-        push @{$FilteredData}, $DynamicFieldConfig,
+        push @{$FilteredData}, $DynamicFieldConfig;
     }
 
     # return filtered data from DB
@@ -1156,7 +1156,7 @@ sub DynamicFieldOrderCheck {
 
         # when finding a field with wrong order, set OrderError flag and exit loop
         $OrderError = 1;
-        last DYNAMICFIELD
+        last DYNAMICFIELD;
     }
 
     return if $OrderError;
@@ -1232,7 +1232,7 @@ sub ObjectMappingGet {
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
 
     # Get configuration for this object type
-    my $Config = $ConfigObject->Get("DynamicFields::ObjectType") || {};
+    my $Config           = $ConfigObject->Get("DynamicFields::ObjectType") || {};
     my $ObjecTypesConfig = $Config->{ $Param{ObjectType} };
 
     if ( !IsHashRefWithData($ObjecTypesConfig) ) {
@@ -1345,7 +1345,7 @@ sub ObjectMappingCreate {
     }
 
     # Get configuration for this object type
-    my $Config = $Kernel::OM->Get('Kernel::Config')->Get("DynamicFields::ObjectType") || {};
+    my $Config           = $Kernel::OM->Get('Kernel::Config')->Get("DynamicFields::ObjectType") || {};
     my $ObjecTypesConfig = $Config->{ $Param{ObjectType} };
 
     if ( !IsHashRefWithData($ObjecTypesConfig) ) {
@@ -1431,7 +1431,7 @@ sub ObjectMappingNameChange {
     }
 
     # Get configuration for this object type
-    my $Config = $Kernel::OM->Get('Kernel::Config')->Get("DynamicFields::ObjectType") || {};
+    my $Config           = $Kernel::OM->Get('Kernel::Config')->Get("DynamicFields::ObjectType") || {};
     my $ObjecTypesConfig = $Config->{ $Param{ObjectType} };
 
     if ( !IsHashRefWithData($ObjecTypesConfig) ) {
@@ -1691,11 +1691,11 @@ sub _DynamicFieldReorder {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut
 

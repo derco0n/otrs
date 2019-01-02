@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -112,15 +112,18 @@ $Selenium->RunTest(
         $Selenium->WaitFor( JavaScript => "return typeof(\$) === 'function' && \$('#Title').length" );
         $Selenium->find_element( "#Title",       'css' )->send_keys("$AppointmentName");
         $Selenium->find_element( "#Description", 'css' )->send_keys('Test repeating appointment');
-        $Selenium->execute_script(
-            "\$('#CalendarID').val($CalendarID).trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#CalendarID',
+            Value   => $CalendarID
         );
-        $Selenium->execute_script(
-            "\$('#RecurrenceType').val('Daily').trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#RecurrenceType',
+            Value   => 'Daily',
         );
         $Selenium->WaitFor( JavaScript => "return typeof(\$) === 'function' && \$('#RecurrenceLimit').length" );
-        $Selenium->execute_script(
-            "\$('#RecurrenceLimit').val('2').trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#RecurrenceLimit',
+            Value   => 2,
         );
         $Selenium->WaitFor( JavaScript => "return typeof(\$) === 'function' && \$('#RecurrenceCount').length" );
         $Selenium->find_element( "#RecurrenceCount", 'css' )->send_keys('3');

@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -47,6 +47,8 @@ for my $Module (qw(DB FS)) {
         "#$Module - FormIDCreate()",
     );
 
+    my $InvalidFormID = $Helper->GetRandomID();
+
     # file checks
     for my $File (qw(xls txt doc png pdf)) {
 
@@ -79,15 +81,26 @@ for my $Module (qw(DB FS)) {
 
         my $Filename = "UploadCache Test1äöüß.$File";
 
-        # Mac OS (HFS+) will store all filenames as NFD internally.
-        if ( $^O eq 'darwin' && $Module eq 'FS' ) {
-            $Filename = Unicode::Normalize::NFD($Filename);
-        }
-
         $Self->True(
             $Add || '',
             "#$Module - FormIDAddFile() - ." . $File,
         );
+
+        if ( $Module eq 'FS' ) {
+            my $Add = $UploadCacheObject->FormIDAddFile(
+                FormID      => $InvalidFormID,
+                Filename    => 'UploadCache Test1äöüß.' . $File,
+                Content     => $Content,
+                ContentType => 'text/html',
+                ContentID   => $ContentID,
+                Disposition => $Disposition,
+            );
+
+            $Self->False(
+                $Add // 0,
+                "#$Module - FormIDAddFile() - Invalid FormID"
+            );
+        }
 
         my @Data = $UploadCacheObject->FormIDGetAllFilesData(
             FormID => $FormID,
@@ -140,6 +153,19 @@ for my $Module (qw(DB FS)) {
                 "#$Module - FormIDGetAllFilesMeta() - Disposition ." . $File,
             );
         }
+
+        if ( $Module eq 'FS' ) {
+            my $Delete = $UploadCacheObject->FormIDRemoveFile(
+                FormID => $InvalidFormID,
+                FileID => 1,
+            );
+
+            $Self->False(
+                $Delete // 0,
+                "#$Module - FormIDRemoveFile() - Invalid FormID"
+            );
+        }
+
         my $Delete = $UploadCacheObject->FormIDRemoveFile(
             FormID => $FormID,
             FileID => 1,
@@ -176,15 +202,21 @@ for my $Module (qw(DB FS)) {
 
         my $Filename = "UploadCache Test1äöüß.$File";
 
-        # Mac OS (HFS+) will store all filenames as NFD internally.
-        if ( $^O eq 'darwin' && $Module eq 'FS' ) {
-            $Filename = Unicode::Normalize::NFD($Filename);
-        }
-
         $Self->True(
             $Add || '',
             "#$Module - FormIDAddFile() - ." . $File,
         );
+
+        if ( $Module eq 'FS' ) {
+            my @Data = $UploadCacheObject->FormIDGetAllFilesData(
+                FormID => $InvalidFormID,
+            );
+
+            $Self->False(
+                @Data // 0,
+                "#$Module - FormIDGetAllFilesData() - Invalid FormID"
+            );
+        }
 
         my @Data = $UploadCacheObject->FormIDGetAllFilesData(
             FormID => $FormID,
@@ -214,6 +246,18 @@ for my $Module (qw(DB FS)) {
                 "#$Module - FormIDGetAllFilesData() - Disposition ." . $File,
             );
         }
+
+        if ( $Module eq 'FS' ) {
+            my @Data = $UploadCacheObject->FormIDGetAllFilesMeta(
+                FormID => $InvalidFormID,
+            );
+
+            $Self->False(
+                @Data // 0,
+                "#$Module - FormIDGetAllFilesMeta() - Invalid FormID"
+            );
+        }
+
         @Data = $UploadCacheObject->FormIDGetAllFilesMeta( FormID => $FormID );
         if (@Data) {
             my %File = %{ $Data[-1] };
@@ -243,6 +287,15 @@ for my $Module (qw(DB FS)) {
         $Remove,
         "#$Module - FormIDRemove()",
     );
+
+    if ( $Module eq 'FS' ) {
+        my $Remove = $UploadCacheObject->FormIDRemove( FormID => $InvalidFormID );
+
+        $Self->False(
+            $Remove // 0,
+            "#$Module - FormIDRemove() - Invalid FormID"
+        );
+    }
 }
 
 # cleanup is done by RestoreDatabase

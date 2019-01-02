@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package scripts::DBUpdateTo6::CleanGroupUserPermissionValue;    ## no critic
@@ -20,7 +20,8 @@ our @ObjectDependencies = (
 
 =head1 NAME
 
-scripts::DBUpdateTo6::CleanGroupUserPermissionValues - Delete from table group_user all the records where permission_value is '0'.
+scripts::DBUpdateTo6::CleanGroupUserPermissionValue - Delete from table group_user all the records where
+permission_value is '0'.
 
 =cut
 
@@ -32,10 +33,11 @@ sub Run {
         Column => 'permission_value',
     );
 
-    if ($ColumnExists) {
-        return if !$Self->_DeleteInvalidRecords();
-        return if !$Self->_DropPermissionValueColumn();
-    }
+    # If column has already been dropped, no migration is needed.
+    return 1 if !$ColumnExists;
+
+    return if !$Self->_DeleteInvalidRecords();
+    return if !$Self->_DropPermissionValueColumn();
 
     return 1;
 }
@@ -73,13 +75,16 @@ Returns 1 if the drop went well.
 sub _DropPermissionValueColumn {
     my ( $Self, %Param ) = @_;
 
-    my $XMLString = '
+    my @XMLStrings = (
+        '
         <TableAlter Name="group_user">
             <ColumnDrop Name="permission_value"/>
-        </TableAlter>
-    ';
+        </TableAlter>',
+    );
 
-    return if !$Self->ExecuteXMLDBString( XMLString => $XMLString );
+    return if !$Self->ExecuteXMLDBArray(
+        XMLArray => \@XMLStrings,
+    );
 
     return 1;
 }
@@ -88,10 +93,10 @@ sub _DropPermissionValueColumn {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

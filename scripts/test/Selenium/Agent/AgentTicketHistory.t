@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -173,7 +173,7 @@ $Selenium->RunTest(
         for my $DynamicFieldType ( sort keys %DynamicFieldValues, sort keys %DynamicFieldDateValues ) {
 
             my $FieldName = $DynamicFields{$DynamicFieldType}->{Name};
-            my $Value = $DynamicFieldValues{$DynamicFieldType} || $DynamicFieldDateValues{$DynamicFieldType};
+            my $Value     = $DynamicFieldValues{$DynamicFieldType} || $DynamicFieldDateValues{$DynamicFieldType};
 
             # Set the value from the dynamic field.
             my $DynamicFieldConfig = $DynamicFieldObject->DynamicFieldGet(
@@ -246,10 +246,15 @@ $Selenium->RunTest(
         # Get current initial URL.
         my $InitialURL = $Selenium->get_current_url();
 
+        # Wait until page has loaded.
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function";' );
+
         # Force sub menus to be visible in order to be able to click one of the links.
+        $Selenium->execute_script("\$('#nav-Miscellaneous ul').css('height', 'auto');");
+        $Selenium->execute_script("\$('#nav-Miscellaneous ul').css('opacity', '1');");
         $Selenium->WaitFor(
             JavaScript =>
-                'return typeof($) === "function" && $("#nav-Miscellaneous ul").css({ "height": "auto", "opacity": "100" });'
+                "return \$('#nav-Miscellaneous ul').css('height') !== '0px' && \$('#nav-Miscellaneous ul').css('opacity') == '1';"
         );
 
         # Click on 'History' and switch window.
@@ -260,7 +265,11 @@ $Selenium->RunTest(
         $Selenium->switch_to_window( $Handles->[1] );
 
         # Wait until page has loaded, if necessary.
-        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $(".CancelClosePopup").length' );
+        $Selenium->WaitFor(
+            JavaScript =>
+                "return typeof(\$) === 'function' && \$('a[href*=\"AgentTicketZoom;TicketID=$TicketID;ArticleID=$ArticleIDs[1]\"]').length;"
+        );
+        sleep 1;
 
         # Check the history entry for the dynamic field.
         my $PageSource = $Selenium->get_page_source();
@@ -279,6 +288,8 @@ $Selenium->RunTest(
         # Switch window back.
         $Selenium->WaitFor( WindowCount => 1 );
         $Selenium->switch_to_window( $Handles->[0] );
+
+        sleep 2;
 
         # Verify new URL.
         my $ChangedURL = $Selenium->get_current_url();

@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -163,8 +163,8 @@ my $CheckEmailContentDisposition = sub {
     my $Body = $Email->{Message}->{Body};
 
     # Search for the image content-type and then get the content-disposition.
-    my $Pos = index $Body, 'Content-Type: image/png;';
-    my $Substr = substr $Body, $Pos;
+    my $Pos                  = index $Body, 'Content-Type: image/png;';
+    my $Substr               = substr $Body, $Pos;
     my ($ContentDisposition) = ( $Substr =~ m/Content-Disposition: (\w+);/i );
 
     $Self->Is(
@@ -190,8 +190,9 @@ my $CheckTicketReplyOrForward = sub {
     $Selenium->VerifiedGet( "${ScriptAlias}index.pl?Action=AgentTicketZoom;TicketID=" . $TicketID );
 
     if ( $Action eq 'Reply' ) {
-        $Selenium->execute_script(
-            "\$('form[title=\"Reply\"] select[id^=\"ResponseID\"]').val('1').trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => "form[title=\"Reply\"] select[id^=\"ResponseID\"]",
+            Value   => 1,
         );
     }
     else {    # Forward
@@ -231,6 +232,9 @@ my $CheckTicketReplyOrForward = sub {
     );
 
     # Input required fields and submit compose.
+    if ( $Action eq 'Reply' ) {
+        $Selenium->VerifiedRefresh();
+    }
     $Selenium->execute_script("\$('#submitRichText').click()");
 
     $Selenium->WaitFor( WindowCount => 1 );

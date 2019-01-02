@@ -1,11 +1,12 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
+## nofilter(TidyAll::Plugin::OTRS::Perl::LayoutObject)
 package Kernel::System::SupportDataCollector::Plugin::OTRS::LegacyConfigBackups;
 
 use strict;
@@ -19,7 +20,7 @@ our @ObjectDependencies = (
     'Kernel::Config',
     'Kernel::System::Main',
     'Kernel::System::Package',
-    'Kernel::Output::HTML::Layout',
+    'Kernel::Language',
 );
 
 sub GetDisplayPath {
@@ -87,12 +88,12 @@ sub Run {
         }
     }
 
-    my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
+    my $LanguageObject = $Kernel::OM->Get('Kernel::Language');
     if ( @InvalidPackages || @WrongFrameworkVersion ) {
         $Self->AddResultOk(
             Label   => Translatable('Legacy Configuration Backups'),
             Value   => scalar @BackupFiles,
-            Message => $LayoutObject->{LanguageObject}->Translate(
+            Message => $LanguageObject->Translate(
                 'Legacy configuration backup files found in %s, but they might still be required by some packages.',
                 $BackupsFolder
             ),
@@ -103,7 +104,7 @@ sub Run {
     $Self->AddResultWarning(
         Label   => Translatable('Legacy Configuration Backups'),
         Value   => scalar @BackupFiles,
-        Message => $LayoutObject->{LanguageObject}->Translate(
+        Message => $LanguageObject->Translate(
             'Legacy configuration backup files are no longer needed for the installed packages, please remove them from %s.',
             $BackupsFolder
         ),

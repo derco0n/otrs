@@ -1,8 +1,10 @@
-/**
- * @project     OTRS (http://www.otrs.org) - Customer Frontend
- * @copyright   OTRS AG
- * @license     AGPL (http://www.gnu.org/licenses/agpl.txt)
- */
+/*
+Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
+
+This software comes with ABSOLUTELY NO WARRANTY. For details, see
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
+*/
 
 @media screen,projection,tv,handheld {
 
@@ -105,7 +107,7 @@ strong {
     display: block;
     width: 30px;
     height: 30px;
-    margin: 0px auto 10px auto;
+    margin: 0px auto 20px auto;
     line-height: 30px;
     border-radius: 50px;
     background: #f92;
@@ -173,10 +175,10 @@ strong {
 
 #Header #Logo {
     position: absolute;
-    top: 6px;
+    top: 9px;
     right: 15px;
-    width: 135px;
-    height: 50px;
+    width: 300px;
+    height: 45px;
     background: transparent url(../img/logo.png) no-repeat;
     background-size: contain;
 }
@@ -315,6 +317,31 @@ textarea.cke_dialog_ui_input_textarea:focus {
 
 #Footer a:hover span {
     opacity: 1;
+}
+
+#Footer ul.FooterLinks {
+    float: none;
+    margin-bottom: 8px;
+    width: 100%;
+}
+
+#Footer ul.FooterLinks li {
+    float: none;
+    display: inline-block;
+    padding: 0;
+}
+
+#Footer ul.FooterLinks li::after {
+    content: '|';
+}
+
+#Footer ul.FooterLinks li:last-child::after {
+    content: '';
+}
+
+#Footer ul.FooterLinks li a {
+    margin: 8px 0 7px 0;
+    padding-left: 0;
 }
 
 /**

@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -227,7 +227,7 @@ $Self->Is(
     "#5 GetCharset()",
 );
 @Attachments = $EmailParserObject->GetAttachments();
-$MD5 = $MainObject->MD5sum( String => $Attachments[1]->{Content} ) || '';
+$MD5         = $MainObject->MD5sum( String => $Attachments[1]->{Content} ) || '';
 $Self->Is(
     $MD5,
     '0596f2939525c6bd50fc2b649e40fbb6',
@@ -283,7 +283,7 @@ $Self->Is(
     "#6 GetCharset()",
 );
 @Attachments = $EmailParserObject->GetAttachments();
-$MD5 = $MainObject->MD5sum( String => $Attachments[1]->{Content} ) || '';
+$MD5         = $MainObject->MD5sum( String => $Attachments[1]->{Content} ) || '';
 $Self->Is(
     $MD5,
     '5ee767f3b68f24a9213e0bef82dc53e5',
@@ -336,7 +336,7 @@ $Self->Is(
     "#7 GetCharset()",
 );
 @Attachments = $EmailParserObject->GetAttachments();
-$MD5 = $MainObject->MD5sum( String => $Attachments[1]->{Content} ) || '';
+$MD5         = $MainObject->MD5sum( String => $Attachments[1]->{Content} ) || '';
 $Self->Is(
     $MD5,
     '5ee767f3b68f24a9213e0bef82dc53e5',
@@ -389,7 +389,7 @@ $Self->Is(
 
 my $Body = $EmailParserObject->GetMessageBody();
 @Attachments = $EmailParserObject->GetAttachments();
-$MD5 = $MainObject->MD5sum( String => $Body ) || '';
+$MD5         = $MainObject->MD5sum( String => $Body ) || '';
 
 $Self->Is(
     $MD5,
@@ -420,7 +420,7 @@ $Self->Is(
 );
 
 @Attachments = $EmailParserObject->GetAttachments();
-$MD5 = $MainObject->MD5sum( String => $Attachments[0]->{Content} ) || '';
+$MD5         = $MainObject->MD5sum( String => $Attachments[0]->{Content} ) || '';
 
 $Self->Is(
     $MD5,
@@ -463,7 +463,7 @@ $Self->Is(
 );
 
 @Attachments = $EmailParserObject->GetAttachments();
-$MD5 = $MainObject->MD5sum( String => $Attachments[0]->{Content} ) || '';
+$MD5         = $MainObject->MD5sum( String => $Attachments[0]->{Content} ) || '';
 $Self->Is(
     $MD5,
     '7ddc731e5a3e76cd27d4b1e0628468b1',
@@ -555,7 +555,7 @@ $Self->Is(
 );
 
 @Attachments = $EmailParserObject->GetAttachments();
-$MD5 = $MainObject->MD5sum( String => $Attachments[1]->{Content} ) || '';
+$MD5         = $MainObject->MD5sum( String => $Attachments[1]->{Content} ) || '';
 $Self->Is(
     $MD5,
     'ecfbec2030e6bf91cc97ed22f7c6551a',
@@ -601,22 +601,22 @@ $Self->Is(
 );
 $Self->Is(
     $Attachments[5]->{Filename} || '',
-    '報告書①..txt',
+    '報告書_..txt',
     "#12 Filename check",
 );
 $Self->Is(
     $Attachments[6]->{Filename} || '',
-    '金田　美羽',
+    '金田_美羽',
     "#12 Filename check",
 );
 $Self->Is(
     $Attachments[7]->{Filename} || '',
-    '國科會50科學之旅活動計畫徵求書(r_final).doc',
+    '國科會50科學之旅活動計畫徵求書_r_final_.doc',
     "#12 Filename check",
 );
 $Self->Is(
     $Attachments[8]->{Filename} || '',
-    '2차 보도자료.hwp',
+    '2차_보도자료.hwp',
     "#12 Filename check",
 );
 $Self->True(
@@ -703,7 +703,7 @@ $Self->Is(
 );
 
 @Attachments = $EmailParserObject->GetAttachments();
-$MD5 = $MainObject->MD5sum( String => $Attachments[1]->{Content} ) || '';
+$MD5         = $MainObject->MD5sum( String => $Attachments[1]->{Content} ) || '';
 $Self->Is(
     $MD5,
     'e86c2c15e59fc1e1695f890ff102b06c',

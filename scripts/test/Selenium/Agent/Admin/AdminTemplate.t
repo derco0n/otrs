@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -74,7 +74,7 @@ $Selenium->RunTest(
 
         # Check breadcrumb on Add screen.
         my $Count = 1;
-        for my $BreadcrumbText ( 'Manage Templates', 'Add Template' ) {
+        for my $BreadcrumbText ( 'Template Management', 'Add Template' ) {
             $Self->Is(
                 $Selenium->execute_script("return \$('.BreadCrumb li:eq($Count)').text().trim()"),
                 $BreadcrumbText,
@@ -86,9 +86,13 @@ $Selenium->RunTest(
 
         # Create real test template.
         my $TemplateRandomID = "Template" . $Helper->GetRandomID();
+
         $Selenium->find_element( "#Name",    'css' )->send_keys($TemplateRandomID);
         $Selenium->find_element( "#Comment", 'css' )->send_keys("Selenium template test");
-        $Selenium->execute_script("\$('#ValidID').val('1').trigger('redraw.InputField').trigger('change');");
+        $Selenium->InputFieldValueSet(
+            Element => '#ValidID',
+            Value   => 1,
+        );
         $Selenium->find_element( "#Submit", 'css' )->VerifiedClick();
 
         # Check overview screen for test template.
@@ -135,7 +139,7 @@ $Selenium->RunTest(
 
         # Check breadcrumb on Edit screen.
         $Count = 1;
-        for my $BreadcrumbText ( 'Manage Templates', 'Edit Template: ' . $TemplateRandomID ) {
+        for my $BreadcrumbText ( 'Template Management', 'Edit Template: ' . $TemplateRandomID ) {
             $Self->Is(
                 $Selenium->execute_script("return \$('.BreadCrumb li:eq($Count)').text().trim()"),
                 $BreadcrumbText,
@@ -147,8 +151,24 @@ $Selenium->RunTest(
 
         # Edit test template.
         $Selenium->find_element( "#Comment", 'css' )->clear();
-        $Selenium->execute_script("\$('#TemplateType').val('Create').trigger('redraw.InputField').trigger('change');");
-        $Selenium->execute_script("\$('#ValidID').val('2').trigger('redraw.InputField').trigger('change');");
+
+        $Selenium->InputFieldValueSet(
+            Element => '#TemplateType',
+            Value   => 'Create',
+        );
+        $Selenium->InputFieldValueSet(
+            Element => '#ValidID',
+            Value   => 2,
+        );
+        $Selenium->InputFieldValueSet(
+            Element => '#TemplateType',
+            Value   => 'Create',
+        );
+        $Selenium->InputFieldValueSet(
+            Element => '#ValidID',
+            Value   => 2,
+        );
+
         $Selenium->find_element( "#Submit", 'css' )->VerifiedClick();
 
         # Check is there notification after template is updated.

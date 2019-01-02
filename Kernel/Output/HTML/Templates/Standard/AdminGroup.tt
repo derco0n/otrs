@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 [% RenderBlockStart("Overview") %]
@@ -38,14 +38,8 @@
             <div class='Content'>
                 <ul class="ActionList">
 [% RenderBlockStart("ActionAdd") %]
-                    <li>
-                        <form action="[% Env("CGIHandle") %]" method="post">
-                            <input type="hidden" name="Action" value="[% Env("Action") %]"/>
-                            <input type="hidden" name="Subaction" value="Add"/>
-                            <button class="CallForAction Fullsize Center" type="submit" value="[% Translate("Add") | html %]">
-                                <span><i class="fa fa-plus-square"></i>[% Translate("Add group") | html %]</span>
-                            </button>
-                        </form>
+                     <li>
+                        <a href="[% Env("Baselink") %]Action=AdminGroup;Subaction=Add" class="CallForAction Fullsize Center"><span><i class="fa fa-plus-square"></i>[% Translate("Add Group") | html %]</span></a>
                     </li>
 [% RenderBlockEnd("ActionAdd") %]
 
@@ -58,16 +52,16 @@
             </div>
         </div>
 [% RenderBlockEnd("ActionList") %]
-
+[% RenderBlockStart("Filter") %]
         <div class="WidgetSimple">
             <div class="Header">
                 <h2><label for="FilterGroups">[% Translate("Filter for Groups") | html %]</label></h2>
             </div>
             <div class="Content">
-                <input type="text" id="FilterGroups" class="FilterBox" placeholder="[% Translate("Just start typing to filter...") | html %]" name="FilterGroups" value="" title="[% Translate("Filter for log entries") | html %]">
+                <input type="text" id="FilterGroups" class="FilterBox" placeholder="[% Translate("Just start typing to filter...") | html %]" name="FilterGroups" value="" title="[% Translate("Filter for groups") | html %]">
             </div>
         </div>
-
+[% RenderBlockEnd("Filter") %]
         <div class="WidgetSimple">
             <div class="Header">
                 <h2>[% Translate("Hint") | html %]</h2>
@@ -154,7 +148,7 @@
                         <div class="Clear"></div>
 
 
-                        <label for="ValidID">[% Translate("Validity") | html %]:</label>
+                        <label class="Mandatory" for="ValidID"><span class="Marker">*</span> [% Translate("Validity") | html %]:</label>
                         <div class="Field">
                             [% Data.ValidOption %]
                         </div>

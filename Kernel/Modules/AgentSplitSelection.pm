@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Modules::AgentSplitSelection;
@@ -116,13 +116,45 @@ sub Run {
     # Split Selection Dialog
     # ---------------------------------------------------------- #
 
-    # Build split selection based on availability of corresponding registered modules.
-    # See bug#13690 (https://bugs.otrs.org/show_bug.cgi?id=13690) for more information.
+    # Get ACL restrictions.
+    my %PossibleActions;
+    my $Counter = 0;
+
+    # Get all registered actions.
+    if ( ref $ConfigObject->Get('Frontend::Module') eq 'HASH' ) {
+
+        my %Actions = %{ $ConfigObject->Get('Frontend::Module') };
+
+        # Only use those actions that start with 'Agent'.
+        %PossibleActions = map { ++$Counter => $_ }
+            grep { substr( $_, 0, length 'Agent' ) eq 'Agent' }
+            sort keys %Actions;
+    }
+
+    my $ACL = $TicketObject->TicketAcl(
+        Data          => \%PossibleActions,
+        Action        => 'AgentTicketZoom',
+        TicketID      => $Param{TicketID},
+        ReturnType    => 'Action',
+        ReturnSubType => '-',
+        UserID        => $Self->{UserID},
+    );
+
+    my %AclAction = %PossibleActions;
+    if ($ACL) {
+        %AclAction = $TicketObject->TicketAclActionData();
+    }
+
+    my %AclActionLookup = reverse %AclAction;
+
+    # Build split selection based on availability of corresponding registered modules and ACL restrictions.
+    # See bug#13690 (https://bugs.otrs.org/show_bug.cgi?id=13690) and
+    #   bug#13947 (https://bugs.otrs.org/show_bug.cgi?id=13947) respectively.
     my %SplitSelectionContent;
-    if ( $ConfigObject->Get('Frontend::Module')->{AgentTicketPhone} ) {
+    if ( $ConfigObject->Get('Frontend::Module')->{AgentTicketPhone} && $AclActionLookup{AgentTicketPhone} ) {
         $SplitSelectionContent{PhoneTicket} = Translatable('Phone ticket');
     }
-    if ( $ConfigObject->Get('Frontend::Module')->{AgentTicketEmail} ) {
+    if ( $ConfigObject->Get('Frontend::Module')->{AgentTicketEmail} && $AclActionLookup{AgentTicketEmail} ) {
         $SplitSelectionContent{EmailTicket} = Translatable('Email ticket');
     }
 

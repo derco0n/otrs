@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -11,6 +11,7 @@ use warnings;
 use utf8;
 
 use vars (qw($Self));
+use Kernel::System::VariableCheck qw(IsHashRefWithData);
 
 my $Selenium = $Kernel::OM->Get('Kernel::System::UnitTest::Selenium');
 
@@ -21,11 +22,11 @@ $Selenium->RunTest(
         my $ConfigObject  = $Kernel::OM->Get('Kernel::Config');
         my $ProcessObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Process');
 
-        # Do not check RichText.
+        # Enable RichText.
         $Helper->ConfigSettingChange(
             Valid => 1,
             Key   => 'Frontend::RichText',
-            Value => 0,
+            Value => 1,
         );
 
         # Create test user.
@@ -38,6 +39,25 @@ $Selenium->RunTest(
             UserLogin => $TestUserLogin,
         );
 
+        my $ACLObject = $Kernel::OM->Get('Kernel::System::ACL::DB::ACL');
+
+        # Set previous ACLs on invalid.
+        my $ACLList = $ACLObject->ACLList(
+            ValidIDs => ['1'],
+            UserID   => 1,
+        );
+
+        for my $Item ( sort keys %{$ACLList} ) {
+
+            $ACLObject->ACLUpdate(
+                ID   => $Item,
+                Name => $ACLList->{$Item},
+                ,
+                ValidID => 2,
+                UserID  => 1,
+            );
+        }
+
         # Get all processes.
         my $ProcessList = $ProcessObject->ProcessListGet(
             UserID => $TestUserID,
@@ -48,8 +68,10 @@ $Selenium->RunTest(
         my $TestProcessExists;
 
         # If there had been some active processes before testing, set them to inactive.
+        PROCESS:
         for my $Process ( @{$ProcessList} ) {
             if ( $Process->{State} eq 'Active' ) {
+
                 $ProcessObject->ProcessUpdate(
                     ID            => $Process->{ID},
                     EntityID      => $Process->{EntityID},
@@ -63,11 +85,6 @@ $Selenium->RunTest(
                 # Save process because of restoring on the end of test.
                 push @DeactivatedProcesses, $Process;
             }
-
-            # Check if test process already exists.
-            if ( $Process->{Name} eq $ProcessName ) {
-                $TestProcessExists = 1;
-            }
         }
 
         # Login.
@@ -78,31 +95,34 @@ $Selenium->RunTest(
         );
 
         my $ScriptAlias = $ConfigObject->Get('ScriptAlias');
-        my $Location;
+
+        $Selenium->VerifiedGet("${ScriptAlias}index.pl?Action=AdminProcessManagement");
 
         # Import test process if does not exist in the system.
-        if ( !$TestProcessExists ) {
-            $Selenium->VerifiedGet("${ScriptAlias}index.pl?Action=AdminProcessManagement");
-            $Location = $ConfigObject->Get('Home')
-                . "/scripts/test/sample/ProcessManagement/TestProcess.yml";
-            $Selenium->find_element( "#FileUpload",                      'css' )->send_keys($Location);
-            $Selenium->find_element( "#OverwriteExistingEntitiesImport", 'css' )->click();
-            $Selenium->WaitFor(
-                JavaScript =>
-                    "return typeof(\$) === 'function' && !\$('#OverwriteExistingEntitiesImport:checked').length"
-            );
-            $Selenium->find_element("//button[\@value='Upload process configuration'][\@type='submit']")
-                ->VerifiedClick();
-            $Selenium->find_element("//a[contains(\@href, \'Subaction=ProcessSync' )]")->VerifiedClick();
+        $Selenium->WaitFor(
+            JavaScript => "return typeof(\$) === 'function' && \$('#OverwriteExistingEntitiesImport').length;"
+        );
 
-            # We have to allow a 1 second delay for Apache2::Reload to pick up the changed process cache.
-            sleep 1;
-        }
+        # Import test Selenium Process.
+        my $Location = $ConfigObject->Get('Home')
+            . "/scripts/test/sample/ProcessManagement/TestProcess.yml";
+        $Selenium->find_element( "#FileUpload",                      'css' )->send_keys($Location);
+        $Selenium->find_element( "#OverwriteExistingEntitiesImport", 'css' )->click();
+        $Selenium->WaitFor(
+            JavaScript => "return !\$('#OverwriteExistingEntitiesImport:checked').length;"
+        );
+        $Selenium->find_element("//button[\@value='Upload process configuration'][\@type='submit']")->VerifiedClick();
+        sleep 1;
+        $Selenium->find_element("//a[contains(\@href, \'Subaction=ProcessSync' )]")->VerifiedClick();
+
+        # We have to allow a 1 second delay for Apache2::Reload to pick up the changed Process cache.
+        sleep 1;
 
         # Get process list.
         my $List = $ProcessObject->ProcessList(
-            UseEntities => 1,
-            UserID      => $TestUserID,
+            UseEntities    => 1,
+            StateEntityIDs => ['S1'],
+            UserID         => $TestUserID,
         );
 
         # Get process entity.
@@ -113,23 +133,30 @@ $Selenium->RunTest(
             UserID   => $TestUserID,
         );
 
+        # Navigate to AdminACL and synchronize ACL's.
+        if ( IsHashRefWithData($ACLList) ) {
+            $Selenium->VerifiedGet("${ScriptAlias}index.pl?Action=AdminACL");
+            $Selenium->find_element("//a[contains(\@href, 'Action=AdminACL;Subaction=ACLDeploy')]")->VerifiedClick();
+        }
+
         # Navigate to AgentTicketProcess screen.
         $Selenium->VerifiedGet("${ScriptAlias}index.pl?Action=AgentTicketProcess");
 
         # Select test process.
-        $Selenium->execute_script(
-            "\$('#ProcessEntityID').val('$ListReverse{$ProcessName}').trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#ProcessEntityID',
+            Value   => $ListReverse{$ProcessName},
         );
 
         # Wait until page has loaded, if necessary.
-        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("#Subject").length' );
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("#Subject").length;' );
 
         # Hide DnDUpload and show input field.
         $Selenium->execute_script(
-            "\$('.DnDUpload').css('display', 'none')"
+            "\$('.DnDUpload').css('display', 'none');"
         );
         $Selenium->execute_script(
-            "\$('#FileUpload').css('display', 'block')"
+            "\$('#FileUpload').css('display', 'block');"
         );
 
         # Add an attachment.
@@ -154,8 +181,13 @@ $Selenium->RunTest(
             "'Main-Test1.txt' - uploaded"
         );
 
-        $Selenium->find_element( "#Subject",  'css' )->send_keys('Test');
-        $Selenium->find_element( "#RichText", 'css' )->send_keys('Test');
+        $Selenium->find_element( "#Subject", 'css' )->send_keys('Test');
+        sleep 1;
+        $Selenium->execute_script(
+            q{
+                return CKEDITOR.instances.RichText.setData('This is a test text');
+            }
+        );
 
         # Submit.
         $Selenium->find_element("//button[\@type='submit']")->VerifiedClick();
@@ -174,7 +206,13 @@ $Selenium->RunTest(
 
         # Get test ticket ID.
         my @TicketZoomUrl = split( 'Action=AgentTicketZoom;TicketID=', $Url );
-        my $TicketID = $TicketZoomUrl[1];
+        my $TicketID      = $TicketZoomUrl[1];
+
+        # Verify article attachment is created.
+        $Self->True(
+            $Selenium->execute_script("return \$('.ArticleAttachments li').length;"),
+            "Attachment is created in process ticket article"
+        );
 
         my $TransitionObject        = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Transition');
         my $ActivityObject          = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Activity');

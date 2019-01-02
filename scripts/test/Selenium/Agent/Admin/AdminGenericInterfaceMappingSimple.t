@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -89,8 +89,9 @@ $Selenium->RunTest(
         $Selenium->find_element("//a[contains(\@href, 'WebserviceID=$WebserviceID')]")->VerifiedClick();
 
         # Select 'Ticket::TicketCreate' as option.
-        $Selenium->execute_script(
-            "\$('#OperationList').val('Ticket::TicketCreate').trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#OperationList',
+            Value   => 'Ticket::TicketCreate',
         );
 
         # Wait until AJAX loads new form.
@@ -103,16 +104,19 @@ $Selenium->RunTest(
         $Selenium->find_element( "#Operation", 'css' )->send_keys('SeleniumOperation');
 
         # Select simple mapping for inbound and outbound data.
-        $Selenium->execute_script(
-            "\$('#MappingInbound').val('Simple').trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#MappingInbound',
+            Value   => 'Simple',
         );
-        $Selenium->execute_script(
-            "\$('#MappingOutbound').val('Simple').trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#MappingOutbound',
+            Value   => 'Simple',
         );
 
         # Set include ticket data to Yes.
-        $Selenium->execute_script(
-            "\$('#IncludeTicketData').val('1').trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#IncludeTicketData',
+            Value   => 1,
         );
 
         $Selenium->find_element( "#Submit", 'css' )->VerifiedClick();
@@ -176,13 +180,15 @@ $Selenium->RunTest(
 
             # Change default type.
             if ( $DefaultMapTo eq 'DefaultKeyMapTo' ) {
-                $Selenium->execute_script(
-                    "\$('#DefaultKeyType').val('MapTo').trigger('redraw.InputField').trigger('change');"
+                $Selenium->InputFieldValueSet(
+                    Element => '#DefaultKeyType',
+                    Value   => 'MapTo',
                 );
             }
             else {
-                $Selenium->execute_script(
-                    "\$('#DefaultValueType').val('MapTo').trigger('redraw.InputField').trigger('change');"
+                $Selenium->InputFieldValueSet(
+                    Element => '#DefaultValueType',
+                    Value   => 'MapTo',
                 );
             }
 

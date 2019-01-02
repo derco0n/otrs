@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -35,7 +35,7 @@ $ConfigObject->Set(
 );
 
 # create test user
-my $Login = $Helper->TestUserCreate();
+my $Login  = $Helper->TestUserCreate();
 my $UserID = $Kernel::OM->Get('Kernel::System::User')->UserLookup( UserLogin => $Login );
 
 my $RandomID = $Helper->GetRandomID();
@@ -346,14 +346,14 @@ my %CustomerSearches      = (
             PriorityIDs => [ 2, 4 ],
             StateIDs    => [ 1, 3, 5 ],
             Body => 'asdf',
-            }
+        }
     },
     Second => {
         Search => {
             CustomerID => 'asdf',
             StateIDs   => [1],
-            }
         }
+    }
 
 );
 

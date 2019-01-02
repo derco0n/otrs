@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Output::HTML::TicketOverview::Preview;
@@ -860,7 +860,7 @@ sub _Show {
             Space              => ' ',
         );
         if ( 60 * 60 * 1 > $Article{FirstResponseTime} ) {
-            $Article{FirstResponseTimeClass} = 'Warning'
+            $Article{FirstResponseTimeClass} = 'Warning';
         }
         $LayoutObject->Block(
             Name => 'FirstResponseTime',
@@ -884,7 +884,7 @@ sub _Show {
             Space              => ' ',
         );
         if ( 60 * 60 * 1 > $Article{UpdateTime} ) {
-            $Article{UpdateTimeClass} = 'Warning'
+            $Article{UpdateTimeClass} = 'Warning';
         }
         $LayoutObject->Block(
             Name => 'UpdateTime',
@@ -1141,9 +1141,9 @@ sub _Show {
 
         # html quoting
         $ArticleItem->{Body} = $LayoutObject->Ascii2Html(
-            NewLine => $Param{Config}->{DefaultViewNewLine}  || 90,
-            Text    => $ArticleItem->{Body},
-            VMax    => $Param{Config}->{DefaultPreViewLines} || 25,
+            NewLine         => $Param{Config}->{DefaultViewNewLine} || 90,
+            Text            => $ArticleItem->{Body},
+            VMax            => $Param{Config}->{DefaultPreViewLines} || 25,
             LinkFeature     => 1,
             HTMLResultMode  => 1,
             StripEmptyLines => $Param{Config}->{StripEmptyLines},

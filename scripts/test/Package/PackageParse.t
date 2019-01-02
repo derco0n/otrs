@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -60,8 +60,8 @@ for a package file.',
       <Name>TestPackage</Name>
       <Version>1.0.1</Version>
       <Vendor>OTRS AG</Vendor>
-      <URL>http://otrs.org/</URL>
-      <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+      <URL>https://otrs.com/</URL>
+      <License>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</License>
       <ChangeLog>2013-08-14 New package (some test &lt; &gt; &amp;).</ChangeLog>
       <Description Lang="en">A test package (some test &lt; &gt; &amp;).</Description>
       <Description Lang="de">Ein Test Paket (some test &lt; &gt; &amp;).</Description>
@@ -83,7 +83,7 @@ for a package file.',
 for my $Test (@Tests) {
 
     my $ResultStructure = 1;
-    my %Structure = $PackageObject->PackageParse( String => $Test->{String} );
+    my %Structure       = $PackageObject->PackageParse( String => $Test->{String} );
     $ResultStructure = 0 if !IsHashRefWithData( \%Structure );
 
     $Self->Is(

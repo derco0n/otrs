@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Modules::AgentDashboardCommon;
@@ -168,7 +168,7 @@ sub Run {
         $LayoutObject->ChallengeTokenCheck();
 
         my $Name = $ParamObject->GetParam( Param => 'Name' );
-        my $Key = $UserSettingsKey . $Name;
+        my $Key  = $UserSettingsKey . $Name;
 
         # Mandatory widgets can't be removed.
         if ( $Config->{$Name} && $Config->{$Name}->{Mandatory} ) {
@@ -538,7 +538,7 @@ sub Run {
         # check permissions
         if ( $Config->{$Name}->{Group} ) {
             my $PermissionOK = 0;
-            my @Groups = split /;/, $Config->{$Name}->{Group};
+            my @Groups       = split /;/, $Config->{$Name}->{Group};
             GROUP:
             for my $Group (@Groups) {
                 my $HasPermission = $GroupObject->PermissionCheck(
@@ -650,7 +650,7 @@ sub Run {
                 Value => {
                     Name     => $Name,
                     NameHTML => $NameHTML,
-                    }
+                }
             );
 
             $LayoutObject->Block(
@@ -680,7 +680,7 @@ sub Run {
         # if column is not a default column, add it for translation
         for my $Column ( sort keys %{ $Element{Config}->{DefaultColumns} } ) {
             if ( !defined $Columns->{$Column} ) {
-                $Columns->{$Column} = $Element{Config}->{DefaultColumns}->{$Column}
+                $Columns->{$Column} = $Element{Config}->{DefaultColumns}->{$Column};
             }
         }
 
@@ -867,7 +867,7 @@ sub _Element {
     # check permissions
     if ( $Configs->{$Name}->{Group} ) {
         my $PermissionOK = 0;
-        my @Groups = split /;/, $Configs->{$Name}->{Group};
+        my @Groups       = split /;/, $Configs->{$Name}->{Group};
         GROUP:
         for my $Group (@Groups) {
             my $HasPermission = $GroupObject->PermissionCheck(

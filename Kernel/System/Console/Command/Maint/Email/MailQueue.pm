@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::Console::Command::Maint::Email::MailQueue;
@@ -108,17 +108,21 @@ sub PreRun {
     if ( $Options{send} ) {
 
         my $PIDObject = $Kernel::OM->Get('Kernel::System::PID');
+        my $Force     = $Self->GetOption('force');
 
-        my %PID = $PIDObject->PIDGet(
-            Name => 'MaintMailQueueSending',
-        );
+        if ( !$Force ) {
+            my %PID = $PIDObject->PIDGet(
+                Name => 'MaintMailQueueSending',
+            );
 
-        if (%PID) {
-            die "Message sending already in progress! Skipping...\n";
+            if (%PID) {
+                die "Message sending already in progress! Skipping...\n";
+            }
         }
 
         my $Success = $PIDObject->PIDCreate(
-            Name => 'MaintMailQueueSending',
+            Name  => 'MaintMailQueueSending',
+            Force => $Force,
         );
 
         if ( !$Success ) {

@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::GenericInterface::Event::ObjectType::Article;
@@ -15,6 +15,7 @@ use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
     'Kernel::System::Log',
+    'Kernel::System::Ticket',
     'Kernel::System::Ticket::Article',
 );
 
@@ -65,6 +66,13 @@ sub DataGet {
         }
     }
 
+    # Get ticket data to be able to filtering conditions at article event (see bug#13708).
+    my %TicketData = $Kernel::OM->Get('Kernel::System::Ticket')->TicketGet(
+        TicketID      => $Param{Data}->{TicketID},
+        DynamicFields => 1,
+        UserID        => 1,
+    );
+
     my $ArticleBackendObject = $Kernel::OM->Get('Kernel::System::Ticket::Article')->BackendForArticle(%IDs);
 
     my %ObjectData = $ArticleBackendObject->ArticleGet(
@@ -74,7 +82,7 @@ sub DataGet {
         UserID        => 1,
     );
 
-    return %ObjectData;
+    return ( %TicketData, %ObjectData );
 
 }
 
@@ -82,10 +90,10 @@ sub DataGet {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

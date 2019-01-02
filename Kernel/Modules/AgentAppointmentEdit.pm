@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Modules::AgentAppointmentEdit;
@@ -320,6 +320,7 @@ sub Run {
                             $Rule->{$Type} eq 'FirstResponseTime'
                             || $Rule->{$Type} eq 'UpdateTime'
                             || $Rule->{$Type} eq 'SolutionTime'
+                            || $Rule->{$Type} eq 'PendingTime'
                             )
                         {
                             $GetParam{ReadOnlyStart}    = 1 if $Type eq 'StartDate';
@@ -922,7 +923,7 @@ sub Run {
         $Appointment{NotificationCustom} ||= '';
 
         if ( $Appointment{NotificationCustom} eq 'datetime' ) {
-            $Param{NotificationCustomDateTimeInputRadio} = 'checked="checked"'
+            $Param{NotificationCustomDateTimeInputRadio} = 'checked="checked"';
         }
         elsif ( $Appointment{NotificationCustom} eq 'relative' ) {
             $Param{NotificationCustomRelativeInputRadio} = 'checked="checked"';
@@ -1606,7 +1607,7 @@ sub Run {
         # build JSON output
         $JSON = $LayoutObject->JSONEncode(
             Data => {
-                Success => $Success ? 1 : 0,
+                Success       => $Success ? 1 : 0,
                 AppointmentID => $AppointmentID,
             },
         );

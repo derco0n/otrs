@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -131,8 +131,9 @@ $Selenium->RunTest(
         # Check client side validation.
         $Selenium->find_element( "#Subject",  'css' )->send_keys('Test');
         $Selenium->find_element( "#RichText", 'css' )->send_keys('Test');
-        $Selenium->execute_script(
-            "\$('#NewResponsibleID').val('').trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#NewResponsibleID',
+            Value   => '',
         );
         $Selenium->find_element( "#submitRichText", 'css' )->click();
         $Selenium->WaitFor( JavaScript => "return \$('#NewResponsibleID.Error').length" );
@@ -152,8 +153,9 @@ $Selenium->RunTest(
         $Selenium->find_element( "#RichText", 'css' )->send_keys('Test');
 
         # Change ticket user responsible.
-        $Selenium->execute_script(
-            "\$('#NewResponsibleID').val('$UserID[1]').trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#NewResponsibleID',
+            Value   => $UserID[1],
         );
         $Selenium->find_element( "#submitRichText", 'css' )->click();
 

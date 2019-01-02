@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -237,6 +237,76 @@ for my $CryptType (qw(plain crypt apr1 md5 sha1 sha2 sha512 bcrypt)) {
         );
     }
 }
+
+# Check auth for user which password is encrypted by crypt algorithm different than system one.
+@Tests = (
+    {
+        Password  => 'test111test111test111',
+        UserLogin => 'example-user' . $Helper->GetRandomID(),
+        CryptType => 'crypt',
+    },
+    {
+        Password  => 'test222test222test222',
+        UserLogin => 'example-user' . $Helper->GetRandomID(),
+        CryptType => 'sha1',
+    }
+);
+
+my $AuthObject = $Kernel::OM->Get('Kernel::System::Auth');
+
+# Create users.
+for my $Test (@Tests) {
+    my $UserID = $UserObject->UserAdd(
+        UserFirstname => $Test->{CryptType} . '-Firstname',
+        UserLastname  => $Test->{CryptType} . '-Lastname',
+        UserLogin     => $Test->{UserLogin},
+        UserEmail     => $Test->{UserLogin} . '@example.com',
+        ValidID       => 1,
+        ChangeUserID  => 1,
+    );
+
+    $Self->True(
+        $UserID,
+        "UserID $UserID is created",
+    );
+
+    $Kernel::OM->ObjectsDiscard(
+        Objects => [
+            'Kernel::System::User',
+            'Kernel::System::Auth',
+        ],
+    );
+
+    $ConfigObject->Set(
+        Key   => "AuthModule::DB::CryptType",
+        Value => $Test->{CryptType},
+    );
+
+    $UserObject = $Kernel::OM->Get('Kernel::System::User');
+    $AuthObject = $Kernel::OM->Get('Kernel::System::Auth');
+
+    my $PasswordSet = $UserObject->SetPassword(
+        UserLogin => $Test->{UserLogin},
+        PW        => $Test->{Password},
+    );
+
+    $Self->True(
+        $PasswordSet,
+        "Password '$Test->{Password}' is set"
+    );
+}
+
+# System is set to sha1 crypt type at this moment and
+# we try to authenticate first created user (password is encrypted by different crypt type).
+my $Result = $AuthObject->Auth(
+    User => $Tests[0]->{UserLogin},
+    Pw   => $Tests[0]->{Password},
+);
+
+$Self->True(
+    $Result,
+    "System crypt type - $Tests[1]->{CryptType}, crypt type for user password - $Tests[0]->{CryptType}, user password '$Tests[0]->{Password}'",
+);
 
 # cleanup is done by RestoreDatabase
 

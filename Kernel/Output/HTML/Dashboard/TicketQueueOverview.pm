@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Output::HTML::Dashboard::TicketQueueOverview;
@@ -54,7 +54,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     my $LimitGroup = $Self->{Config}->{QueuePermissionGroup} || 0;
-    my $CacheKey = 'User' . '-' . $Self->{UserID} . '-' . $LimitGroup;
+    my $CacheKey   = 'User' . '-' . $Self->{UserID} . '-' . $LimitGroup;
 
     # get cache object
     my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
@@ -133,20 +133,35 @@ sub Run {
         $QueueIDURL .= "QueueIDs=$QueueID;";
     }
 
-    my %Results;
-    for my $QueueID ( sort keys %Queues ) {
-        my @Results;
-        for my $StateOrderID ( sort { $a <=> $b } keys %ConfiguredStates ) {
-            my $QueueTotal = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
-                UserID => $Self->{UserID},
-                Result => 'COUNT',
-                Queues => [ $Queues{$QueueID} ],
-                States => [ $ConfiguredStates{$StateOrderID} ],
-            ) || 0;
-            push @Results, $QueueTotal;
-        }
+    # Prepare ticket count.
+    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my @QueueIDs     = sort keys %Queues;
+    if ( !@QueueIDs ) {
+        @QueueIDs = (999_999);
+    }
 
-        $Results{ $Queues{$QueueID} } = [@Results];
+    my %Results;
+    for my $StateOrderID ( sort { $a <=> $b } keys %ConfiguredStates ) {
+
+        # Run ticket search for all Queues and appropriate available State.
+        my @StateOrderTicketIDs = $TicketObject->TicketSearch(
+            UserID   => $Self->{UserID},
+            Result   => 'ARRAY',
+            QueueIDs => \@QueueIDs,
+            States   => [ $ConfiguredStates{$StateOrderID} ],
+        );
+
+        # Count of tickets per QueueID.
+        my $TicketCountByQueueID = $TicketObject->TicketCountByAttribute(
+            Attribute => 'QueueID',
+            TicketIDs => \@StateOrderTicketIDs,
+        );
+
+        # Gather ticket count for corresponding Queue <-> State.
+        for my $QueueID (@QueueIDs) {
+            push @{ $Results{ $Queues{$QueueID} } },
+                $TicketCountByQueueID->{$QueueID} ? $TicketCountByQueueID->{$QueueID} : 0;
+        }
     }
 
     # build header
@@ -186,7 +201,7 @@ sub Run {
             Data => {
                 QueueID   => $QueueToID{$Queue},
                 QueueName => $Queue,
-                }
+            }
         );
 
         # iterate over states
@@ -243,7 +258,7 @@ sub Run {
             Name => 'ContentLargeTicketQueueOverviewNone',
             Data => {
                 ColumnCount => ( scalar keys %ConfiguredStates ) + 2,
-                }
+            }
         );
     }
 
@@ -280,7 +295,7 @@ sub Run {
             Type  => 'DashboardQueueOverview',
             Key   => $CacheKey,
             Value => $Content || '',
-            TTL   => 2 * 60,
+            TTL   => $Self->{Config}->{CacheTTLLocal} * 60,
         );
     }
 

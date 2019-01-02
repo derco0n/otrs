@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -121,8 +121,9 @@ $Selenium->RunTest(
         $Selenium->VerifiedGet("${ScriptAlias}index.pl?Action=AgentTicketZoom;TicketID=$TicketID");
 
         # Click on Reply, we should try to send an email first.
-        $Selenium->execute_script(
-            "\$('#ResponseID$ArticleID').val('1').trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => "#ResponseID$ArticleID",
+            Value   => 1,
         );
 
         # Switch to compose window.
@@ -157,10 +158,10 @@ $Selenium->RunTest(
 
                 # It's necessary to hide drag&drop upload and show input field.
                 $Selenium->execute_script(
-                    "\$('.DnDUpload').css('display', 'none')"
+                    "\$('.DnDUpload').css('display', 'none');"
                 );
                 $Selenium->execute_script(
-                    "\$('#FileUpload').css('display', 'block')"
+                    "\$('#FileUpload').css('display', 'block');"
                 );
             }
 
@@ -191,7 +192,9 @@ $Selenium->RunTest(
         $Selenium->switch_to_window( $Handles->[0] );
 
         # Wait until page has loaded, if necessary.
-        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function";' );
+        $Selenium->WaitFor(
+            JavaScript => 'return typeof($) === "function" && $("#Row2 td.Channel span i.Warning").length;'
+        );
 
         # Verify transmission status is shown as processing.
         $Self->Is(
@@ -205,6 +208,19 @@ $Selenium->RunTest(
         $Self->True(
             ( $DisplayedTransmissionMessage =~ /This message has been queued for sending./ ) || 0,
             'Transmission processing message displayed correctly (1)'
+        );
+
+        # Verify css is correct for collapsed article widget.
+        $Self->False(
+            $Selenium->execute_script("return \$('.WidgetMenu').hasClass('SpacingBottom');"),
+            "CSS is correct for collapsed article widget."
+        );
+
+        # Click to expand article widget information and verify css.
+        $Selenium->find_element( '.WidgetAction.Expand', 'css' )->click();
+        $Self->True(
+            $Selenium->execute_script("return \$('.WidgetMenu').hasClass('SpacingBottom');"),
+            "CSS is correct for expanded article widget."
         );
 
         # Get article ID of last message.
@@ -302,6 +318,9 @@ $Selenium->RunTest(
 
             # Text body.
             if ( $Field eq 'RichText' ) {
+                $Selenium->WaitFor(
+                    JavaScript => "return \$('#$Selector').length;"
+                );
                 $Self->Is(
                     $Selenium->find_element( "#$Selector", 'css' )->get_value(),
                     $ComposeData{$Field},
@@ -311,6 +330,10 @@ $Selenium->RunTest(
 
             # Attachment.
             elsif ( $Field eq 'FileUpload' ) {
+                $Selenium->WaitFor(
+                    JavaScript =>
+                        "return \$('.AttachmentList tbody tr td.Filename:contains($ComposeData{$Field})').length;"
+                );
                 $Self->True(
                     $Selenium->execute_script(
                         "return \$('.AttachmentList tbody tr td.Filename:contains($ComposeData{$Field})').length;"
@@ -326,6 +349,10 @@ $Selenium->RunTest(
                 if ( $Field eq 'ToCustomer' ) {
                     $Selector =~ s{^To}{}x;
                 }
+
+                $Selenium->WaitFor(
+                    JavaScript => "return \$('#${Selector}TicketText_1').length;"
+                );
 
                 $Self->Is(
                     $Selenium->find_element( "#${Selector}TicketText_1", 'css' )->get_value(),
@@ -345,13 +372,15 @@ $Selenium->RunTest(
         $Selenium->find_element( '#ToCustomer', 'css' )->send_keys($ToCustomer);
         $Selenium->find_element( 'body',        'css' )->click();
 
-        $Selenium->find_element( '#submitRichText', 'css' )->click();
+        $Selenium->execute_script("\$('#submitRichText').click();");
 
         $Selenium->WaitFor( WindowCount => 1 );
         $Selenium->switch_to_window( $Handles->[0] );
 
         # Wait until page has loaded, if necessary.
-        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function";' );
+        $Selenium->WaitFor(
+            JavaScript => 'return typeof($) === "function" && $("#Row3 td.Channel span i.Warning").length;'
+        );
 
         # Verify transmission status is shown as processing.
         $Self->Is(
@@ -380,7 +409,7 @@ $Selenium->RunTest(
         $Selenium->switch_to_window( $Handles->[1] );
 
         # Wait until page has loaded, if necessary.
-        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $(".CancelClosePopup").length' );
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $(".CancelClosePopup").length;' );
 
         # Verify that resend screen worked as expected.
         my $HistoryText = "Resent email to \"$ToCustomer\".";

@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2019 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -88,19 +88,19 @@ $Selenium->RunTest(
         $Selenium->VerifiedGet("${ScriptAlias}index.pl?Action=AgentAppointmentCalendarOverview");
 
         # Wait for AJAX to finish.
-        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && !$(".CalendarWidget.Loading").length' );
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && !$(".CalendarWidget.Loading").length;' );
 
         # Click on the month view.
         $Selenium->find_element( '.fc-month-button', 'css' )->click();
 
         # Wait for AJAX to finish.
-        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && !$(".CalendarWidget.Loading").length' );
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && !$(".CalendarWidget.Loading").length;' );
 
         # Go to next month.
         $Selenium->find_element( '.fc-toolbar .fc-next-button', 'css' )->click();
 
         # Wait for AJAX to finish.
-        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && !$(".CalendarWidget.Loading").length' );
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && !$(".CalendarWidget.Loading").length;' );
 
         my $DataDate = sprintf( "%04d-%02d-01", $NextMonthSettings->{Year}, $NextMonthSettings->{Month} );
 
@@ -291,21 +291,21 @@ $Selenium->RunTest(
         for my $Test (@TemplateCreateTests) {
 
             # Create appointment.
-            $Selenium->find_element( ".fc-widget-content td[data-date=\"$DataDate\"]", 'css' )->click();
+            $Selenium->find_elements("//td[contains(\@data-date,'$DataDate')]")->[1]->click();
 
             # Wait until form and overlay has loaded, if neccessary.
-            $Selenium->WaitFor( JavaScript => "return typeof(\$) === 'function' && \$('#Title').length" );
+            $Selenium->WaitFor( JavaScript => "return typeof(\$) === 'function' && \$('#Title').length;" );
 
             # Enter some data.
-            $Selenium->find_element( 'Title', 'name' )->send_keys("$Test->{Data}->{Description}");
-            $Selenium->execute_script(
-                "\$('#CalendarID').val("
-                    . $Calendar1{CalendarID}
-                    . ").trigger('redraw.InputField').trigger('change');"
+            $Selenium->find_element( '#Title', 'css' )->send_keys("$Test->{Data}->{Description}");
+            $Selenium->InputFieldValueSet(
+                Element => '#CalendarID',
+                Value   => $Calendar1{CalendarID},
             );
 
-            $Selenium->execute_script(
-                "\$('#NotificationTemplate').val('$Test->{Data}->{NotificationTemplate}').trigger('redraw.InputField').trigger('change');"
+            $Selenium->InputFieldValueSet(
+                Element => '#NotificationTemplate',
+                Value   => $Test->{Data}->{NotificationTemplate},
             );
 
             # Click on Save.
@@ -314,7 +314,7 @@ $Selenium->RunTest(
             # Wait for dialog to close and AJAX to finish.
             $Selenium->WaitFor(
                 JavaScript =>
-                    'return typeof($) === "function" && !$(".Dialog:visible").length && !$(".CalendarWidget.Loading").length'
+                    'return typeof($) === "function" && !$(".Dialog:visible").length && !$(".CalendarWidget.Loading").length;'
             );
 
             my @AppointmentList = $AppointmentObject->AppointmentList(
@@ -506,22 +506,22 @@ $Selenium->RunTest(
         for my $Test (@TemplateCustomRelativeCreateTests) {
 
             # Create appointment.
-            $Selenium->find_element( ".fc-widget-content td[data-date=\"$DataDate\"]", 'css' )->click();
+            $Selenium->find_elements("//td[contains(\@data-date,'$DataDate')]")->[1]->click();
 
             # Wait until form and overlay has loaded, if neccessary.
-            $Selenium->WaitFor( JavaScript => "return typeof(\$) === 'function' && \$('#Title').length" );
+            $Selenium->WaitFor( JavaScript => "return typeof(\$) === 'function' && \$('#Title').length;" );
 
             # Enter some data.
-            $Selenium->find_element( 'Title', 'name' )->send_keys("$Test->{Data}->{Description}");
-            $Selenium->execute_script(
-                "\$('#CalendarID').val("
-                    . $Calendar1{CalendarID}
-                    . ").trigger('redraw.InputField').trigger('change');"
+            $Selenium->find_element( '#Title', 'css' )->send_keys("$Test->{Data}->{Description}");
+            $Selenium->InputFieldValueSet(
+                Element => '#CalendarID',
+                Value   => $Calendar1{CalendarID},
             );
 
             # Select custom template.
-            $Selenium->execute_script(
-                "\$('#NotificationTemplate').val('$Test->{Data}->{NotificationTemplate}').trigger('redraw.InputField').trigger('change');"
+            $Selenium->InputFieldValueSet(
+                Element => '#NotificationTemplate',
+                Value   => $Test->{Data}->{NotificationTemplate},
             );
 
             # Activate the relative notifications.
@@ -529,17 +529,19 @@ $Selenium->RunTest(
 
             # Fill out the custom unit count field.
             $Selenium->execute_script(
-                "return \$('#NotificationCustomRelativeUnitCount').val('$Test->{Data}->{NotificationCustomRelativeUnitCount}');"
+                "\$('#NotificationCustomRelativeUnitCount').val('$Test->{Data}->{NotificationCustomRelativeUnitCount}');"
             );
 
             # Fill out the custom unit field.
-            $Selenium->execute_script(
-                "\$('#NotificationCustomRelativeUnit').val('$Test->{Data}->{NotificationCustomRelativeUnit}').trigger('redraw.InputField').trigger('change');"
+            $Selenium->InputFieldValueSet(
+                Element => '#NotificationCustomRelativeUnit',
+                Value   => $Test->{Data}->{NotificationCustomRelativeUnit},
             );
 
             # Fill out the custom unit point of time field.
-            $Selenium->execute_script(
-                "\$('#NotificationCustomRelativePointOfTime').val('$Test->{Data}->{NotificationCustomRelativePointOfTime}').trigger('redraw.InputField').trigger('change');"
+            $Selenium->InputFieldValueSet(
+                Element => '#NotificationCustomRelativePointOfTime',
+                Value   => $Test->{Data}->{NotificationCustomRelativePointOfTime},
             );
 
             # Click on Save.
@@ -548,7 +550,7 @@ $Selenium->RunTest(
             # Wait for dialog to close and AJAX to finish.
             $Selenium->WaitFor(
                 JavaScript =>
-                    'return typeof($) === "function" && !$(".Dialog:visible").length && !$(".CalendarWidget.Loading").length'
+                    'return typeof($) === "function" && !$(".Dialog:visible").length && !$(".CalendarWidget.Loading").length;'
             );
 
             my @AppointmentList = $AppointmentObject->AppointmentList(
@@ -736,7 +738,7 @@ $Selenium->RunTest(
                     NotificationCustomRelativePointOfTime => 'beforestart',
                     DateTimeDay                           => '18',
                     DateTimeMonth                         => '10',
-                    DateTimeYear                          => '2016',
+                    DateTimeYear                          => $YearBeforeLastSettings->{Year},
                     DateTimeHour                          => '2',
                     DateTimeMinute                        => '3',
                     UserID                                => $UserID,
@@ -757,51 +759,56 @@ $Selenium->RunTest(
         for my $Test (@TemplateCustomDateTimeCreateTests) {
 
             # Create appointment.
-            $Selenium->find_element( ".fc-widget-content td[data-date=\"$DataDate\"]", 'css' )->click();
+            $Selenium->find_elements("//td[contains(\@data-date,'$DataDate')]")->[1]->click();
 
             # Wait until form and overlay has loaded, if neccessary.
-            $Selenium->WaitFor( JavaScript => "return typeof(\$) === 'function' && \$('#Title').length" );
+            $Selenium->WaitFor( JavaScript => "return typeof(\$) === 'function' && \$('#Title').length;" );
 
             # Enter some data.
-            $Selenium->find_element( 'Title', 'name' )->send_keys("$Test->{Data}->{Description}");
-            $Selenium->execute_script(
-                "\$('#CalendarID').val("
-                    . $Calendar1{CalendarID}
-                    . ").trigger('redraw.InputField').trigger('change');"
+            $Selenium->find_element( '#Title', 'css' )->send_keys("$Test->{Data}->{Description}");
+            $Selenium->InputFieldValueSet(
+                Element => '#CalendarID',
+                Value   => $Calendar1{CalendarID},
             );
 
             # Select custom template.
-            $Selenium->execute_script(
-                "\$('#NotificationTemplate').val('$Test->{Data}->{NotificationTemplate}').trigger('redraw.InputField').trigger('change');"
+            $Selenium->InputFieldValueSet(
+                Element => '#NotificationTemplate',
+                Value   => $Test->{Data}->{NotificationTemplate},
             );
 
             # Activate the relative notifications.
             $Selenium->find_element( "#NotificationCustomDateTimeInput", 'css' )->click();
-            $Selenium->WaitFor( JavaScript => "return \$('#NotificationCustomDateTimeInput:checked').length" );
+            $Selenium->WaitFor( JavaScript => "return \$('#NotificationCustomDateTimeInput:checked').length;" );
 
             # Select day.
-            $Selenium->execute_script(
-                "\$('#NotificationCustomDateTimeDay').val('$Test->{Data}->{DateTimeDay}').trigger('redraw.InputField').trigger('change');"
+            $Selenium->InputFieldValueSet(
+                Element => '#NotificationCustomDateTimeDay',
+                Value   => $Test->{Data}->{DateTimeDay},
             );
 
             # Select month.
-            $Selenium->execute_script(
-                "\$('#NotificationCustomDateTimeMonth').val('$Test->{Data}->{DateTimeMonth}').trigger('redraw.InputField').trigger('change');"
+            $Selenium->InputFieldValueSet(
+                Element => '#NotificationCustomDateTimeMonth',
+                Value   => $Test->{Data}->{DateTimeMonth},
             );
 
             # Select year.
-            $Selenium->execute_script(
-                "\$('#NotificationCustomDateTimeYear').val('$Test->{Data}->{DateTimeYear}').trigger('redraw.InputField').trigger('change');"
+            $Selenium->InputFieldValueSet(
+                Element => '#NotificationCustomDateTimeYear',
+                Value   => $Test->{Data}->{DateTimeYear},
             );
 
             # Select hour.
-            $Selenium->execute_script(
-                "\$('#NotificationCustomDateTimeHour').val('$Test->{Data}->{DateTimeHour}').trigger('redraw.InputField').trigger('change');"
+            $Selenium->InputFieldValueSet(
+                Element => '#NotificationCustomDateTimeHour',
+                Value   => $Test->{Data}->{DateTimeHour},
             );
 
             # Select minute.
-            $Selenium->execute_script(
-                "\$('#NotificationCustomDateTimeMinute').val('$Test->{Data}->{DateTimeMinute}').trigger('redraw.InputField').trigger('change');"
+            $Selenium->InputFieldValueSet(
+                Element => '#NotificationCustomDateTimeMinute',
+                Value   => $Test->{Data}->{DateTimeMinute},
             );
 
             # Click on Save.
@@ -810,7 +817,7 @@ $Selenium->RunTest(
             # Wait for dialog to close and AJAX to finish.
             $Selenium->WaitFor(
                 JavaScript =>
-                    'return typeof($) === "function" && !$(".Dialog:visible").length && !$(".CalendarWidget.Loading").length'
+                    'return typeof($) === "function" && !$(".Dialog:visible").length && !$(".CalendarWidget.Loading").length;'
             );
 
             my @AppointmentList = $AppointmentObject->AppointmentList(

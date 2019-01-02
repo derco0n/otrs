@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -45,7 +45,7 @@ Some Content in Body',
         NewTicket => 1,
         Check     => {
             Type => 'Unclassified',
-            }
+        }
     },
     {
         Name  => 'Valid ticket type (Unclassified)',
@@ -58,7 +58,7 @@ Some Content in Body',
         NewTicket => 1,
         Check     => {
             Type => 'X-OTRS-Type-Test',
-            }
+        }
     },
     {
         Name  => 'Invalid ticket type, ticket still needs to be created',
@@ -71,7 +71,7 @@ Some Content in Body',
         NewTicket => 1,
         Check     => {
             Type => 'Unclassified',
-            }
+        }
     },
 );
 

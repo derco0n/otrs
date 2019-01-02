@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -53,8 +53,9 @@ $Selenium->RunTest(
         for my $Type (qw(Ticket Article)) {
 
             my $ObjectType = $Type . "DynamicField";
-            $Selenium->execute_script(
-                "\$('#$ObjectType').val('Checkbox').trigger('redraw.InputField').trigger('change');"
+            $Selenium->InputFieldValueSet(
+                Element => "#$ObjectType",
+                Value   => 'Checkbox',
             );
 
             for my $ID (
@@ -97,8 +98,14 @@ $Selenium->RunTest(
             # Edit test DynamicFieldCheckbox default value and set it to invalid.
             $Selenium->find_element( $RandomID, 'link_text' )->VerifiedClick();
 
-            $Selenium->execute_script("\$('#DefaultValue').val('1').trigger('redraw.InputField').trigger('change');");
-            $Selenium->execute_script("\$('#ValidID').val('2').trigger('redraw.InputField').trigger('change');");
+            $Selenium->InputFieldValueSet(
+                Element => '#DefaultValue',
+                Value   => 1,
+            );
+            $Selenium->InputFieldValueSet(
+                Element => '#ValidID',
+                Value   => 2,
+            );
 
             # Edit name to trigger JS and verify warning is visible.
             my $EditName = $RandomID . 'edit';

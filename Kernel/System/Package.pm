@@ -1,15 +1,16 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::Package;
 
 use strict;
 use warnings;
+use utf8;
 
 use MIME::Base64;
 use File::Copy;
@@ -94,9 +95,10 @@ sub new {
         PackageMerge    => 'ARRAY',
 
         # package flags
-        PackageIsVisible      => 'SCALAR',
-        PackageIsDownloadable => 'SCALAR',
-        PackageIsRemovable    => 'SCALAR',
+        PackageIsVisible         => 'SCALAR',
+        PackageIsDownloadable    => 'SCALAR',
+        PackageIsRemovable       => 'SCALAR',
+        PackageAllowDirectUpdate => 'SCALAR',
 
         # *(Pre|Post) - just for compat. to 2.2
         IntroInstallPre    => 'ARRAY',
@@ -579,7 +581,7 @@ sub PackageInstall {
     # install database (pre)
     if ( $Structure{DatabaseInstall} && $Structure{DatabaseInstall}->{pre} ) {
 
-        my $DatabaseInstall = $Self->_CheckDBMerged( Database => $Structure{DatabaseInstall}->{pre} );
+        my $DatabaseInstall = $Self->_CheckDBInstalledOrMerged( Database => $Structure{DatabaseInstall}->{pre} );
 
         if ( IsArrayRefWithData($DatabaseInstall) ) {
             $Self->_Database( Database => $DatabaseInstall );
@@ -620,7 +622,7 @@ sub PackageInstall {
     # install database (post)
     if ( $Structure{DatabaseInstall} && $Structure{DatabaseInstall}->{post} ) {
 
-        my $DatabaseInstall = $Self->_CheckDBMerged( Database => $Structure{DatabaseInstall}->{post} );
+        my $DatabaseInstall = $Self->_CheckDBInstalledOrMerged( Database => $Structure{DatabaseInstall}->{post} );
 
         if ( IsArrayRefWithData($DatabaseInstall) ) {
             $Self->_Database( Database => $DatabaseInstall );
@@ -643,6 +645,7 @@ sub PackageInstall {
             'SysConfigDefaultList',
             'SysConfigDefault',
             'SysConfigPersistent',
+            'SysConfigModifiedList',
         ],
     );
     $Kernel::OM->Get('Kernel::System::Loader')->CacheDelete();
@@ -748,6 +751,7 @@ sub PackageReinstall {
             'SysConfigDefaultList',
             'SysConfigDefault',
             'SysConfigPersistent',
+            'SysConfigModifiedList',
         ],
     );
     $Kernel::OM->Get('Kernel::System::Loader')->CacheDelete();
@@ -1177,6 +1181,7 @@ sub PackageUpgrade {
             'SysConfigDefaultList',
             'SysConfigDefault',
             'SysConfigPersistent',
+            'SysConfigModifiedList',
         ],
     );
     $Kernel::OM->Get('Kernel::System::Loader')->CacheDelete();
@@ -1288,6 +1293,7 @@ sub PackageUninstall {
             'SysConfigDefaultList',
             'SysConfigDefault',
             'SysConfigPersistent',
+            'SysConfigModifiedList',
         ],
     );
     $Kernel::OM->Get('Kernel::System::Loader')->CacheDelete();
@@ -1852,20 +1858,54 @@ sub PackageVerify {
         return;
     }
 
-    # return package as verified if cloud services are disabled
-    if ( $Self->{CloudServicesDisabled} ) {
-        return 'verified';
-    }
+    # Check if installation of packages, which are not verified by us, is possible.
+    my $PackageAllowNotVerifiedPackages = $Kernel::OM->Get('Kernel::Config')->Get('Package::AllowNotVerifiedPackages');
 
     # define package verification info
-    my $PackageVerifyInfo = {
-        Description =>
-            Translatable(
-            "<p>If you continue to install this package, the following issues may occur:</p><ul><li>Security problems</li><li>Stability problems</li><li>Performance problems</li></ul><p>Please note that issues that are caused by working with this package are not covered by OTRS service contracts.</p>"
-            ),
-        Title =>
-            Translatable('Package not verified by the OTRS Group! It is recommended not to use this package.'),
-    };
+    my $PackageVerifyInfo;
+
+    if ($PackageAllowNotVerifiedPackages) {
+
+        $PackageVerifyInfo = {
+            Description =>
+                Translatable(
+                "<p>If you continue to install this package, the following issues may occur:</p><ul><li>Security problems</li><li>Stability problems</li><li>Performance problems</li></ul><p>Please note that issues that are caused by working with this package are not covered by OTRS service contracts.</p>"
+                ),
+            Title =>
+                Translatable('Package not verified by the OTRS Group! It is recommended not to use this package.'),
+            PackageInstallPossible => 1,
+        };
+    }
+    else {
+
+        $PackageVerifyInfo = {
+            Description =>
+                Translatable(
+                "<p>The installation of packages which are not verified by the OTRS Group is not possible by default.</p>"
+                )
+                .
+                Translatable(
+                '<p>You can activate the installation of not verified packages in the <a href="%sAction=AdminSystemConfiguration;Subaction=View;Setting=Package%3A%3AAllowNotVerifiedPackages" target="_blank">System Configuration</a>.</p>'
+                ),
+            Title =>
+                Translatable('Package not verified by the OTRS Group! It is recommended not to use this package.'),
+            PackageInstallPossible => 0,
+        };
+    }
+
+    # return package as verified if cloud services are disabled
+    if ( $Self->{CloudServicesDisabled} ) {
+
+        my $Verify = $PackageAllowNotVerifiedPackages ? 'verified' : 'not_verified';
+
+        if ( $Verify eq 'not_verified' ) {
+            $PackageVerifyInfo->{VerifyCSSClass} = 'NotVerifiedPackage';
+        }
+
+        $Self->{PackageVerifyInfo} = $PackageVerifyInfo;
+
+        return $Verify;
+    }
 
     # investigate name
     my $Name = $Param{Structure}->{Name}->{Content} || $Param{Name};
@@ -1885,6 +1925,12 @@ sub PackageVerify {
         Key  => $Sum,
     );
     if ($CachedValue) {
+
+        if ( $CachedValue eq 'not_verified' ) {
+
+            $PackageVerifyInfo->{VerifyCSSClass} = 'NotVerifiedPackage';
+        }
+
         $Self->{PackageVerifyInfo} = $PackageVerifyInfo;
 
         return $CachedValue;
@@ -1943,6 +1989,9 @@ sub PackageVerify {
 
     # set package verification info
     if ( $PackageVerify eq 'not_verified' ) {
+
+        $PackageVerifyInfo->{VerifyCSSClass} = 'NotVerifiedPackage';
+
         $Self->{PackageVerifyInfo} = $PackageVerifyInfo;
     }
 
@@ -2120,7 +2169,7 @@ build an opm package
             Content => 'L<http://otrs.org/>',
         },
         License => {
-            Content => 'GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007',
+            Content => 'GNU GENERAL PUBLIC LICENSE Version 3, November 2007',
         }
         Description => [
             {
@@ -2151,7 +2200,7 @@ build an opm package
 sub PackageBuild {
     my ( $Self, %Param ) = @_;
 
-    my $XML = '';
+    my $XML  = '';
     my $Home = $Param{Home} || $Self->{ConfigObject}->Get('Home');
 
     # check needed stuff
@@ -2192,7 +2241,7 @@ sub PackageBuild {
     for my $Tag (
         qw(Name Version Vendor URL License ChangeLog Description Framework OS
         IntroInstall IntroUninstall IntroReinstall IntroUpgrade
-        PackageIsVisible PackageIsDownloadable PackageIsRemovable PackageMerge
+        PackageIsVisible PackageIsDownloadable PackageIsRemovable PackageAllowDirectUpdate PackageMerge
         PackageRequired ModuleRequired CodeInstall CodeUpgrade CodeUninstall CodeReinstall)
         )
     {
@@ -3142,6 +3191,21 @@ sub PackageUpgradeAll {
         Result => 'short',
     );
 
+    # Modify @PackageInstalledList if ITSM packages are installed from Bundle (see bug#13778).
+    if ( grep { $_->{Name} eq 'ITSM' } @PackageInstalledList && grep { $_->{Name} eq 'ITSM' } @PackageOnlineList ) {
+        my @TmpPackages = (
+            'GeneralCatalog',
+            'ITSMCore',
+            'ITSMChangeManagement',
+            'ITSMConfigurationManagement',
+            'ITSMIncidentProblemManagement',
+            'ITSMServiceLevelManagement',
+            'ImportExport'
+        );
+        my %Values = map { $_ => 1 } @TmpPackages;
+        @PackageInstalledList = grep { !$Values{ $_->{Name} } } @PackageInstalledList;
+    }
+
     my $JSONObject = $Kernel::OM->Get('Kernel::System::JSON');
     my $JSON       = $JSONObject->Encode(
         Data => \@PackageInstalledList,
@@ -3462,7 +3526,7 @@ sub PackageUpgradeAllIsRunning {
             'Kernel::System::DateTime',
             ObjectParams => {
                 String => $SystemData{UpdateTime},
-                }
+            }
         );
         $TargetDateTimeObject->Add( Minutes => 5 );
         if ( $CurrentDateTimeObject > $TargetDateTimeObject ) {
@@ -3472,8 +3536,8 @@ sub PackageUpgradeAllIsRunning {
     }
 
     return (
-        IsRunning => $IsRunning // 0,
-        UpgradeStatus  => $SystemData{Status}  || '',
+        IsRunning      => $IsRunning // 0,
+        UpgradeStatus  => $SystemData{Status} || '',
         UpgradeSuccess => $SystemData{Success} || '',
     );
 }
@@ -4129,7 +4193,7 @@ sub _FileRemove {
     # check if file exists
     if ( !-e $RealFile ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
+            Priority => 'debug',
             Message  => "No such file: $RealFile!",
         );
         return;
@@ -4428,6 +4492,7 @@ sub _PackageUninstallMerged {
             'SysConfigDefaultList',
             'SysConfigDefault',
             'SysConfigPersistent',
+            'SysConfigModifiedList',
         ],
     );
     $Kernel::OM->Get('Kernel::System::Loader')->CacheDelete();
@@ -4452,7 +4517,7 @@ sub _MergedPackages {
     return 1 if ref $Param{Structure}->{PackageMerge} ne 'ARRAY';
 
     # get repository list
-    my @RepositoryList = $Self->RepositoryList();
+    my @RepositoryList    = $Self->RepositoryList();
     my %PackageListLookup = map { $_->{Name}->{Content} => $_ } @RepositoryList;
 
     # check required packages
@@ -4602,7 +4667,7 @@ sub _MergedPackages {
     return 1;
 }
 
-sub _CheckDBMerged {
+sub _CheckDBInstalledOrMerged {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
@@ -4652,7 +4717,11 @@ sub _CheckDBMerged {
             )
             || (
                 defined $Part->{IfNotPackage}
-                && defined $Self->{MergedPackages}->{ $Part->{IfNotPackage} }
+                &&
+                (
+                    defined $Self->{MergedPackages}->{ $Part->{IfNotPackage} }
+                    || $Self->PackageIsInstalled( Name => $Part->{IfNotPackage} )
+                )
             )
             )
         {
@@ -4825,13 +4894,41 @@ sub _ConfigurationDeploy {
         }
     }
 
+    #
+    # Normally, on package modifications, a configuration settings cleanup needs to happen,
+    #   to prevent old configuration settings from breaking the system.
+    #
+    # This does not work in the case of updates: there we can have situations where the packages
+    #   only exist in the DB, but not yet on the file system, and need to be reinstalled. We have
+    #   to prevent the cleanup until all packages are properly installed again.
+    #
+    # Please see bug#13754 for more information.
+    #
+
+    my $CleanUp = 1;
+
+    PACKAGE:
+    for my $Package ( $Self->RepositoryList() ) {
+
+        # Only check the deployment state of the XML configuration files for performance reasons.
+        #   Otherwise, this would be too slow on systems with many packages.
+        $CleanUp = $Self->_ConfigurationFilesDeployCheck(
+            Name    => $Package->{Name}->{Content},
+            Version => $Package->{Version}->{Content},
+        );
+
+        # Stop if any package has its configuration wrong deployed, configuration cleanup should not
+        #   take place in the lines below. Otherwise modified setting values can be lost.
+        last PACKAGE if !$CleanUp;
+    }
+
     my $SysConfigObject = Kernel::System::SysConfig->new();
 
     if (
         !$SysConfigObject->ConfigurationXML2DB(
             UserID  => 1,
             Force   => 1,
-            CleanUp => 1,
+            CleanUp => $CleanUp,
         )
         )
     {
@@ -5087,7 +5184,7 @@ sub _PackageInstallOrderListGet {
         $Param{InstallOrder}->{$PackageName} = $InitialValue;
     }
 
-    return $Success
+    return $Success;
 }
 
 =head2 _PackageOnlineListGet()
@@ -5113,7 +5210,7 @@ Returns:
                         # ... ,
                     }
                 ],
-                License => 'GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007',
+                License => 'GNU GENERAL PUBLIC LICENSE Version 3, November 2007',
                 PackageRequired => [
                     {
                         Content => 'TestRequitement',
@@ -5206,7 +5303,7 @@ framework version.
 Returns:
 
     %RepositoryList = (
-        'http://ftp.otrs.org/pub/otrs/packages' => 'OTRS Free Features',
+        'http://ftp.otrs.org/pub/otrs/packages' => 'OTRS Freebie Features',
         # ...,
     );
 
@@ -5233,7 +5330,7 @@ sub _ConfiguredRepositoryDefinitionGet {
     return %RepositoryList if !@Matches;
 
     my @FrameworkVersionParts = split /\./, $Self->{ConfigObject}->Get('Version');
-    my $FrameworkVersion = $FrameworkVersionParts[0];
+    my $FrameworkVersion      = $FrameworkVersionParts[0];
 
     my $CurrentITSMRepository = "http://ftp.otrs.org/pub/otrs/itsm/packages$FrameworkVersion/";
 
@@ -5275,6 +5372,74 @@ sub _RepositoryCacheClear {
     return 1;
 }
 
+=head2 _ConfigurationFilesDeployCheck()
+
+check if package configuration files are deployed correctly.
+
+    my $Success = $PackageObject->_ConfigurationFilesDeployCheck(
+        Name    => 'Application A',
+        Version => '1.0',
+    );
+
+=cut
+
+sub _ConfigurationFilesDeployCheck {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(Name Version)) {
+        if ( !defined $Param{$Needed} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "$Needed not defined!",
+            );
+            return;
+        }
+    }
+
+    my $Package = $Self->RepositoryGet( %Param, Result => 'SCALAR' );
+    my %Structure = $Self->PackageParse( String => $Package );
+
+    return 1 if !$Structure{Filelist};
+    return 1 if ref $Structure{Filelist} ne 'ARRAY';
+
+    my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+
+    my $Success = 1;
+
+    FILE:
+    for my $File ( @{ $Structure{Filelist} } ) {
+
+        my $Extension = substr $File->{Location}, -4, 4;
+
+        next FILE if lc $Extension ne '.xml';
+
+        my $LocalFile = $Self->{Home} . '/' . $File->{Location};
+
+        if ( !-e $LocalFile ) {
+            $Success = 0;
+            last FILE;
+        }
+
+        my $Content = $MainObject->FileRead(
+            Location => $Self->{Home} . '/' . $File->{Location},
+            Mode     => 'binmode',
+        );
+
+        if ( !$Content ) {
+            $Success = 0;
+            last FILE;
+        }
+
+        if ( ${$Content} ne $File->{Content} ) {
+            $Success = 0;
+            last FILE;
+        }
+    }
+
+    return $Success;
+}
+
 sub DESTROY {
     my $Self = shift;
 
@@ -5290,10 +5455,10 @@ sub DESTROY {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

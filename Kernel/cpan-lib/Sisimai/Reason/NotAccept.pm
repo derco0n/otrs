@@ -15,13 +15,14 @@ sub match {
     my $argv1 = shift // return undef;
 
     # Destination mail server does not accept any message
-    my $regex = qr{(?:
-         Name[ ]server:[ ][.]:[ ]host[ ]not[ ]found # Sendmail
-        |55[46][ ]smtp[ ]protocol[ ]returned[ ]a[ ]permanent[ ]error
-        )
-    }ix;
+    my $index = [
+        'host/domain does not accept mail', # iCloud
+        'name server: .: host not found',   # Sendmail
+        'no mx record found for domain=',   # Oath(Yahoo!)
+        'smtp protocol returned a permanent error',
+    ];
 
-    return 1 if $argv1 =~ $regex;
+    return 1 if grep { rindex($argv1, $_) > -1 } @$index;
     return 0;
 }
 
@@ -34,28 +35,13 @@ sub true {
     # @see http://www.ietf.org/rfc/rfc2822.txt
     my $class = shift;
     my $argvs = shift // return undef;
+    return 1 if $argvs->reason eq 'notaccept';
 
-    return undef unless ref $argvs eq 'Sisimai::Data';
-    my $reasontext = __PACKAGE__->text;
-
-    return 1 if $argvs->reason eq $reasontext;
-
-    my $diagnostic = $argvs->diagnosticcode // '';
-    my $v = 0;
-
-    if( $argvs->replycode =~ m/\A(?:521|554|556)\z/ ) {
-        # SMTP Reply Code is 554 or 556
-        $v = 1;
-
-    } else {
-        # Check the value of Diagnosic-Code: header with patterns
-        if( $argvs->smtpcommand eq 'MAIL' ) {
-            # Matched with a pattern in this class
-            $v = 1 if __PACKAGE__->match($diagnostic);
-        }
-    }
-
-    return $v;
+    # SMTP Reply Code is 521, 554 or 556
+    return 1 if $argvs->replycode =~ /\A(?:521|554|556)\z/;
+    return 0 unless $argvs->smtpcommand eq 'MAIL';
+    return 1 if __PACKAGE__->match(lc $argvs->diagnosticcode);
+    return 0;
 }
 
 1;
@@ -107,7 +93,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2016 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2016,2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -35,30 +35,6 @@ $Selenium->RunTest(
         my $TestUserID = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
             UserLogin => $TestUserLogin,
         );
-
-        # Get all processes.
-        my $ProcessList = $ProcessObject->ProcessListGet(
-            UserID => $TestUserID,
-        );
-        my @DeactivatedProcesses;
-
-        # If there had been some active processes before testing,set them to inactive.
-        for my $Process ( @{$ProcessList} ) {
-            if ( $Process->{State} eq 'Active' ) {
-                $ProcessObject->ProcessUpdate(
-                    ID            => $Process->{ID},
-                    EntityID      => $Process->{EntityID},
-                    Name          => $Process->{Name},
-                    StateEntityID => 'S2',
-                    Layout        => $Process->{Layout},
-                    Config        => $Process->{Config},
-                    UserID        => $TestUserID,
-                );
-
-                # Save process because of restoring on the end of test.
-                push @DeactivatedProcesses, $Process;
-            }
-        }
 
         # Login as test user.
         $Selenium->Login(
@@ -195,6 +171,30 @@ $Selenium->RunTest(
             $Success,
             "Process deleted - $Process->{Name},",
         );
+
+        # Get all processes.
+        my $ProcessList = $ProcessObject->ProcessListGet(
+            UserID => $TestUserID,
+        );
+        my @DeactivatedProcesses;
+
+        # If there had been some active processes before testing,set them to inactive.
+        for my $Process ( @{$ProcessList} ) {
+            if ( $Process->{State} eq 'Active' ) {
+                $ProcessObject->ProcessUpdate(
+                    ID            => $Process->{ID},
+                    EntityID      => $Process->{EntityID},
+                    Name          => $Process->{Name},
+                    StateEntityID => 'S2',
+                    Layout        => $Process->{Layout},
+                    Config        => $Process->{Config},
+                    UserID        => $TestUserID,
+                );
+
+                # Save process because of restoring on the end of test.
+                push @DeactivatedProcesses, $Process;
+            }
+        }
 
         $Selenium->VerifiedGet("${ScriptAlias}index.pl?Action=AdminProcessManagement");
         $Selenium->find_element("//a[contains(\@href, \'Subaction=ProcessSync' )]")->VerifiedClick();

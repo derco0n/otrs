@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::Ticket;
@@ -27,6 +27,7 @@ use Kernel::System::VariableCheck qw(:all);
 our @ObjectDependencies = (
     'Kernel::Config',
     'Kernel::System::Cache',
+    'Kernel::System::Calendar',
     'Kernel::System::CustomerUser',
     'Kernel::System::DB',
     'Kernel::System::DynamicField',
@@ -51,6 +52,7 @@ our @ObjectDependencies = (
     'Kernel::System::Type',
     'Kernel::System::User',
     'Kernel::System::Valid',
+    'Kernel::Language',
 );
 
 =head1 NAME
@@ -651,8 +653,8 @@ sub TicketCreate {
         $Self->TicketCustomerSet(
             TicketID => $TicketID,
             No       => $Param{CustomerNo} || $Param{CustomerID} || '',
-            User => $Param{CustomerUser} || '',
-            UserID => $Param{UserID},
+            User     => $Param{CustomerUser} || '',
+            UserID   => $Param{UserID},
         );
     }
 
@@ -753,6 +755,12 @@ sub TicketDelete {
     $Kernel::OM->Get('Kernel::System::Cache')->Delete(
         Type => $Self->{CacheType},
         Key  => 'TicketFlag::' . $Param{TicketID},
+    );
+
+    # Delete calendar appointments linked to this ticket.
+    #   Please see bug#13642 for more information.
+    return if !$Kernel::OM->Get('Kernel::System::Calendar')->TicketAppointmentDelete(
+        TicketID => $Param{TicketID},
     );
 
     # delete ticket_history
@@ -2134,9 +2142,7 @@ sub TicketServiceList {
         );
 
         # Filter Services based on relation with CustomerUser and KeepChildren config.
-        for my $ServiceID ( sort keys %AllServices ) {
-            $Services{$ServiceID} = $CustomerServices{$ServiceID};
-        }
+        %Services = map { $_ => $CustomerServices{$_} } grep { defined $CustomerServices{$_} } sort keys %AllServices;
     }
     else {
         %Services = %AllServices;
@@ -2430,7 +2436,7 @@ sub TicketEscalationDateCalculation {
                 'Kernel::System::DateTime',
                 ObjectParams => {
                     Epoch => $Ticket{$Key}
-                    }
+                }
             );
 
             my $DeltaObj = $DateTimeObject->Delta(
@@ -2462,7 +2468,7 @@ sub TicketEscalationDateCalculation {
                 'Kernel::System::DateTime',
                 ObjectParams => {
                     Epoch => $Ticket{$Key}
-                    }
+                }
             );
 
             my $DeltaObj = $StartTimeObj->Delta(
@@ -2484,7 +2490,7 @@ sub TicketEscalationDateCalculation {
             'Kernel::System::DateTime',
             ObjectParams => {
                 Epoch => $Ticket{$Key}
-                }
+            }
         );
 
         $Data{ $Map{$Key} . 'TimeDestinationTime' } = $Ticket{$Key};
@@ -2635,7 +2641,7 @@ sub TicketEscalationIndexBuild {
                 'Kernel::System::DateTime',
                 ObjectParams => {
                     String => $Ticket{Created},
-                    }
+                }
             );
 
             $DateTimeObject->Add(
@@ -2739,7 +2745,7 @@ sub TicketEscalationIndexBuild {
                 'Kernel::System::DateTime',
                 ObjectParams => {
                     String => $LastSenderTime,
-                    }
+                }
             );
 
             $DateTimeObject->Add(
@@ -2808,7 +2814,7 @@ sub TicketEscalationIndexBuild {
                 'Kernel::System::DateTime',
                 ObjectParams => {
                     String => $Ticket{Created},
-                    }
+                }
             );
 
             $DateTimeObject->Add(
@@ -3621,7 +3627,7 @@ sub TicketPendingTimeSet {
                 'Kernel::System::DateTime',
                 ObjectParams => {
                     String => $Param{String}
-                    }
+                }
             );
             return if ( !$DateTimeObject );
 
@@ -3656,7 +3662,7 @@ sub TicketPendingTimeSet {
                 'Kernel::System::DateTime',
                 ObjectParams => {
                     String => "$Param{Year}-$Param{Month}-$Param{Day} $Param{Hour}:$Param{Minute}:00",
-                    }
+                }
             );
             return if !$DateTimeObject;
             $Time = $DateTimeObject->ToEpoch();
@@ -5140,7 +5146,7 @@ sub HistoryTicketStatusGet {
         'Kernel::System::DateTime',
         ObjectParams => {
             String => "$Param{StopYear}-$Param{StopMonth}-$Param{StopDay} 00:00:00",
-            }
+        }
     );
     $StopDateTimeObject->Add( Hours => 24 );
     my $StopDateTimeString = $StopDateTimeObject->Format( Format => '%Y-%m-%d 00:00:00' );
@@ -5369,7 +5375,7 @@ sub HistoryTicketGet {
             if ( $Row[0] =~ /^\%\%FieldName\%\%(.+?)\%\%Value\%\%(.*?)(?:\%\%|$)/ ) {
 
                 my $FieldName = $1;
-                my $Value = $2 || '';
+                my $Value     = $2 || '';
                 $Ticket{$FieldName} = $Value;
 
                 # Backward compatibility for TicketFreeText and TicketFreeTime
@@ -5907,6 +5913,21 @@ sub TicketMerge {
         }
     }
 
+    # Get the list of all merged states.
+    my @MergeStateList = $Kernel::OM->Get('Kernel::System::State')->StateGetStatesByType(
+        StateType => ['merged'],
+        Result    => 'Name',
+    );
+
+    # Error handling.
+    if ( !@MergeStateList ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "No merge state found! Please add a valid merge state.",
+        );
+        return 'NoValidMergeStates';
+    }
+
     # get database object
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
@@ -5948,10 +5969,26 @@ sub TicketMerge {
         DynamicFields => 0,
     );
 
-    # get config object
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
 
+    # Set language for AutomaticMergeText, see more in bug #13967
+    my %UserInfo = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+        UserID => $Param{UserID},
+    );
+    my $Language = $UserInfo{UserLanguage} || $Kernel::OM->Get('Kernel::Config')->Get('DefaultLanguage') || 'en';
+
+    $Kernel::OM->ObjectsDiscard(
+        Objects => ['Kernel::Language'],
+    );
+    $Kernel::OM->ObjectParamAdd(
+        'Kernel::Language' => {
+            UserLanguage => $Language,
+        },
+    );
+    my $LanguageObject = $Kernel::OM->Get('Kernel::Language');
+
     my $Body = $ConfigObject->Get('Ticket::Frontend::AutomaticMergeText');
+    $Body = $LanguageObject->Translate($Body);
     $Body =~ s{<OTRS_TICKET>}{$MergeTicket{TicketNumber}}xms;
     $Body =~ s{<OTRS_MERGE_TO_TICKET>}{$MainTicket{TicketNumber}}xms;
 
@@ -6047,21 +6084,6 @@ sub TicketMerge {
         SQL  => 'UPDATE ticket SET change_time = current_timestamp, change_by = ? WHERE id = ?',
         Bind => [ \$Param{UserID}, \$Param{MainTicketID} ],
     );
-
-    # get the list of all merged states
-    my @MergeStateList = $Kernel::OM->Get('Kernel::System::State')->StateGetStatesByType(
-        StateType => ['merged'],
-        Result    => 'Name',
-    );
-
-    # error handling
-    if ( !@MergeStateList ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => "No merge state found! Please add a valid merge state.",
-        );
-        return;
-    }
 
     # set new state of merge ticket
     $Self->TicketStateSet(
@@ -6222,27 +6244,71 @@ sub TicketMergeLinkedObjects {
         }
     }
 
-    # lookup the object id of a ticket
+    # Lookup the object id of a ticket.
     my $TicketObjectID = $Kernel::OM->Get('Kernel::System::LinkObject')->ObjectLookup(
         Name => 'Ticket',
     );
 
-    # update links from old ticket to new ticket where the old ticket is the source
-    $Kernel::OM->Get('Kernel::System::DB')->Do(
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
+    # Delete all duplicate links relations between merged tickets.
+    # See bug#12994 (https://bugs.otrs.org/show_bug.cgi?id=12994).
+    $DBObject->Prepare(
+        SQL => '
+            SELECT target_key
+            FROM link_relation
+            WHERE target_object_id = ?
+              AND source_object_id = ?
+              AND source_key= ?
+              AND target_key
+              IN (SELECT target_key FROM link_relation WHERE source_key= ? )',
+        Bind => [
+            \$TicketObjectID,
+            \$TicketObjectID,
+            \$Param{MainTicketID},
+            \$Param{MergeTicketID},
+        ],
+    );
+
+    my @Relations;
+    while ( my @Row = $DBObject->FetchrowArray() ) {
+        push @Relations, $Row[0];
+    }
+    if (@Relations) {
+
+        my $SQL = "DELETE FROM link_relation
+                 WHERE target_object_id = ?
+                   AND source_object_id = ?
+                   AND source_key = ?
+                   AND target_key IN ( '${\(join '\',\'', @Relations)}' )";
+
+        $DBObject->Prepare(
+            SQL  => $SQL,
+            Bind => [
+                \$TicketObjectID,
+                \$TicketObjectID,
+                \$Param{MergeTicketID},
+            ],
+        );
+    }
+
+    # Update links from old ticket to new ticket where the old ticket is the source  MainTicketID.
+    $DBObject->Do(
         SQL => '
             UPDATE link_relation
             SET source_key = ?
             WHERE source_object_id = ?
               AND source_key = ?',
         Bind => [
+
             \$Param{MainTicketID},
             \$TicketObjectID,
             \$Param{MergeTicketID},
         ],
     );
 
-    # update links from old ticket to new ticket where the old ticket is the target
-    $Kernel::OM->Get('Kernel::System::DB')->Do(
+    # Update links from old ticket to new ticket where the old ticket is the target.
+    $DBObject->Do(
         SQL => '
             UPDATE link_relation
             SET target_key = ?
@@ -6255,8 +6321,8 @@ sub TicketMergeLinkedObjects {
         ],
     );
 
-    # delete all links between tickets where source and target object are the same
-    $Kernel::OM->Get('Kernel::System::DB')->Do(
+    # Delete all links between tickets where source and target object are the same.
+    $DBObject->Do(
         SQL => '
             DELETE FROM link_relation
             WHERE source_object_id = ?
@@ -7603,7 +7669,7 @@ sub _TicketGetFirstResponse {
             'Kernel::System::DateTime',
             ObjectParams => {
                 String => $Param{Ticket}->{Created},
-                }
+            }
         );
 
         my $FirstResponseTimeObj = $DateTimeObject->Clone();
@@ -7704,14 +7770,14 @@ sub _TicketGetClosed {
         'Kernel::System::DateTime',
         ObjectParams => {
             String => $Param{Ticket}->{Created},
-            }
+        }
     );
 
     my $SolutionTimeObj = $Kernel::OM->Create(
         'Kernel::System::DateTime',
         ObjectParams => {
             String => $Data{Closed},
-            }
+        }
     );
 
     my $DeltaObj = $DateTimeObject->Delta(
@@ -7787,10 +7853,10 @@ sub _TicketGetFirstLock {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

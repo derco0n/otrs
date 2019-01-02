@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::Console::Command::Dev::Tools::TranslationsUpdate;
@@ -118,7 +118,7 @@ sub Run {
         keys %Stats
         )
     {
-        my $Strings = $Stats{$Language}->{Total};
+        my $Strings      = $Stats{$Language}->{Total};
         my $Translations = $Stats{$Language}->{Translated} // 0;
         $Self->Print( "\t" . sprintf( "%7s", $Language ) . ": " );
         $Self->Print( sprintf( "%02d", int( ( $Translations / $Strings ) * 100 ) ) );
@@ -140,7 +140,7 @@ sub HandleLanguage {
     my ( $Self, %Param ) = @_;
 
     my $Language = $Param{Language};
-    my $Module = $Param{Module} || '';
+    my $Module   = $Param{Module} || '';
 
     my $ModuleDirectory = $Module;
     my $LanguageFile;
@@ -158,7 +158,7 @@ sub HandleLanguage {
     );
 
     my $TransifexLanguage = $TransifexLanguagesMap{$Language} // $Language;
-    my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+    my $Home              = $Kernel::OM->Get('Kernel::Config')->Get('Home');
 
     if ( !$Module ) {
         $LanguageFile  = "$Home/Kernel/Language/$Language.pm";
@@ -903,11 +903,11 @@ sub WritePerlLanguageFile {
 
         $NewOut = <<"EOF";
 $Separator
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 $Separator
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 $Separator
 
 package Kernel::Language::$Param{Language}_$Param{Module};

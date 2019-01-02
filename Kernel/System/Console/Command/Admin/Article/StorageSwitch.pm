@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::Console::Command::Admin::Article::StorageSwitch;
@@ -123,6 +123,12 @@ sub Run {
             StateType                => 'Closed',
             TicketCloseTimeOlderDate => $OlderDTObject->ToString(),
         );
+    }
+
+    # If Archive system is enabled, take into account archived tickets as well.
+    # See bug#13945 (https://bugs.otrs.org/show_bug.cgi?id=13945).
+    if ( $Kernel::OM->Get('Kernel::Config')->{'Ticket::ArchiveSystem'} ) {
+        $SearchParams{ArchiveFlags} = [ 'y', 'n' ];
     }
 
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');

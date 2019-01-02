@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -120,10 +120,15 @@ $Selenium->RunTest(
         # Navigate to zoom view of created test ticket.
         $Selenium->VerifiedGet("${ScriptAlias}index.pl?Action=AgentTicketZoom;TicketID=$TicketID");
 
+        # Wait until page has loaded.
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function";' );
+
         # Force sub menus to be visible in order to be able to click one of the links.
+        $Selenium->execute_script("\$('#nav-People ul').css('height', 'auto');");
+        $Selenium->execute_script("\$('#nav-People ul').css('opacity', '1');");
         $Selenium->WaitFor(
             JavaScript =>
-                'return typeof($) === "function" && $("#nav-People ul").css({ "height": "auto", "opacity": "100" });'
+                "return \$('#nav-People ul').css('height') !== '0px' && \$('#nav-People ul').css('opacity') == '1';"
         );
 
         # Click on 'Owner' and switch window.
@@ -157,7 +162,7 @@ $Selenium->RunTest(
         );
 
         # Expand 'New owner' input field.
-        $Selenium->execute_script("\$('#NewOwnerID_Search').focus().focus()");
+        $Selenium->execute_script("\$('#NewOwnerID_Search').focus().focus();");
 
         # Click on filter button in input fileld.
         $Selenium->execute_script("\$('.InputField_Filters').click();");
@@ -173,8 +178,9 @@ $Selenium->RunTest(
         );
 
         # Change ticket user owner.
-        $Selenium->execute_script(
-            "\$('#NewOwnerID').val('$UserID[1]').trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#NewOwnerID',
+            Value   => $UserID[1],
         );
 
         $Selenium->find_element( "#Subject",        'css' )->send_keys('Test');
@@ -204,10 +210,15 @@ $Selenium->RunTest(
         # Navigate to zoom view of created test ticket.
         $Selenium->VerifiedGet("${ScriptAlias}index.pl?Action=AgentTicketZoom;TicketID=$TicketID");
 
+        # Wait until page has loaded.
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function";' );
+
         # Force sub menus to be visible in order to be able to click one of the links.
+        $Selenium->execute_script("\$('#nav-Communication ul').css('height', 'auto');");
+        $Selenium->execute_script("\$('#nav-Communication ul').css('opacity', '1');");
         $Selenium->WaitFor(
             JavaScript =>
-                'return typeof($) === "function" && $("#nav-Communication ul").css({ "height": "auto", "opacity": "100" });'
+                "return \$('#nav-Communication ul').css('height') !== '0px' && \$('#nav-Communication ul').css('opacity') == '1';"
         );
 
         # Click on 'Note' and switch window.
@@ -231,6 +242,11 @@ $Selenium->RunTest(
         # Switch window back to AgentTicketZoom view of created test ticket.
         $Selenium->WaitFor( WindowCount => 1 );
         $Selenium->switch_to_window( $Handles->[0] );
+
+        $Selenium->WaitFor(
+            JavaScript =>
+                "return typeof(\$) === 'function' && \$('#Row2 .Sender a').text() === '$TestUser[1] $TestUser[1]';"
+        );
 
         # Verified there is no Out Of Office message in the 'Sender' column of created Note.
         $Self->Is(

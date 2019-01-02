@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::GenericInterface::Invoker;
@@ -140,11 +140,11 @@ prepare the invocation of the configured remote web service.
 sub PrepareRequest {
     my ( $Self, %Param ) = @_;
 
-    # Check data - only accept undef or hash ref.
-    if ( defined $Param{Data} && ref $Param{Data} ne 'HASH' ) {
+    # Check data - only accept undef or hash ref or array ref.
+    if ( defined $Param{Data} && ref $Param{Data} ne 'HASH' && ref $Param{Data} ne 'ARRAY' ) {
 
         return $Self->{DebuggerObject}->Error(
-            Summary => 'Got Data but it is not a hash ref in Invoker handler (PrepareRequest)!'
+            Summary => 'Got Data but it is not a hash or array ref in Invoker handler (PrepareRequest)!'
         );
     }
 
@@ -178,11 +178,11 @@ handle response data of the configured remote web service.
 sub HandleResponse {
     my ( $Self, %Param ) = @_;
 
-    # Check data - only accept undef or hash ref.
-    if ( defined $Param{Data} && ref $Param{Data} ne 'HASH' ) {
+    # Check data - only accept undef or hash ref or array ref.
+    if ( defined $Param{Data} && ref $Param{Data} ne 'HASH' && ref $Param{Data} ne 'ARRAY' ) {
 
         return $Self->{DebuggerObject}->Error(
-            Summary => 'Got Data but it is not a hash ref in Invoker handler (HandleResponse)!'
+            Summary => 'Got Data but it is not a hash or array ref in Invoker handler (HandleResponse)!'
         );
     }
 
@@ -214,11 +214,11 @@ handle error data of the configured remote web service.
 sub HandleError {
     my ( $Self, %Param ) = @_;
 
-    # Check data - only accept undef or hash ref.
-    if ( defined $Param{Data} && ref $Param{Data} ne 'HASH' ) {
+    # Check data - only accept undef or hash ref or array ref.
+    if ( defined $Param{Data} && ref $Param{Data} ne 'HASH' && ref $Param{Data} ne 'ARRAY' ) {
 
         return $Self->{DebuggerObject}->Error(
-            Summary => 'Got Data but it is not a hash ref in Invoker handler (HandleResponse)!'
+            Summary => 'Got Data but it is not a hash or array ref in Invoker handler (HandleResponse)!'
         );
     }
 
@@ -230,10 +230,10 @@ sub HandleError {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

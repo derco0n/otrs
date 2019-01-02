@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -72,7 +72,7 @@ my @Tests = (
                 },
                 Key4 => {
                     Bar => [ "f", "o", "o" ]
-                    }
+                }
             },
         ],
         Result =>
@@ -95,7 +95,7 @@ my @Tests = (
                 },
                 Key4 => {
                     Bar => [ "f", "o", "o" ],
-                    }
+                }
             },
         ],
         Params => {
@@ -198,7 +198,7 @@ for my $Test (@Tests) {
                 },
                 Key4 => {
                     Bar => [ "f", "o", "o" ]
-                    }
+                }
             },
         ],
         InputDecode =>
@@ -249,7 +249,7 @@ for my $Test (@Tests) {
                 },
                 Key4 => {
                     Bar => [ 0, "o", 1 ]
-                    }
+                }
             },
         ],
         InputDecode =>

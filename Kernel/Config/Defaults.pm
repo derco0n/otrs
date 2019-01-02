@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 # Default configuration for OTRS. All changes to this file will be lost after an
@@ -193,6 +193,7 @@ sub LoadDefaults {
         'id'      => 'Indonesian',
         'it'      => 'Italian',
         'ja'      => 'Japanese',
+        'ko'      => 'Korean',
         'lt'      => 'Lithuanian',
         'lv'      => 'Latvian',
         'ms'      => 'Malay',
@@ -243,6 +244,7 @@ sub LoadDefaults {
         'id'      => 'Bahasa Indonesia',
         'it'      => 'Italiano',
         'ja'      => '日本語',
+        'ko'      => '한국어',
         'lt'      => 'Lietuvių kalba',
         'lv'      => 'Latvijas',
         'ms'      => 'Melayu',
@@ -1077,7 +1079,7 @@ sub LoadDefaults {
     # Package::RepositoryRoot
     # (get online repository list, use the fist availabe result)
     $Self->{'Package::RepositoryRoot'} = [
-        'http://ftp.otrs.org/pub/otrs/misc/packages/repository.xml',
+        'https://ftp.otrs.org/pub/otrs/misc/packages/repository.xml',
     ];
 
     # Package::RepositoryList
@@ -1490,6 +1492,9 @@ via the Preferences button after logging in.
         CustomerUserNameFields             => [ 'title', 'first_name', 'last_name' ],
         CustomerUserEmailUniqCheck         => 1,
 
+#        # Configures the character for joining customer user name parts. Join single space if it is not defined.
+#        # CustomerUserNameFieldsJoin => '',
+
 #        # show now own tickets in customer panel, CompanyTickets
 #        CustomerUserExcludePrimaryCustomerID => 0,
 #        # generate auto logins
@@ -1591,6 +1596,8 @@ via the Preferences button after logging in.
 #        CustomerUserSearchListLimit => 250,
 #        CustomerUserPostMasterSearchFields => ['mail'],
 #        CustomerUserNameFields => ['givenname', 'sn'],
+#        # Configures the character for joining customer user name parts. Join single space if it is not defined.
+#        CustomerUserNameFieldsJoin => '',
 #        # show customer user and customer tickets in customer interface
 #        CustomerUserExcludePrimaryCustomerID => 0,
 #        # add a ldap filter for valid users (expert setting)
@@ -2169,10 +2176,10 @@ sub AutoloadPerlPackages {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

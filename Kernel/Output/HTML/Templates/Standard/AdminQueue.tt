@@ -1,18 +1,18 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 [% RenderBlockStart("Overview") %]
 <div class="MainBox ARIARoleMain LayoutFixedSidebar SidebarFirst">
-    <h1 class="InvisibleText">[% Translate("Manage Queues") | html %]</h1>
+    <h1 class="InvisibleText">[% Translate("Queue Management") | html %]</h1>
 
     [% BreadcrumbPath = [
             {
-                Name => Translate('Manage Queues'),
+                Name => Translate('Queue Management'),
                 Link => Env("Action"),
             },
         ]
@@ -279,9 +279,14 @@
                         <div class="Clear"></div>
 
 [% RenderBlockStart("OptionalField") %]
-                        <label for="DefaultSignKey">[% Translate("Default sign key") | html %] <em>([% Data.Email | html %])</em>:</label>
+                        <label for="DefaultSignKey">[% Translate("Default sign key") | html %][% IF Data.Email %]<em> ([% Data.Email | html %])</em>[% END %]:</label>
                         <div class="Field">
                             [% Data.DefaultSignKeyOption %]
+                            [% IF !Data.DefaultSignKeyListAvailable %]
+                                <p class="FieldExplanation">
+                                    [% Translate("To use a sign key, PGP keys or S/MIME certificates need to be added with identifiers for selected queue system address.") | html %]
+                                </p>
+                            [% END %]
                         </div>
                         <div class="Clear"></div>
 [% RenderBlockEnd("OptionalField") %]

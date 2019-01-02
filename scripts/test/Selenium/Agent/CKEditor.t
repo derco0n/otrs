@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -95,6 +95,17 @@ $Selenium->RunTest(
             "Successfully sent data to the CKE instance."
         );
 
+        # Wait until CKEditor content is updated.
+        $Selenium->WaitFor(
+            JavaScript => "return CKEDITOR.instances.RichText.getData() === \"This is a test text\";",
+        );
+
+        $Self->Is(
+            $Selenium->execute_script('return CKEDITOR.instances.RichText.getData();'),
+            'This is a test text',
+            'Check plain text content.'
+        );
+
         # now go through the test cases
         for my $TestCase (@TestCasesBasic) {
 
@@ -106,8 +117,16 @@ $Selenium->RunTest(
 
             $Selenium->execute_script( 'CKEDITOR.instances.RichText.setData("' . $TestCase->{Input} . '");' );
 
-            # we wait a second to make sure the content has been set correctly
-            sleep 1;
+            my $EscapedText = $TestCase->{Expected};
+
+            # Escape some chars for JS usage.
+            $EscapedText =~ s{\n}{\\n}g;
+            $EscapedText =~ s{"}{\\"}g;
+
+            # Wait until CKEditor content is updated.
+            $Selenium->WaitFor(
+                JavaScript => "return CKEDITOR.instances.RichText.getData() === \"$EscapedText\";",
+            );
 
             $Self->Is(
                 $Selenium->execute_script('return CKEDITOR.instances.RichText.getData();'),

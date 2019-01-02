@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::Email;
@@ -621,7 +621,7 @@ sub Send {
     # set envelope sender for auto-responses and notifications
     if ( $Param{Loop} ) {
         my $NotificationEnvelopeFrom = $ConfigObject->Get('SendmailNotificationEnvelopeFrom') || '';
-        my $NotificationFallback = $ConfigObject->Get('SendmailNotificationEnvelopeFrom::FallbackToEmailFrom');
+        my $NotificationFallback     = $ConfigObject->Get('SendmailNotificationEnvelopeFrom::FallbackToEmailFrom');
         if ( $NotificationEnvelopeFrom || !$NotificationFallback ) {
             $RealFrom = $NotificationEnvelopeFrom;
         }
@@ -790,7 +790,7 @@ sub Check {
     my %Check = $Self->{Backend}->Check();
 
     if ( $Check{Successful} ) {
-        return ( Successful => 1 )
+        return ( Successful => 1 );
     }
     else {
         return (
@@ -888,7 +888,7 @@ sub Bounce {
     my $MessageID = $Param{'Message-ID'} || $Self->_MessageIDCreate();
 
     # split body && header
-    my @EmailPlain = split( /\n/, $Param{Email} );
+    my @EmailPlain  = split( /\n/, $Param{Email} );
     my $EmailObject = Mail::Internet->new( \@EmailPlain );
 
     # get sender
@@ -1297,10 +1297,10 @@ sub _CreateMimeEntity {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

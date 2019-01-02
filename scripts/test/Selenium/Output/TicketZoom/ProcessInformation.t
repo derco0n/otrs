@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -105,15 +105,16 @@ $Selenium->RunTest(
         $Self->Is(
             $Process->{Name},
             'TestProcess',
-            "Test process is creted"
+            "Test process is created"
         );
 
         # navigate to AgentTicketProcess screen
         $Selenium->VerifiedGet("${ScriptAlias}index.pl?Action=AgentTicketProcess");
 
         # select test process
-        $Selenium->execute_script(
-            "\$('#ProcessEntityID').val('$ListReverse{$ProcessName}').trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#ProcessEntityID',
+            Value   => $ListReverse{$ProcessName},
         );
 
         # wait until page has loaded, if necessary
@@ -121,9 +122,22 @@ $Selenium->RunTest(
 
         # input process ticket subject and body
         my $SubjectRand = 'ProcessSubject-' . $Helper->GetRandomID();
-        $Selenium->execute_script("\$('#QueueID').val('2').trigger('redraw.InputField').trigger('change');");
+        $Selenium->InputFieldValueSet(
+            Element => '#QueueID',
+            Value   => 2,
+        );
         $Selenium->find_element( "#Subject",  'css' )->send_keys($SubjectRand);
         $Selenium->find_element( "#RichText", 'css' )->send_keys('Test Process Body');
+
+        # Check if default value for title is shown.
+        # See bug#13937 https://bugs.otrs.org/show_bug.cgi?id=13937.
+        my $TitleValue = 'Test Process Title Default';
+
+        $Self->Is(
+            $Selenium->execute_script("return \$('#Title').val();"),
+            $TitleValue,
+            "Title field Default value is: $TitleValue",
+        );
 
         # submit process
         $Selenium->find_element("//button[\@value='Submit'][\@type='submit']")->VerifiedClick();
@@ -148,11 +162,18 @@ $Selenium->RunTest(
         $Self->Is(
             $Ticket{CreateBy},
             $TestUserID,
-            "Test ticket process is creted"
+            "Test ticket process is created"
         ) || die;
 
         # navigate to AgentTicketZoom screen of created test process
         $Selenium->VerifiedGet("${ScriptAlias}index.pl?Action=AgentTicketZoom;TicketID=$TicketIDs[0]");
+
+        # Check ticket title.
+        $Self->Is(
+            $Selenium->execute_script("return \$('.Headline.NoMargin h1').text().trim().split(\" — \").pop();"),
+            $TitleValue,
+            "Ticket title is: $TitleValue",
+        );
 
         # verify there is 'Process Information' widget
         my $ParentElement = $Selenium->find_element( ".SidebarColumn", 'css' );
@@ -184,7 +205,10 @@ $Selenium->RunTest(
         $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("#NewPriorityID").length' );
 
         # select '5 very high' priority to trigger next stage in process
-        $Selenium->execute_script("\$('#NewPriorityID').val('5').trigger('redraw.InputField').trigger('change');");
+        $Selenium->InputFieldValueSet(
+            Element => '#NewPriorityID',
+            Value   => '5',
+        );
 
         $Selenium->find_element( "#Subject",  'css' )->send_keys('TestSubject');
         $Selenium->find_element( "#RichText", 'css' )->send_keys('TestBody');

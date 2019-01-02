@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Modules::AdminCustomerCompany;
@@ -57,7 +57,7 @@ sub Run {
         my $CustomerID
             = $ParamObject->GetParam( Param => 'CustomerID' ) || $ParamObject->GetParam( Param => 'ID' ) || '';
         my $Notification = $ParamObject->GetParam( Param => 'Notification' ) || '';
-        my %Data = $CustomerCompanyObject->CustomerCompanyGet(
+        my %Data         = $CustomerCompanyObject->CustomerCompanyGet(
             CustomerID => $CustomerID,
         );
         $Data{CustomerCompanyID} = $CustomerID;
@@ -183,7 +183,7 @@ sub Run {
                             Info => $LayoutObject->{LanguageObject}->Translate(
                                 'Dynamic field %s not found!',
                                 $Entry->[2],
-                                )
+                            )
                         );
                         next ENTRY;
                     }
@@ -505,7 +505,7 @@ sub Run {
             Search => $Search,
             %GetParam,
         );
-        my $Output = $LayoutObject->Header();
+        my $Output       = $LayoutObject->Header();
         my $Notification = $ParamObject->GetParam( Param => 'Notification' ) || '';
         $Output .= $LayoutObject->NavigationBar(
             Type => $NavigationBarType,

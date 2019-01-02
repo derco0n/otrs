@@ -13,24 +13,23 @@ sub match {
     # @since v4.0.0
     my $class = shift;
     my $argv1 = shift // return undef;
-    my $regex = qr{(?:
-         invalid/inactive[ ]user
-        # http://service.mail.qq.com/cgi-bin/help?subtype=1&&id=20022&&no=1000742
-        |email[ ]account[ ]that[ ]you[ ]tried[ ]to[ ]reach[ ]is[ ]disabled
-        |is[ ]a[ ]deactivated[ ]mailbox
-        |mailbox[ ](?:
-             currently[ ]suspended
-            |unavailable[ ]or[ ]access[ ]denied
-            )
-        |user[ ]suspended   # http://mail.163.com/help/help_spam_16.htm
-        |recipient[ ]suspend[ ]the[ ]service
-        |sorry[ ]your[ ]message[ ]to[ ].+[ ]cannot[ ]be[ ]delivered[.][ ]this[ ]
-            account[ ]has[ ]been[ ]disabled[ ]or[ ]discontinued
-        |vdelivermail:[ ]account[ ]is[ ]locked[ ]email[ ]bounced
-        )
-    }xi;
+    my $index = [
+        ' is currently suspended',
+        ' temporary locked',
+        'boite du destinataire archivee',
+        'email account that you tried to reach is disabled',
+        'invalid/inactive user',
+        'is a deactivated mailbox', # http://service.mail.qq.com/cgi-bin/help?subtype=1&&id=20022&&no=1000742
+        'mailbox currently suspended',
+        'mailbox unavailable or access denied',
+        'recipient rejected: temporarily inactive',
+        'recipient suspend the service',
+        'this account has been disabled or discontinued',
+        'user suspended',   # http://mail.163.com/help/help_spam_16.htm
+        'vdelivermail: account is locked email bounced',
+    ];
 
-    return 1 if $argv1 =~ $regex;
+    return 1 if grep { rindex($argv1, $_) > -1 } @$index;
     return 0;
 }
 
@@ -43,14 +42,10 @@ sub true {
     # @see http://www.ietf.org/rfc/rfc2822.txt
     my $class = shift;
     my $argvs = shift // return undef;
+    return undef unless $argvs->deliverystatus;
 
-    return undef unless ref $argvs eq 'Sisimai::Data';
-    my $statuscode = $argvs->deliverystatus // '';
-    my $reasontext = __PACKAGE__->text;
-
-    return undef unless length $statuscode;
-    return 1 if $argvs->reason eq $reasontext;
-    return 1 if __PACKAGE__->match($argvs->diagnosticcode // '');
+    return 1 if $argvs->reason eq 'suspend';
+    return 1 if __PACKAGE__->match(lc $argvs->diagnosticcode);
     return 0
 }
 
@@ -101,10 +96,11 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2016 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 
 This software is distributed under The BSD 2-Clause License.
 
 =cut
+

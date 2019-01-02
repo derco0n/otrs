@@ -27,7 +27,6 @@ sub new {
     my $class = shift;
     my $argv1 = shift // return undef;
     my $param = { 'offset' => 0 };
-
     return undef unless -f $argv1;
 
     $param->{'dir'}    = File::Basename::dirname $argv1;
@@ -35,6 +34,7 @@ sub new {
     $param->{'size'}   = -s $argv1;
     $param->{'file'}   = File::Basename::basename $argv1;
     $param->{'handle'} = ref $argv1 ? $argv1 : IO::File->new($argv1, 'r');
+    binmode $param->{'handle'};
 
     return bless($param, __PACKAGE__);
 }
@@ -62,7 +62,7 @@ sub read {
 
         while( my $r = <$filehandle> ) {
             # Read the UNIX mbox file from 'From ' to the next 'From '
-            last if( length $readbuffer && substr($r, 0, 5) eq 'From ' );
+            last if( $readbuffer && substr($r, 0, 5) eq 'From ' );
             $readbuffer .= $r;
         }
         $seekoffset += length $readbuffer;
@@ -102,7 +102,7 @@ C<new()> is a constructor of Sisimai::Mail::Mbox
 
 =head1 INSTANCE METHODS
 
-=head2 C<B<base()>>
+=head2 C<B<dir()>>
 
 C<dir()> returns the directory name of mbox
 
@@ -154,7 +154,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2016 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2016,2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

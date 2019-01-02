@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Modules::AgentPreferences;
@@ -41,7 +41,7 @@ sub Run {
         )
     {
         $Self->{CurrentUserID}       = $EditUserID;
-        $Self->{EditingAnotherAgent} = 1;
+        $Self->{EditingAnotherAgent} = ";EditUserID=$EditUserID";
     }
 
     # ------------------------------------------------------------ #
@@ -115,7 +115,7 @@ sub Run {
 
             # get user data
             my %UserData = $UserObject->GetUserData( UserID => $Self->{CurrentUserID} );
-            my $Module = $Preferences{$Group}->{Module};
+            my $Module   = $Preferences{$Group}->{Module};
             if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($Module) ) {
                 return $LayoutObject->FatalError();
             }
@@ -204,7 +204,7 @@ sub Run {
 
             # get user data
             my %UserData = $UserObject->GetUserData( UserID => $Self->{CurrentUserID} );
-            my $Module = $Preferences{$Group}->{Module};
+            my $Module   = $Preferences{$Group}->{Module};
             if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($Module) ) {
                 return $LayoutObject->FatalError();
             }
@@ -264,7 +264,7 @@ sub Run {
 
         my $SysConfigObject = $Kernel::OM->Get('Kernel::System::SysConfig');
 
-        my $SettingName = $ParamObject->GetParam( Param => 'SettingName' ) || '';
+        my $SettingName        = $ParamObject->GetParam( Param => 'SettingName' ) || '';
         my $EffectiveValueJSON = $ParamObject->GetParam( Param => 'EffectiveValue' );
 
         my $EffectiveValue;
@@ -396,7 +396,7 @@ sub Run {
         $LayoutObject->ChallengeTokenCheck();
 
         my $SysConfigObject = $Kernel::OM->Get('Kernel::System::SysConfig');
-        my $RootNavigation = $ParamObject->GetParam( Param => 'RootNavigation' ) || '';
+        my $RootNavigation  = $ParamObject->GetParam( Param => 'RootNavigation' ) || '';
 
         my @SettingList = $SysConfigObject->ConfigurationListGet(
             TargetUserID    => $Self->{CurrentUserID},
@@ -482,6 +482,33 @@ sub Run {
         $Output .= $LayoutObject->Footer();
 
         return $Output;
+    }
+
+    # ------------------------------------------------------------ #
+    # Return user favourite system configuration settings.
+    # ------------------------------------------------------------ #
+    elsif ( $Self->{Subaction} eq 'UserSystemConfigurationFavourites' ) {
+
+        my $Favourites      = [];
+        my %UserPreferences = $Kernel::OM->Get('Kernel::System::User')->GetPreferences(
+            UserID => $Self->{UserID},
+        );
+
+        if ( $UserPreferences{UserSystemConfigurationFavourites} ) {
+            $Favourites = $Kernel::OM->Get('Kernel::System::JSON')
+                ->Decode( Data => $UserPreferences{UserSystemConfigurationFavourites} );
+        }
+
+        my $JSON = $Kernel::OM->Get('Kernel::System::JSON')->Encode(
+            Data => $Favourites,
+        );
+
+        return $LayoutObject->Attachment(
+            ContentType => 'application/json; charset=' . $LayoutObject->{Charset},
+            Content     => $JSON,
+            Type        => 'inline',
+            NoCache     => 1,
+        );
     }
 
     # ------------------------------------------------------------ #
@@ -574,7 +601,7 @@ sub AgentPreferencesForm {
         && $Self->_CheckEditPreferencesPermission()
         )
     {
-        $Self->{EditingAnotherAgent} = 1;
+        $Self->{EditingAnotherAgent} = ";EditUserID=$EditUserID";
         $Self->{CurrentUserID}       = $EditUserID;
     }
 

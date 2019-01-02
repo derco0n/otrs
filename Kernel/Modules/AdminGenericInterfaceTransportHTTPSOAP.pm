@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Modules::AdminGenericInterfaceTransportHTTPSOAP;
@@ -159,7 +159,7 @@ sub Run {
             # Separator if required if SOAPAction is enabled and selected scheme uses separator.
             if ( !$GetParam->{SOAPActionSeparator} ) {
                 $Error{SOAPActionSeparatorServerError}        = $ServerError;
-                $Error{SOAPActionSeparatorServerErrorMessage} = $ServerErrorMessage
+                $Error{SOAPActionSeparatorServerErrorMessage} = $ServerErrorMessage;
             }
         }
         elsif ( $GetParam->{SOAPActionScheme} eq 'FreeText' ) {
@@ -167,7 +167,7 @@ sub Run {
             # Free text if required if SOAPAction is enabled and selected scheme uses free text.
             if ( !$GetParam->{SOAPActionSeparator} ) {
                 $Error{SOAPActionSeparatorServerError}        = $ServerError;
-                $Error{SOAPActionSeparatorServerErrorMessage} = $ServerErrorMessage
+                $Error{SOAPActionSeparatorServerErrorMessage} = $ServerErrorMessage;
             }
         }
     }
@@ -364,7 +364,7 @@ sub _ShowEdit {
     for my $Type (qw(Request Response)) {
         my $TypeDefault = $Type eq 'Request' ? 'Plain' : 'Response';
         my $SelectedID = $TransportConfig->{ $Type . 'NameScheme' } || $TypeDefault;
-        my %Data = (
+        my %Data       = (
             'Plain'   => "<FunctionName>DATA</FunctionName>",
             $Type     => "<FunctionName${Type}>DATA</FunctionName${Type}>",
             'Append'  => "<FunctionNameFreeText>DATA</FunctionNameFreeText>",
@@ -449,11 +449,11 @@ sub _ShowEdit {
         $Param{SOAPActionSeparatorHidden} = 'Hidden';
     }
     $Param{SOAPActionSeparatorStrg} = $LayoutObject->BuildSelection(
-        Data => [ '#', '/' ],
-        Name => 'SOAPActionSeparator',
+        Data          => [ '#', '/' ],
+        Name          => 'SOAPActionSeparator',
         SelectedValue => $TransportConfig->{SOAPActionSeparator} || '#',
-        Sort => 'AlphaNumericValue',
-        Class => 'Modernize ' . ( $Param{SOAPActionSeparatorMandatory} || '' ),
+        Sort          => 'AlphaNumericValue',
+        Class         => 'Modernize ' . ( $Param{SOAPActionSeparatorMandatory} || '' ),
     );
 
     # Create options for SOAPAction free text.
@@ -469,8 +469,8 @@ sub _ShowEdit {
 
         # Create Timeout select.
         $Param{TimeoutStrg} = $LayoutObject->BuildSelection(
-            Data => [ '30', '60', '90', '120', '150', '180', '210', '240', '270', '300' ],
-            Name => 'Timeout',
+            Data          => [ '30', '60', '90', '120', '150', '180', '210', '240', '270', '300' ],
+            Name          => 'Timeout',
             SelectedValue => $Param{Timeout} || '120',
             Sort          => 'NumericValue',
             Class         => 'Modernize',
@@ -496,8 +496,8 @@ sub _ShowEdit {
 
         # Create use Proxy select.
         $Param{UseProxyStrg} = $LayoutObject->BuildSelection(
-            Data => [ 'No', 'Yes' ],
-            Name => 'UseProxy',
+            Data          => [ 'No', 'Yes' ],
+            Name          => 'UseProxy',
             SelectedValue => $Param{UseProxy} || 'No',
             PossibleNone  => 0,
             Sort          => 'AlphanumericValue',
@@ -506,8 +506,8 @@ sub _ShowEdit {
 
         # Create Proxy exclude select.
         $Param{ProxyExcludeStrg} = $LayoutObject->BuildSelection(
-            Data => [ 'No', 'Yes' ],
-            Name => 'ProxyExclude',
+            Data          => [ 'No', 'Yes' ],
+            Name          => 'ProxyExclude',
             SelectedValue => $Param{ProxyExclude} || 'No',
             PossibleNone  => 0,
             Sort          => 'AlphanumericValue',
@@ -523,8 +523,8 @@ sub _ShowEdit {
 
         # Create use SSL select.
         $Param{UseSSLStrg} = $LayoutObject->BuildSelection(
-            Data => [ 'No', 'Yes' ],
-            Name => 'UseSSL',
+            Data          => [ 'No', 'Yes' ],
+            Name          => 'UseSSL',
             SelectedValue => $Param{UseSSL} || 'No',
             PossibleNone  => 0,
             Sort          => 'AlphanumericValue',

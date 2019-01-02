@@ -1,9 +1,9 @@
 // --
-// Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+// Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 // --
 // This software comes with ABSOLUTELY NO WARRANTY. For details, see
-// the enclosed file COPYING for license information (AGPL). If you
-// did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+// the enclosed file COPYING for license information (GPL). If you
+// did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 // --
 
 "use strict";
@@ -31,13 +31,13 @@ Core.Agent.Admin.NotificationEvent = (function (TargetNS) {
     TargetNS.Init = function () {
 
         // bind click function to add button
-        $('.LanguageAdd').on('change', function () {
+        $('.LanguageAdd').off('change.NotificationEvent').on('change.NotificationEvent', function () {
             TargetNS.AddLanguage($(this).val(), $('.LanguageAdd option:selected').text());
             return false;
         });
 
         // bind click function to remove button
-        $('.LanguageRemove').on('click', function () {
+        $('.LanguageRemove').off('click.NotificationEvent').on('click.NotificationEvent', function () {
 
             if (window.confirm(Core.Language.Translate('Do you really want to delete this notification language?'))) {
                 TargetNS.RemoveLanguage($(this));
@@ -62,7 +62,7 @@ Core.Agent.Admin.NotificationEvent = (function (TargetNS) {
             }
         }
 
-        $('#VisibleForAgent').on('change', VisibleForAgentHandler);
+        $('#VisibleForAgent').on('change.NotificationEvent', VisibleForAgentHandler);
 
         // Run on first view.
         VisibleForAgentHandler();
@@ -191,7 +191,7 @@ Core.Agent.Admin.NotificationEvent = (function (TargetNS) {
         }
 
         // bind click function to remove button
-        $('.LanguageRemove').on('click', function () {
+        $('.LanguageRemove').off('click.NotificationEvent').on('click.NotificationEvent', function () {
 
             if (window.confirm(Core.Language.Translate('Do you really want to delete this notification language?'))) {
                 TargetNS.RemoveLanguage($(this));
@@ -200,6 +200,8 @@ Core.Agent.Admin.NotificationEvent = (function (TargetNS) {
         });
 
         TargetNS.LanguageSelectionRebuild();
+
+        Core.UI.InitWidgetActionToggle();
 
         return false;
     };
@@ -241,8 +243,10 @@ Core.Agent.Admin.NotificationEvent = (function (TargetNS) {
             }
         });
 
+        $('#Language').trigger('redraw.InputField');
+
         // bind click function to add button
-        $('.LanguageAdd').on('change', function () {
+        $('.LanguageAdd').off('change.NotificationEvent').on('change.NotificationEvent', function () {
             TargetNS.AddLanguage($(this).val(), $('.LanguageAdd option:selected').text());
             return false;
         });

@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Modules::AdminType;
@@ -40,6 +40,18 @@ sub Run {
     my $ParamObject  = $Kernel::OM->Get('Kernel::System::Web::Request');
     my $TypeObject   = $Kernel::OM->Get('Kernel::System::Type');
 
+    # Check if ticket type is enabled.
+    my $TypeNotActive;
+    if ( !$Kernel::OM->Get('Kernel::Config')->Get('Ticket::Type') ) {
+        $TypeNotActive = $LayoutObject->Notify(
+            Priority => 'Error',
+            Data     => $LayoutObject->{LanguageObject}->Translate( "Please activate %s first!", "Type" ),
+            Link =>
+                $LayoutObject->{Baselink}
+                . 'Action=AdminSystemConfiguration;Subaction=View;Setting=Ticket%3A%3AType',
+        );
+    }
+
     # ------------------------------------------------------------ #
     # change
     # ------------------------------------------------------------ #
@@ -53,6 +65,7 @@ sub Run {
         }
         my $Output = $LayoutObject->Header();
         $Output .= $LayoutObject->NavigationBar();
+        $Output .= $TypeNotActive;
         $Self->_Edit(
             Action => 'Change',
             %Data,
@@ -100,7 +113,7 @@ sub Run {
         );
 
         if ($NameExists) {
-            $Errors{NameExists} = 1;
+            $Errors{NameExists}    = 1;
             $Errors{'NameInvalid'} = 'ServerError';
         }
 
@@ -201,6 +214,7 @@ sub Run {
         # something has gone wrong
         my $Output = $LayoutObject->Header();
         $Output .= $LayoutObject->NavigationBar();
+        $Output .= $TypeNotActive;
         $Output .= $LayoutObject->Notify( Priority => 'Error' );
         $Self->_Edit(
             Action => 'Change',
@@ -224,6 +238,7 @@ sub Run {
         $GetParam{Name} = $ParamObject->GetParam( Param => 'Name' );
         my $Output = $LayoutObject->Header();
         $Output .= $LayoutObject->NavigationBar();
+        $Output .= $TypeNotActive;
         $Self->_Edit(
             Action => 'Add',
             %GetParam,
@@ -260,7 +275,7 @@ sub Run {
         # check if a type exists with this name
         my $NameExists = $TypeObject->NameExistsCheck( Name => $GetParam{Name} );
         if ($NameExists) {
-            $Errors{NameExists} = 1;
+            $Errors{NameExists}    = 1;
             $Errors{'NameInvalid'} = 'ServerError';
         }
 
@@ -276,6 +291,7 @@ sub Run {
                 $Self->_Overview();
                 my $Output = $LayoutObject->Header();
                 $Output .= $LayoutObject->NavigationBar();
+                $Output .= $TypeNotActive;
                 $Output .= $LayoutObject->Notify( Info => Translatable('Type added!') );
                 $Output .= $LayoutObject->Output(
                     TemplateFile => 'AdminType',
@@ -289,6 +305,7 @@ sub Run {
         # something has gone wrong
         my $Output = $LayoutObject->Header();
         $Output .= $LayoutObject->NavigationBar();
+        $Output .= $TypeNotActive;
         $Output .= $LayoutObject->Notify( Priority => 'Error' );
         $Self->_Edit(
             Action => 'Add',
@@ -310,17 +327,7 @@ sub Run {
 
         my $Output = $LayoutObject->Header();
         $Output .= $LayoutObject->NavigationBar();
-
-        # check if ticket type is enabled to use it here
-        if ( !$Kernel::OM->Get('Kernel::Config')->Get('Ticket::Type') ) {
-            $Output .= $LayoutObject->Notify(
-                Priority => 'Error',
-                Data     => $LayoutObject->{LanguageObject}->Translate( "Please activate %s first!", "Type" ),
-                Link =>
-                    $LayoutObject->{Baselink}
-                    . 'Action=AdminSystemConfiguration;Subaction=View;Setting=Ticket%3A%3AType',
-            );
-        }
+        $Output .= $TypeNotActive;
 
         $Self->_Overview();
 
@@ -454,7 +461,7 @@ sub _Overview {
     );
 
     my $TypeObject = $Kernel::OM->Get('Kernel::System::Type');
-    my %List = $TypeObject->TypeList( Valid => 0 );
+    my %List       = $TypeObject->TypeList( Valid => 0 );
 
     # if there are any types, they are shown
     if (%List) {

@@ -418,7 +418,7 @@
         </Value>
     </Setting>
     <Setting Name="Ticket::SearchIndexModule" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Helps to extend your articles full-text search (From, To, Cc, Subject and Body search). Runtime will do full-text searches on live data (it works fine for up to 50.000 tickets). StaticDB will strip all articles and will build an index after article creation, increasing fulltext searches about 50%. To create an initial index use "bin/otrs.Console.pl Maint::Ticket::FulltextIndexRebuild".</Description>
+        <Description Translatable="1">Helps to extend your articles full-text search (From, To, Cc, Subject and Body search). It will strip all articles and will build an index after article creation, increasing fulltext searches about 50%. To create an initial index use "bin/otrs.Console.pl Maint::Ticket::FulltextIndexRebuild".</Description>
         <Navigation>Core::Ticket::FulltextSearch</Navigation>
         <Value>
             <Item ValueType="PerlModule" ValueFilter="Kernel/System/Ticket/ArticleSearchIndex/*.pm">Kernel::System::Ticket::ArticleSearchIndex::DB</Item>
@@ -1408,16 +1408,6 @@
             </Array>
         </Value>
     </Setting>
-    <Setting Name="Ticket::EventModulePost###2000-ArticleSearchIndex" Required="0" Valid="1">
-        <Description Translatable="1">Marks articles for index rebuild right after the article's update.</Description>
-        <Navigation>Core::Event::Ticket</Navigation>
-        <Value>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::Event::ArticleSearchIndex</Item>
-                <Item Key="Event">(ArticleUpdate)</Item>
-            </Hash>
-        </Value>
-    </Setting>
     <Setting Name="Ticket::Frontend::Overview###Small" Required="0" Valid="1">
         <Description Translatable="1">Allows having a small format ticket overview (CustomerInfo =&gt; 1 - shows also the customer information).</Description>
         <Navigation>Frontend::Agent::TicketOverview</Navigation>
@@ -2214,35 +2204,35 @@
             <Item ValueType="String"></Item>
         </Value>
     </Setting>
-    <Setting Name="Ticket::Frontend::AgentTicketSearch###Defaults###From" UserPreferencesGroup="Advanced" UserModificationActive="1" UserModificationPossible="1" Required="0" Valid="0">
+    <Setting Name="Ticket::Frontend::AgentTicketSearch###Defaults###MIMEBase_From" UserPreferencesGroup="Advanced" UserModificationActive="1" UserModificationPossible="1" Required="0" Valid="0">
         <Description Translatable="1">Defines the default shown ticket search attribute for ticket search screen.</Description>
         <Navigation>Frontend::Agent::View::TicketSearch</Navigation>
         <Value>
             <Item ValueType="String"></Item>
         </Value>
     </Setting>
-    <Setting Name="Ticket::Frontend::AgentTicketSearch###Defaults###To" UserPreferencesGroup="Advanced" UserModificationActive="1" UserModificationPossible="1" Required="0" Valid="0">
+    <Setting Name="Ticket::Frontend::AgentTicketSearch###Defaults###MIMEBase_To" UserPreferencesGroup="Advanced" UserModificationActive="1" UserModificationPossible="1" Required="0" Valid="0">
         <Description Translatable="1">Defines the default shown ticket search attribute for ticket search screen.</Description>
         <Navigation>Frontend::Agent::View::TicketSearch</Navigation>
         <Value>
             <Item ValueType="String"></Item>
         </Value>
     </Setting>
-    <Setting Name="Ticket::Frontend::AgentTicketSearch###Defaults###Cc" UserPreferencesGroup="Advanced" UserModificationActive="1" UserModificationPossible="1" Required="0" Valid="0">
+    <Setting Name="Ticket::Frontend::AgentTicketSearch###Defaults###MIMEBase_Cc" UserPreferencesGroup="Advanced" UserModificationActive="1" UserModificationPossible="1" Required="0" Valid="0">
         <Description Translatable="1">Defines the default shown ticket search attribute for ticket search screen.</Description>
         <Navigation>Frontend::Agent::View::TicketSearch</Navigation>
         <Value>
             <Item ValueType="String"></Item>
         </Value>
     </Setting>
-    <Setting Name="Ticket::Frontend::AgentTicketSearch###Defaults###Subject" UserPreferencesGroup="Advanced" UserModificationActive="1" UserModificationPossible="1" Required="0" Valid="0">
+    <Setting Name="Ticket::Frontend::AgentTicketSearch###Defaults###MIMEBase_Subject" UserPreferencesGroup="Advanced" UserModificationActive="1" UserModificationPossible="1" Required="0" Valid="0">
         <Description Translatable="1">Defines the default shown ticket search attribute for ticket search screen.</Description>
         <Navigation>Frontend::Agent::View::TicketSearch</Navigation>
         <Value>
             <Item ValueType="String"></Item>
         </Value>
     </Setting>
-    <Setting Name="Ticket::Frontend::AgentTicketSearch###Defaults###Body" UserPreferencesGroup="Advanced" UserModificationActive="1" UserModificationPossible="1" Required="0" Valid="0">
+    <Setting Name="Ticket::Frontend::AgentTicketSearch###Defaults###MIMEBase_Body" UserPreferencesGroup="Advanced" UserModificationActive="1" UserModificationPossible="1" Required="0" Valid="0">
         <Description Translatable="1">Defines the default shown ticket search attribute for ticket search screen.</Description>
         <Navigation>Frontend::Agent::View::TicketSearch</Navigation>
         <Value>
@@ -4951,7 +4941,7 @@
                 <Item Key="Action">AgentTicketProcess</Item>
                 <Item Key="AccessKey"></Item>
                 <Item Key="CssClass">ProcessTicket</Item>
-                <Item Key="Icon">fa fa-th-large</Item>
+                <Item Key="Icon">fa fa-sitemap</Item>
                 <Item Key="Priority">1020030</Item>
             </Hash>
         </Value>
@@ -5407,7 +5397,7 @@
         </Value>
     </Setting>
     <Setting Name="Ticket::Frontend::MenuModule###400-Owner" Required="0" Valid="1">
-        <Description Translatable="1">Shows a link in the menu to see the owner of a ticket in the ticket zoom view of the agent interface. Additional access control to show or not show this link can be done by using Key "Group" and Content like "rw:group1;move_into:group2". To cluster menu items use for Key "ClusterName" and for the Content any name you want to see in the UI. Use "ClusterPriority" to configure the order of a certain cluster within the toolbar.</Description>
+        <Description Translatable="1">Shows a link in the menu to change the owner of a ticket in the ticket zoom view of the agent interface. Additional access control to show or not show this link can be done by using Key "Group" and Content like "rw:group1;move_into:group2". To cluster menu items use for Key "ClusterName" and for the Content any name you want to see in the UI. Use "ClusterPriority" to configure the order of a certain cluster within the toolbar.</Description>
         <Navigation>Frontend::Agent::View::TicketZoom::MenuModule</Navigation>
         <Value>
             <Hash>
@@ -5424,7 +5414,7 @@
         </Value>
     </Setting>
     <Setting Name="Ticket::Frontend::MenuModule###410-Responsible" Required="0" Valid="1">
-        <Description Translatable="1">Shows a link in the menu to see the responsible agent of a ticket in the ticket zoom view of the agent interface. Additional access control to show or not show this link can be done by using Key "Group" and Content like "rw:group1;move_into:group2". To cluster menu items use for Key "ClusterName" and for the Content any name you want to see in the UI. Use "ClusterPriority" to configure the order of a certain cluster within the toolbar.</Description>
+        <Description Translatable="1">Shows a link in the menu to change the responsible agent of a ticket in the ticket zoom view of the agent interface. Additional access control to show or not show this link can be done by using Key "Group" and Content like "rw:group1;move_into:group2". To cluster menu items use for Key "ClusterName" and for the Content any name you want to see in the UI. Use "ClusterPriority" to configure the order of a certain cluster within the toolbar.</Description>
         <Navigation>Frontend::Agent::View::TicketZoom::MenuModule</Navigation>
         <Value>
             <Hash>
@@ -5441,7 +5431,7 @@
         </Value>
     </Setting>
     <Setting Name="Ticket::Frontend::MenuModule###420-Customer" Required="0" Valid="1">
-        <Description Translatable="1">Shows a link in the menu to see the customer who requested the ticket in the ticket zoom view of the agent interface. Additional access control to show or not show this link can be done by using Key "Group" and Content like "rw:group1;move_into:group2". To cluster menu items use for Key "ClusterName" and for the Content any name you want to see in the UI. Use "ClusterPriority" to configure the order of a certain cluster within the toolbar.</Description>
+        <Description Translatable="1">Shows a link in the menu to change the customer who requested the ticket in the ticket zoom view of the agent interface. Additional access control to show or not show this link can be done by using Key "Group" and Content like "rw:group1;move_into:group2". To cluster menu items use for Key "ClusterName" and for the Content any name you want to see in the UI. Use "ClusterPriority" to configure the order of a certain cluster within the toolbar.</Description>
         <Navigation>Frontend::Agent::View::TicketZoom::MenuModule</Navigation>
         <Value>
             <Hash>
@@ -5475,7 +5465,7 @@
         </Value>
     </Setting>
     <Setting Name="Ticket::Frontend::MenuModule###425-Phone Call Outbound" Required="0" Valid="1">
-        <Description Translatable="1">Shows a link in the menu to add a note in the ticket zoom view of the agent interface. Additional access control to show or not show this link can be done by using Key "Group" and Content like "rw:group1;move_into:group2". To cluster menu items use for Key "ClusterName" and for the Content any name you want to see in the UI. Use "ClusterPriority" to configure the order of a certain cluster within the toolbar.</Description>
+        <Description Translatable="1">Shows a link in the menu to add a phone call outbound in the ticket zoom view of the agent interface. Additional access control to show or not show this link can be done by using Key "Group" and Content like "rw:group1;move_into:group2". To cluster menu items use for Key "ClusterName" and for the Content any name you want to see in the UI. Use "ClusterPriority" to configure the order of a certain cluster within the toolbar.</Description>
         <Navigation>Frontend::Agent::View::TicketZoom::MenuModule</Navigation>
         <Value>
             <Hash>
@@ -5492,7 +5482,7 @@
         </Value>
     </Setting>
     <Setting Name="Ticket::Frontend::MenuModule###426-Phone Call Inbound" Required="0" Valid="1">
-        <Description Translatable="1">Shows a link in the menu to add a note in the ticket zoom view of the agent interface. Additional access control to show or not show this link can be done by using Key "Group" and Content like "rw:group1;move_into:group2". To cluster menu items use for Key "ClusterName" and for the Content any name you want to see in the UI. Use "ClusterPriority" to configure the order of a certain cluster within the toolbar.</Description>
+        <Description Translatable="1">Shows a link in the menu to add a phone call inbound in the ticket zoom view of the agent interface. Additional access control to show or not show this link can be done by using Key "Group" and Content like "rw:group1;move_into:group2". To cluster menu items use for Key "ClusterName" and for the Content any name you want to see in the UI. Use "ClusterPriority" to configure the order of a certain cluster within the toolbar.</Description>
         <Navigation>Frontend::Agent::View::TicketZoom::MenuModule</Navigation>
         <Value>
             <Hash>
@@ -6226,7 +6216,7 @@
                 <Item Key="Group"></Item>
                 <Item Key="Default">1</Item>
                 <Item Key="Sort">SortBy=Age;OrderBy=Up</Item>
-                <Item Key="CacheTTLLocal">0.5</Item>
+                <Item Key="CacheTTLLocal">2</Item>
                 <Item Key="States">
                     <Hash>
                         <Item Key="1">new</Item>
@@ -7048,7 +7038,7 @@
         </Value>
     </Setting>
     <Setting Name="Ticket::Frontend::CustomerTicketMessage###Queue" Required="1" Valid="1">
-        <Description Translatable="1">Allows customers to set the ticket queue in the customer interface. If this is set to 'No', QueueDefault should be configured.</Description>
+        <Description Translatable="1">Allows customers to set the ticket queue in the customer interface. If this is not enabled, QueueDefault should be configured.</Description>
         <Navigation>Frontend::Customer::View::TicketMessage</Navigation>
         <Value>
             <Item ValueType="Checkbox">1</Item>
@@ -7062,7 +7052,7 @@
         </Value>
     </Setting>
     <Setting Name="Ticket::Frontend::CustomerTicketMessage###TicketType" Required="1" Valid="1">
-        <Description Translatable="1">Allows customers to set the ticket type in the customer interface. If this is set to 'No', TicketTypeDefault should be configured.</Description>
+        <Description Translatable="1">Allows customers to set the ticket type in the customer interface. If this is not enabled, TicketTypeDefault should be configured.</Description>
         <Navigation>Frontend::Customer::View::TicketMessage</Navigation>
         <Value>
             <Item ValueType="Checkbox">1</Item>
@@ -9480,7 +9470,7 @@
                         </Array>
                     </Item>
                     <Item Key="Description" Translatable="1">This module is part of the admin area of OTRS.</Item>
-                    <Item Key="Title" Translatable="1">Auto Responses ↔ Queues</Item>
+                    <Item Key="Title" Translatable="1">Queues ↔ Auto Responses</Item>
                     <Item Key="NavBarName">Admin</Item>
                 </Hash>
             </Item>
@@ -9526,7 +9516,7 @@
                     </Array>
                 </Item>
                 <Item Key="Module">Kernel::Output::HTML::NavBar::ModuleAdmin</Item>
-                <Item Key="Name" Translatable="1">Auto Responses ↔ Queues</Item>
+                <Item Key="Name" Translatable="1">Queues ↔ Auto Responses</Item>
                 <Item Key="Block">Ticket</Item>
                 <Item Key="Description" Translatable="1">Link queues to auto responses.</Item>
                 <Item Key="IconBig">fa-reply</Item>
@@ -9620,7 +9610,7 @@
                         </Array>
                     </Item>
                     <Item Key="Description" Translatable="1">This module is part of the admin area of OTRS.</Item>
-                    <Item Key="Title" Translatable="1">Attachments ↔ Templates</Item>
+                    <Item Key="Title" Translatable="1">Templates ↔ Attachments</Item>
                     <Item Key="NavBarName">Admin</Item>
                 </Hash>
             </Item>
@@ -9666,9 +9656,9 @@
                     </Array>
                 </Item>
                 <Item Key="Module">Kernel::Output::HTML::NavBar::ModuleAdmin</Item>
-                <Item Key="Name" Translatable="1">Attachments ↔ Templates</Item>
+                <Item Key="Name" Translatable="1">Templates ↔ Attachments</Item>
                 <Item Key="Block">Ticket</Item>
-                <Item Key="Description" Translatable="1">Link attachments to templates.</Item>
+                <Item Key="Description" Translatable="1">Link templates to attachments.</Item>
                 <Item Key="IconBig">fa-paperclip</Item>
                 <Item Key="IconSmall">fa-file-text-o</Item>
             </Hash>
@@ -10719,7 +10709,7 @@
         </Value>
     </Setting>
     <Setting Name="Loader::Module::CustomerTicketMessage###002-Ticket" Required="0" Valid="1">
-        <Description Translatable="1">Loader module registration for the agent interface.</Description>
+        <Description Translatable="1">Loader module registration for the customer interface.</Description>
         <Navigation>Frontend::Customer::ModuleRegistration::Loader</Navigation>
         <Value>
             <Hash>
@@ -10786,7 +10776,7 @@
         </Value>
     </Setting>
     <Setting Name="Loader::Module::CustomerTicketZoom###002-Ticket" Required="0" Valid="1">
-        <Description Translatable="1">Loader module registration for the agent interface.</Description>
+        <Description Translatable="1">Loader module registration for the customer interface.</Description>
         <Navigation>Frontend::Customer::ModuleRegistration::Loader</Navigation>
         <Value>
             <Hash>
@@ -10884,7 +10874,7 @@
         </Value>
     </Setting>
     <Setting Name="Loader::Module::CustomerTicketSearch###002-Ticket" Required="0" Valid="1">
-        <Description Translatable="1">Loader module registration for the agent interface.</Description>
+        <Description Translatable="1">Loader module registration for the customer interface.</Description>
         <Navigation>Frontend::Customer::ModuleRegistration::Loader</Navigation>
         <Value>
             <Hash>
@@ -11086,6 +11076,7 @@
                 <Item>AgentTicketWatcher</Item>
                 <Item>AgentTicketZoom</Item>
                 <Item>AgentLinkObject</Item>
+                <Item>AgentSplitSelection</Item>
                 <Item>CustomerTicketPrint</Item>
                 <Item>CustomerTicketProcess</Item>
                 <Item>CustomerTicketZoom</Item>
@@ -11272,6 +11263,7 @@
                 <Item>In-Reply-To</Item>
                 <Item>Auto-Submitted</Item>
                 <Item>X-Loop</Item>
+                <Item>X-Spam</Item>
                 <Item>X-Spam-Flag</Item>
                 <Item>X-Spam-Level</Item>
                 <Item>X-Spam-Score</Item>
@@ -13013,6 +13005,8 @@ Thanks for your help!
                 </DefaultItem>
                 <Item Key="Age" SelectedID="2"></Item>
                 <Item Key="Changed" SelectedID="1"></Item>
+                <Item Key="Created" SelectedID="1"></Item>
+                <Item Key="CustomerCompanyName" SelectedID="1"></Item>
                 <Item Key="CustomerID" SelectedID="2"></Item>
                 <Item Key="CustomerName" SelectedID="1"></Item>
                 <Item Key="CustomerUserID" SelectedID="1"></Item>
@@ -13838,7 +13832,7 @@ Thanks for your help!
         </Value>
     </Setting>
     <Setting Name="Ticket::Frontend::RedirectAfterCloseDisabled" Required="1" Valid="1" UserModificationActive="1" UserModificationPossible="1">
-        <Description Translatable="1">Disables the redirection to the last screen overview / dashboard after a ticket is created.</Description>
+        <Description Translatable="1">Disables the redirection to the last screen overview / dashboard after a ticket is closed.</Description>
         <Navigation>Frontend::Agent</Navigation>
         <Value>
             <Item ValueType="Checkbox">0</Item>

@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::Auth::LDAP;
@@ -35,7 +35,7 @@ sub new {
 
     # get ldap preferences
     $Self->{Count} = $Param{Count} || '';
-    $Self->{Die} = $ConfigObject->Get( 'AuthModule::LDAP::Die' . $Param{Count} );
+    $Self->{Die}   = $ConfigObject->Get( 'AuthModule::LDAP::Die' . $Param{Count} );
     if ( $ConfigObject->Get( 'AuthModule::LDAP::Host' . $Param{Count} ) ) {
         $Self->{Host} = $ConfigObject->Get( 'AuthModule::LDAP::Host' . $Param{Count} );
     }

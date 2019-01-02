@@ -1,9 +1,9 @@
 // --
-// Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+// Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 // --
 // This software comes with ABSOLUTELY NO WARRANTY. For details, see
-// the enclosed file COPYING for license information (AGPL). If you
-// did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+// the enclosed file COPYING for license information (GPL). If you
+// did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 // --
 
 "use strict";
@@ -340,7 +340,9 @@ Core.Agent.Admin.ACL = (function (TargetNS) {
             else {
                 alert(Core.Language.Translate('An item with this name is already present.'));
             }
-            $Object.blur().val('');
+
+            // Set empty value for $Object and blur its sibling modern input field (see bug#14157).
+            $Object.val('').siblings('.InputField_Container').find('.InputField_Search').blur();
         }
         else if (Level === 2) {
 
@@ -395,7 +397,9 @@ Core.Agent.Admin.ACL = (function (TargetNS) {
             else {
                 alert(Core.Language.Translate('An item with this name is already present.'));
             }
-            $Object.blur().val('');
+
+            // Set empty value for $Object and blur its sibling modern input field (see bug#14157).
+            $Object.val('').siblings('.InputField_Container').find('.InputField_Search').blur();
         }
         else if (Level === 3) {
 

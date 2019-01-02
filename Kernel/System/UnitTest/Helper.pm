@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::UnitTest::Helper;
@@ -142,7 +142,7 @@ my %GetRandomNumberPrevious;
 sub GetRandomNumber {
 
     my $PIDReversed = reverse $$;
-    my $PID = reverse sprintf '%.6d', $PIDReversed;
+    my $PID         = reverse sprintf '%.6d', $PIDReversed;
 
     my $Prefix = $PID . substr time(), -5, 5;
 
@@ -394,7 +394,7 @@ sub FixedTimeSet {
         $FixedTime = $TimeToSave->ToEpoch();
     }
     else {
-        $FixedTime = $TimeToSave // CORE::time()
+        $FixedTime = $TimeToSave // CORE::time();
     }
 
     # This is needed to reload objects that directly use the native time functions
@@ -644,7 +644,7 @@ sub ConfigSettingChange {
         $ValueDump =~ s/\$VAR1/$KeyDump/;
     }
     else {
-        $ValueDump = "delete $KeyDump;"
+        $ValueDump = "delete $KeyDump;";
     }
 
     my $PackageName = "ZZZZUnitTest$RandomNumber";
@@ -709,7 +709,7 @@ use warnings;
 sub CustomCodeActivate {
     my ( $Self, %Param ) = @_;
 
-    my $Code = $Param{Code};
+    my $Code       = $Param{Code};
     my $Identifier = $Param{Identifier} || $Self->GetRandomNumber();
 
     die "Need 'Code'" if !defined $Code;
@@ -984,7 +984,7 @@ sub TestDatabaseCleanup {
 
     if ( scalar @Tables ) {
         my $TableList = join ', ', sort @Tables;
-        my $DBType = $DBObject->{'DB::Type'};
+        my $DBType    = $DBObject->{'DB::Type'};
 
         if ( $DBType eq 'mysql' ) {
 
@@ -1008,6 +1008,30 @@ sub TestDatabaseCleanup {
             for my $Table (@Tables) {
                 $DBObject->Do( SQL => "DROP TABLE $Table CASCADE CONSTRAINTS" );
             }
+
+            # Get complete list of user sequences.
+            my @Sequences;
+            return if !$DBObject->Prepare(
+                SQL => 'SELECT sequence_name FROM user_sequences ORDER BY sequence_name',
+            );
+            while ( my @Row = $DBObject->FetchrowArray() ) {
+                push @Sequences, $Row[0];
+            }
+
+            # Drop all found sequences as well.
+            for my $Sequence (@Sequences) {
+                $DBObject->Do( SQL => "DROP SEQUENCE $Sequence" );
+            }
+
+            # Check if all sequences have been dropped.
+            @Sequences = ();
+            return if !$DBObject->Prepare(
+                SQL => 'SELECT sequence_name FROM user_sequences ORDER BY sequence_name',
+            );
+            while ( my @Row = $DBObject->FetchrowArray() ) {
+                push @Sequences, $Row[0];
+            }
+            return if scalar @Sequences;
         }
 
         # Check if all tables have been dropped.
@@ -1105,10 +1129,10 @@ sub DatabaseXMLExecute {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

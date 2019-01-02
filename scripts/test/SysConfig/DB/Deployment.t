@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 ## no critic (Modules::RequireExplicitPackage)
@@ -511,7 +511,7 @@ for my $Test (@Tests) {
         && $ExclusiveLockGUID
         )
     {
-        $Test->{Params}->{ExclusiveLockGUID} = $ExclusiveLockGUID
+        $Test->{Params}->{ExclusiveLockGUID} = $ExclusiveLockGUID;
     }
 
     my $Success = $SysConfigDBObject->DeploymentUnlock( %{ $Test->{Params} } );
@@ -1268,7 +1268,7 @@ for my $Count ( 1 .. 35 ) {
     );
 
     if ( $DeploymentsToAdd - $Count < 20 ) {
-        push @RemainingDeployents, $DeploymentID,
+        push @RemainingDeployents, $DeploymentID;
     }
 }
 

@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Modules::AdminGenericAgent;
@@ -248,6 +248,17 @@ sub Run {
             $Errors{ProfileInvalid} = 'ServerError';
         }
 
+        # Check length of fields from Add Note section.
+        if ( length $GetParam{NewNoteFrom} > 200 ) {
+            $Errors{NewNoteFromServerError} = 'ServerError';
+        }
+        if ( length $GetParam{NewNoteSubject} > 200 ) {
+            $Errors{NewNoteSubjectServerError} = 'ServerError';
+        }
+        if ( length $GetParam{NewNoteBody} > 200 ) {
+            $Errors{NewNoteBodyServerError} = 'ServerError';
+        }
+
         # Check if ticket selection contains stop words
         my %StopWordsServerErrors = $Self->_StopWordsServerErrorsGet(
             MIMEBase_From    => $GetParam{MIMEBase_From},
@@ -315,7 +326,9 @@ sub Run {
         );
 
         # generate search mask
-        my $Output = $LayoutObject->Header( Title => 'Edit' );
+        my $Output = $LayoutObject->Header(
+            Title => Translatable('Edit'),
+        );
         $Output .= $LayoutObject->NavigationBar();
         $Output .= $LayoutObject->Output(
             TemplateFile => 'AdminGenericAgent',
@@ -333,7 +346,9 @@ sub Run {
         $JobDataReference = $Self->_MaskUpdate(%Param);
 
         # generate search mask
-        my $Output = $LayoutObject->Header( Title => 'Edit' );
+        my $Output = $LayoutObject->Header(
+            Title => Translatable('Edit'),
+        );
 
         $Output .= $LayoutObject->NavigationBar();
         $Output .= $LayoutObject->Output(
@@ -1039,6 +1054,14 @@ sub _MaskUpdate {
     for my $DynamicFieldConfig ( @{ $Self->{DynamicField} } ) {
         next DYNAMICFIELD if !IsHashRefWithData($DynamicFieldConfig);
 
+        # Check if field is Attachment type ( from OTRSDynamicFieldAttachment )
+        #   this field is not updatable by Generic Agent
+        my $IsAttachement = $DynamicFieldBackendObject->HasBehavior(
+            DynamicFieldConfig => $DynamicFieldConfig,
+            Behavior           => 'IsAttachement',
+        );
+        next DYNAMICFIELD if $IsAttachement;
+
         my $PossibleValuesFilter;
 
         my $IsACLReducible = $DynamicFieldBackendObject->HasBehavior(
@@ -1156,9 +1179,10 @@ sub _MaskUpdate {
 
         # paint each selector
         my $EventStrg = $LayoutObject->BuildSelection(
-            Data => $RegisteredEvents{$Type} || [],
-            Name => $Type . 'Event',
-            Sort => 'AlphanumericValue',
+            PossibleNone => 0,
+            Data         => $RegisteredEvents{$Type} || [],
+            Name         => $Type . 'Event',
+            Sort         => 'AlphanumericValue',
             PossibleNone => 0,
             Class        => 'Modernize EventList GenericInterfaceSpacing',
             Title        => $LayoutObject->{LanguageObject}->Translate('Event'),
@@ -1283,7 +1307,7 @@ sub _MaskRun {
 
     # perform ticket search
     my $GenericAgentTicketSearch = $ConfigObject->Get("Ticket::GenericAgentTicketSearch") || {};
-    my $Counter = $TicketObject->TicketSearch(
+    my $Counter                  = $TicketObject->TicketSearch(
         Result          => 'COUNT',
         SortBy          => 'Age',
         OrderBy         => 'Down',

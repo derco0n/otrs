@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::Web::UploadCache::FS;
@@ -51,6 +51,8 @@ sub FormIDRemove {
         return;
     }
 
+    return if !$Self->_FormIDValidate( $Param{FormID} );
+
     my $Directory = $Self->{TempDir} . '/' . $Param{FormID};
 
     if ( !-d $Directory ) {
@@ -95,10 +97,12 @@ sub FormIDAddFile {
         }
     }
 
+    return if !$Self->_FormIDValidate( $Param{FormID} );
+
     $Param{Content} = '' if !defined( $Param{Content} );
 
     # create content id
-    my $ContentID = $Param{ContentID};
+    my $ContentID   = $Param{ContentID};
     my $Disposition = $Param{Disposition} || '';
     if ( !$ContentID && lc $Disposition eq 'inline' ) {
 
@@ -135,6 +139,7 @@ sub FormIDAddFile {
         Content    => \$Param{Content},
         Mode       => 'binmode',
         Permission => '640',
+        NoReplace  => 1,
     );
     return if !$MainObject->FileWrite(
         Directory  => $Directory,
@@ -142,6 +147,7 @@ sub FormIDAddFile {
         Content    => \$Param{ContentType},
         Mode       => 'binmode',
         Permission => '640',
+        NoReplace  => 1,
     );
     return if !$MainObject->FileWrite(
         Directory  => $Directory,
@@ -149,6 +155,7 @@ sub FormIDAddFile {
         Content    => \$ContentID,
         Mode       => 'binmode',
         Permission => '640',
+        NoReplace  => 1,
     );
     return if !$MainObject->FileWrite(
         Directory  => $Directory,
@@ -156,6 +163,7 @@ sub FormIDAddFile {
         Content    => \$Disposition,
         Mode       => 'binmode',
         Permission => '644',
+        NoReplace  => 1,
     );
     return 1;
 }
@@ -172,6 +180,8 @@ sub FormIDRemoveFile {
             return;
         }
     }
+
+    return if !$Self->_FormIDValidate( $Param{FormID} );
 
     my @Index = @{ $Self->FormIDGetAllFilesMeta(%Param) };
 
@@ -193,18 +203,22 @@ sub FormIDRemoveFile {
     $MainObject->FileDelete(
         Directory => $Directory,
         Filename  => "$File{Filename}",
+        NoReplace => 1,
     );
     $MainObject->FileDelete(
         Directory => $Directory,
         Filename  => "$File{Filename}.ContentType",
+        NoReplace => 1,
     );
     $MainObject->FileDelete(
         Directory => $Directory,
         Filename  => "$File{Filename}.ContentID",
+        NoReplace => 1,
     );
     $MainObject->FileDelete(
         Directory => $Directory,
         Filename  => "$File{Filename}.Disposition",
+        NoReplace => 1,
     );
 
     return 1;
@@ -222,6 +236,8 @@ sub FormIDGetAllFilesData {
     }
 
     my @Data;
+
+    return \@Data if !$Self->_FormIDValidate( $Param{FormID} );
 
     my $Directory = $Self->{TempDir} . '/' . $Param{FormID};
 
@@ -255,7 +271,7 @@ sub FormIDGetAllFilesData {
 
             # remove meta data in files
             if ( $FileSize > 30 ) {
-                $FileSize = $FileSize - 30
+                $FileSize = $FileSize - 30;
             }
         }
         my $Content = $MainObject->FileRead(
@@ -319,6 +335,8 @@ sub FormIDGetAllFilesMeta {
 
     my @Data;
 
+    return \@Data if !$Self->_FormIDValidate( $Param{FormID} );
+
     my $Directory = $Self->{TempDir} . '/' . $Param{FormID};
 
     if ( !-d $Directory ) {
@@ -351,7 +369,7 @@ sub FormIDGetAllFilesMeta {
 
             # remove meta data in files
             if ( $FileSize > 30 ) {
-                $FileSize = $FileSize - 30
+                $FileSize = $FileSize - 30;
             }
         }
 
@@ -412,7 +430,7 @@ sub FormIDCleanUp {
         my $SubdirTime = $Subdir;
 
         if ( $SubdirTime =~ /^.*\/\d+\..+$/ ) {
-            $SubdirTime =~ s/^.*\/(\d+?)\..+$/$1/
+            $SubdirTime =~ s/^.*\/(\d+?)\..+$/$1/;
         }
         else {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
@@ -440,9 +458,25 @@ sub FormIDCleanUp {
                     Priority => 'error',
                     Message  => "Can't remove: $Subdir: $!!",
                 );
-                return;
+                next SUBDIR;
             }
         }
+    }
+
+    return 1;
+}
+
+sub _FormIDValidate {
+    my ( $Self, $FormID ) = @_;
+
+    return if !$FormID;
+
+    if ( $FormID !~ m{^ \d+ \. \d+ \. \d+ $}xms ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => 'Invalid FormID!',
+        );
+        return;
     }
 
     return 1;

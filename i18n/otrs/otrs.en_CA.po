@@ -1,12 +1,14 @@
-# 
 # Translators:
+# Udo Bretz, 2018
+# Martin Gruner <martin.gruner@otrs.com>, 2018
+# 
 msgid ""
 msgstr ""
-"Project-Id-Version: OTRS\n"
-"POT-Creation-Date: 2018-02-05 18:26+0000\n"
-"PO-Revision-Date: 2018-02-05 18:27+0000\n"
-"Last-Translator: Carlos Rodríguez <carlos.rodriguez@otrs.com>\n"
-"Language-Team: English (Canada) (http://www.transifex.com/otrs/OTRS/language/en_CA/)\n"
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2018-12-06 17:43+0000\n"
+"PO-Revision-Date: 2018-09-20 13:03+0000\n"
+"Last-Translator: Martin Gruner <martin.gruner@otrs.com>, 2018\n"
+"Language-Team: English (Canada) (https://www.transifex.com/otrs/teams/23435/en_CA/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -235,10 +237,6 @@ msgid "Edit Calendar"
 msgstr ""
 
 #. Template: AdminAppointmentCalendarManage
-msgid "Go back"
-msgstr ""
-
-#. Template: AdminAppointmentCalendarManage
 msgid "Calendar Overview"
 msgstr ""
 
@@ -271,6 +269,10 @@ msgstr ""
 
 #. Template: AdminAppointmentCalendarManage
 msgid "Import Calendar"
+msgstr ""
+
+#. Template: AdminAppointmentCalendarManage
+msgid "Filter for Calendars"
 msgstr ""
 
 #. Template: AdminAppointmentCalendarManage
@@ -422,6 +424,10 @@ msgid "Appointment Import"
 msgstr ""
 
 #. Template: AdminAppointmentImport
+msgid "Go back"
+msgstr ""
+
+#. Template: AdminAppointmentImport
 msgid "Uploaded file must be in valid iCal format (.ics)."
 msgstr ""
 
@@ -463,10 +469,6 @@ msgstr ""
 
 #. Template: AdminAppointmentNotificationEvent
 msgid "Edit Notification"
-msgstr ""
-
-#. Template: AdminAppointmentNotificationEvent
-msgid "Add notification"
 msgstr ""
 
 #. Template: AdminAppointmentNotificationEvent
@@ -582,7 +584,7 @@ msgid "Send to these agents"
 msgstr ""
 
 #. Template: AdminAppointmentNotificationEvent
-msgid "Send to all group members"
+msgid "Send to all group members (agents only)"
 msgstr ""
 
 #. Template: AdminAppointmentNotificationEvent
@@ -736,6 +738,10 @@ msgstr ""
 
 #. Template: AdminAppointmentNotificationEventTransportEmailSettings
 msgid "Additional recipient email addresses"
+msgstr ""
+
+#. Template: AdminAppointmentNotificationEventTransportEmailSettings
+msgid "This field must have less then 200 characters."
 msgstr ""
 
 #. Template: AdminAppointmentNotificationEventTransportEmailSettings
@@ -991,11 +997,15 @@ msgid "Communication Log"
 msgstr ""
 
 #. Template: AdminCommunicationLog
-msgid "Time range"
+msgid "Time Range"
 msgstr ""
 
 #. Template: AdminCommunicationLog
 msgid "Show only communication logs created in specific time range."
+msgstr ""
+
+#. Template: AdminCommunicationLog
+msgid "Filter for Communications"
 msgstr ""
 
 #. Template: AdminCommunicationLog
@@ -1105,15 +1115,15 @@ msgid "Account Status"
 msgstr ""
 
 #. Template: AdminCommunicationLogAccounts
-msgid "Back"
+msgid "Back to overview"
+msgstr ""
+
+#. Template: AdminCommunicationLogAccounts
+msgid "Filter for Accounts"
 msgstr ""
 
 #. Template: AdminCommunicationLogAccounts
 msgid "Filter for accounts"
-msgstr ""
-
-#. Template: AdminCommunicationLogAccounts
-msgid "Filter for log entries"
 msgstr ""
 
 #. Template: AdminCommunicationLogAccounts
@@ -1188,6 +1198,14 @@ msgstr ""
 
 #. Template: AdminCommunicationLogZoom
 msgid "Detail view for %s communication started at %s"
+msgstr ""
+
+#. Template: AdminCommunicationLogZoom
+msgid "Filter for Log Entries"
+msgstr ""
+
+#. Template: AdminCommunicationLogZoom
+msgid "Filter for log entries"
 msgstr ""
 
 #. Template: AdminCommunicationLogZoom
@@ -1532,6 +1550,10 @@ msgid ""
 msgstr ""
 
 #. Template: AdminCustomerUserGroup
+msgid "Filter for groups"
+msgstr ""
+
+#. Template: AdminCustomerUserGroup
 msgid "Select the customer user - group permissions."
 msgstr ""
 
@@ -1546,7 +1568,7 @@ msgid "Customer User Default Groups:"
 msgstr ""
 
 #. Template: AdminCustomerUserService
-msgid "Manage Customer User-Services Relations"
+msgid "Manage Customer User-Service Relations"
 msgstr ""
 
 #. Template: AdminCustomerUserService
@@ -1555,6 +1577,10 @@ msgstr ""
 
 #. Template: AdminCustomerUserService
 msgid "Filter for Services"
+msgstr ""
+
+#. Template: AdminCustomerUserService
+msgid "Filter for services"
 msgstr ""
 
 #. Template: AdminCustomerUserService
@@ -1953,27 +1979,27 @@ msgid "Send"
 msgstr ""
 
 #. Template: AdminGenericAgent
-msgid "Generic Agent"
+msgid "Generic Agent Job Management"
 msgstr ""
 
 #. Template: AdminGenericAgent
-msgid "Edit job"
+msgid "Edit Job"
 msgstr ""
 
 #. Template: AdminGenericAgent
-msgid "Add job"
+msgid "Add Job"
 msgstr ""
 
 #. Template: AdminGenericAgent
-msgid "Run job"
+msgid "Run Job"
 msgstr ""
 
 #. Template: AdminGenericAgent
-msgid "Filter for Generic Agent Jobs"
+msgid "Filter for Jobs"
 msgstr ""
 
 #. Template: AdminGenericAgent
-msgid "Filter for generic agent jobs"
+msgid "Filter for jobs"
 msgstr ""
 
 #. Template: AdminGenericAgent
@@ -2590,7 +2616,7 @@ msgstr ""
 
 #. Template: AdminGenericInterfaceErrorHandlingDefault
 msgid ""
-"Example: Enter '^.*401 Unauthorized.*\\$' to handle only authentication "
+"Example: Enter '^.*401 Unauthorized.*\\\\$' to handle only authentication "
 "related errors."
 msgstr ""
 
@@ -2816,10 +2842,6 @@ msgstr ""
 #. Template: AdminGenericInterfaceInvokerDefault
 msgid ""
 "The name is typically used to call up an operation of a remote web service."
-msgstr ""
-
-#. Template: AdminGenericInterfaceInvokerDefault
-msgid "Please provide a unique name for this web service invoker."
 msgstr ""
 
 #. Template: AdminGenericInterfaceInvokerDefault
@@ -3168,8 +3190,9 @@ msgstr ""
 
 #. Template: AdminGenericInterfaceMappingXSLT
 msgid ""
-"Example 3: Search = '^(?<number>\\d+) (?<text>.+?)\\$' / Replace = "
-"'_\\$+{text}_\\$+{number}' turns '16 elementname' into '_elementname_16'."
+"Example 3: Search = '^(?<number>\\\\d+) (?<text>.+?)\\\\$' / Replace = "
+"'_\\\\$+{text}_\\\\$+{number}' turns '16 elementname' into "
+"'_elementname_16'."
 msgstr ""
 
 #. Template: AdminGenericInterfaceMappingXSLT
@@ -3219,16 +3242,6 @@ msgid ""
 msgstr ""
 
 #. Template: AdminGenericInterfaceOperationDefault
-msgid "Mapping for incoming request data"
-msgstr ""
-
-#. Template: AdminGenericInterfaceOperationDefault
-msgid ""
-"The request data will be processed by this mapping, to transform it to the "
-"kind of data OTRS expects."
-msgstr ""
-
-#. Template: AdminGenericInterfaceOperationDefault
 msgid "Operation backend"
 msgstr ""
 
@@ -3236,6 +3249,16 @@ msgstr ""
 msgid ""
 "This OTRS operation backend module will be called internally to process the "
 "request, generating data for the response."
+msgstr ""
+
+#. Template: AdminGenericInterfaceOperationDefault
+msgid "Mapping for incoming request data"
+msgstr ""
+
+#. Template: AdminGenericInterfaceOperationDefault
+msgid ""
+"The request data will be processed by this mapping, to transform it to the "
+"kind of data OTRS expects."
 msgstr ""
 
 #. Template: AdminGenericInterfaceOperationDefault
@@ -3253,9 +3276,7 @@ msgid "Include Ticket Data"
 msgstr ""
 
 #. Template: AdminGenericInterfaceOperationDefault
-msgid ""
-"Include ticket data by response. Only available for TicketCreate and "
-"TicketUpdate operations."
+msgid "Include ticket data in response."
 msgstr ""
 
 #. Template: AdminGenericInterfaceTransportHTTPREST
@@ -3760,10 +3781,6 @@ msgid ""
 msgstr ""
 
 #. Template: AdminGenericInterfaceWebservice
-msgid "Web Service List"
-msgstr ""
-
-#. Template: AdminGenericInterfaceWebservice
 msgid "Remote system"
 msgstr ""
 
@@ -3904,10 +3921,6 @@ msgid "Edit Group"
 msgstr ""
 
 #. Template: AdminGroup
-msgid "Add group"
-msgstr ""
-
-#. Template: AdminGroup
 msgid ""
 "The admin group is to get in the admin area and the stats group to get stats"
 " area."
@@ -3925,10 +3938,6 @@ msgstr ""
 
 #. Template: AdminLog
 msgid "System Log"
-msgstr ""
-
-#. Template: AdminLog
-msgid "Filter for Log Entries"
 msgstr ""
 
 #. Template: AdminLog
@@ -4223,7 +4232,7 @@ msgid "Manage %s"
 msgstr ""
 
 #. Template: AdminOTRSBusinessInstalled
-msgid "Downgrade to OTRS Free"
+msgid "Downgrade to ((OTRS)) Community Edition"
 msgstr ""
 
 #. Template: AdminOTRSBusinessInstalled
@@ -4313,8 +4322,8 @@ msgstr ""
 
 #. Template: AdminOTRSBusinessNotInstalled
 msgid ""
-"Your OTRS Free is the base for all future actions. Please register first "
-"before you continue with the upgrade process of %s!"
+"Your ((OTRS)) Community Edition is the base for all future actions. Please "
+"register first before you continue with the upgrade process of %s!"
 msgstr ""
 
 #. Template: AdminOTRSBusinessNotInstalled
@@ -4403,8 +4412,8 @@ msgstr ""
 
 #. Template: AdminOTRSBusinessUninstall
 msgid ""
-"You are about to downgrade to OTRS Free and will lose the following features"
-" and all data related to these:"
+"You are about to downgrade to ((OTRS)) Community Edition and will lose the "
+"following features and all data related to these:"
 msgstr ""
 
 #. Template: AdminOTRSBusinessUninstall
@@ -4478,19 +4487,11 @@ msgid "Check PGP configuration"
 msgstr ""
 
 #. Template: AdminPGP
-msgid "Add PGP key"
-msgstr ""
-
-#. Template: AdminPGP
 msgid "In this way you can directly edit the keyring configured in SysConfig."
 msgstr ""
 
 #. Template: AdminPGP
 msgid "Introduction to PGP"
-msgstr ""
-
-#. Template: AdminPGP
-msgid "Result"
 msgstr ""
 
 #. Template: AdminPGP
@@ -4544,7 +4545,7 @@ msgid ""
 msgstr ""
 
 #. Template: AdminPackageManager
-msgid "Go to upgrading instructions"
+msgid "Go to updating instructions"
 msgstr ""
 
 #. Template: AdminPackageManager
@@ -4592,8 +4593,7 @@ msgstr ""
 
 #. Template: AdminPackageManager
 msgid ""
-"Please find all relevant information within the upgrading instructions at "
-"%s."
+"Please find all relevant information within the updating instructions at %s."
 msgstr ""
 
 #. Template: AdminPackageManager
@@ -4847,15 +4847,11 @@ msgid "Edit PostMaster Filter"
 msgstr ""
 
 #. Template: AdminPostMasterFilter
-msgid "Add filter"
+msgid "Filter for PostMaster Filters"
 msgstr ""
 
 #. Template: AdminPostMasterFilter
-msgid "Filter for Postmaster Filters"
-msgstr ""
-
-#. Template: AdminPostMasterFilter
-msgid "Filter for postmaster filters"
+msgid "Filter for PostMaster filters"
 msgstr ""
 
 #. Template: AdminPostMasterFilter
@@ -4974,6 +4970,10 @@ msgstr ""
 
 #. Template: AdminProcessManagement
 msgid "Filter for Processes"
+msgstr ""
+
+#. Template: AdminProcessManagement
+msgid "Filter for processes"
 msgstr ""
 
 #. Template: AdminProcessManagement
@@ -5484,7 +5484,7 @@ msgid "Remove this Parameter"
 msgstr ""
 
 #. Template: AdminQueue
-msgid "Manage Queues"
+msgid "Queue Management"
 msgstr ""
 
 #. Template: AdminQueue
@@ -5601,6 +5601,12 @@ msgid "Default sign key"
 msgstr ""
 
 #. Template: AdminQueue
+msgid ""
+"To use a sign key, PGP keys or S/MIME certificates need to be added with "
+"identifiers for selected queue system address."
+msgstr ""
+
+#. Template: AdminQueue
 msgid "Salutation"
 msgstr ""
 
@@ -5654,6 +5660,10 @@ msgstr ""
 
 #. Template: AdminQueueTemplates
 msgid "Filter for Templates"
+msgstr ""
+
+#. Template: AdminQueueTemplates
+msgid "Filter for templates"
 msgstr ""
 
 #. Template: AdminQueueTemplates
@@ -5985,10 +5995,6 @@ msgid "Manage Role-Group Relations"
 msgstr ""
 
 #. Template: AdminRoleGroup
-msgid "Add role"
-msgstr ""
-
-#. Template: AdminRoleGroup
 msgid "Roles"
 msgstr ""
 
@@ -6051,11 +6057,15 @@ msgid "Manage Agent-Role Relations"
 msgstr ""
 
 #. Template: AdminRoleUser
-msgid "Add agent"
+msgid "Add Agent"
 msgstr ""
 
 #. Template: AdminRoleUser
 msgid "Filter for Agents"
+msgstr ""
+
+#. Template: AdminRoleUser
+msgid "Filter for agents"
 msgstr ""
 
 #. Template: AdminRoleUser
@@ -6125,19 +6135,11 @@ msgid "Check SMIME configuration"
 msgstr ""
 
 #. Template: AdminSMIME
-msgid "Add certificate"
-msgstr ""
-
-#. Template: AdminSMIME
-msgid "Add private key"
-msgstr ""
-
-#. Template: AdminSMIME
 msgid "Filter for Certificates"
 msgstr ""
 
 #. Template: AdminSMIME
-msgid "Filter for S/MIME certs"
+msgid "Filter for certificates"
 msgstr ""
 
 #. Template: AdminSMIME
@@ -6206,6 +6208,10 @@ msgid "Available Certificates"
 msgstr ""
 
 #. Template: AdminSMIME
+msgid "Filter for S/MIME certs"
+msgstr ""
+
+#. Template: AdminSMIME
 msgid "Relate this certificate"
 msgstr ""
 
@@ -6231,10 +6237,6 @@ msgstr ""
 
 #. Template: AdminSalutation
 msgid "Edit Salutation"
-msgstr ""
-
-#. Template: AdminSalutation
-msgid "Add salutation"
 msgstr ""
 
 #. Template: AdminSalutation
@@ -6339,14 +6341,6 @@ msgid "Edit Service"
 msgstr ""
 
 #. Template: AdminService
-msgid "Add service"
-msgstr ""
-
-#. Template: AdminService
-msgid "Filter for services"
-msgstr ""
-
-#. Template: AdminService
 msgid "Service name maximum length is 200 characters (with Sub-service)."
 msgstr ""
 
@@ -6359,7 +6353,7 @@ msgid "Session Management"
 msgstr ""
 
 #. Template: AdminSession
-msgid "Detail Session View for"
+msgid "Detail Session View for %s (%s)"
 msgstr ""
 
 #. Template: AdminSession
@@ -6411,7 +6405,7 @@ msgid "Kill"
 msgstr ""
 
 #. Template: AdminSession
-msgid "Detail View for SessionID"
+msgid "Detail View for SessionID: %s - %s"
 msgstr ""
 
 #. Template: AdminSignature
@@ -6424,10 +6418,6 @@ msgstr ""
 
 #. Template: AdminSignature
 msgid "Edit Signature"
-msgstr ""
-
-#. Template: AdminSignature
-msgid "Add signature"
 msgstr ""
 
 #. Template: AdminSignature
@@ -6478,6 +6468,12 @@ msgstr ""
 
 #. Template: AdminState
 msgid "State type"
+msgstr ""
+
+#. Template: AdminState
+msgid ""
+"It's not possible to invalidate this entry because there is no other merge "
+"states in system!"
 msgstr ""
 
 #. Template: AdminState
@@ -6820,6 +6816,10 @@ msgstr ""
 msgid "View single Setting: %s"
 msgstr ""
 
+#. Template: AdminSystemConfigurationView
+msgid "Go back to Deployment Details"
+msgstr ""
+
 #. Template: AdminSystemMaintenance
 msgid "System Maintenance Management"
 msgstr ""
@@ -6905,7 +6905,7 @@ msgid "Kill all Sessions, except for your own"
 msgstr ""
 
 #. Template: AdminTemplate
-msgid "Manage Templates"
+msgid "Template Management"
 msgstr ""
 
 #. Template: AdminTemplate
@@ -6914,10 +6914,6 @@ msgstr ""
 
 #. Template: AdminTemplate
 msgid "Edit Template"
-msgstr ""
-
-#. Template: AdminTemplate
-msgid "Add template"
 msgstr ""
 
 #. Template: AdminTemplate
@@ -6991,10 +6987,6 @@ msgid "Edit Type"
 msgstr ""
 
 #. Template: AdminType
-msgid "Add ticket type"
-msgstr ""
-
-#. Template: AdminType
 msgid "Filter for Types"
 msgstr ""
 
@@ -7018,10 +7010,6 @@ msgstr ""
 
 #. Template: AdminUser
 msgid "Agent Management"
-msgstr ""
-
-#. Template: AdminUser
-msgid "Add Agent"
 msgstr ""
 
 #. Template: AdminUser
@@ -7761,8 +7749,8 @@ msgstr ""
 
 #. Template: AgentOTRSBusinessBlockScreen
 msgid ""
-"If you decide to downgrade to OTRS Free, you will lose all database tables "
-"and data related to %s."
+"If you decide to downgrade to ((OTRS)) Community Edition, you will lose all "
+"database tables and data related to %s."
 msgstr ""
 
 #. Template: AgentPreferences
@@ -7770,7 +7758,7 @@ msgid "Edit your preferences"
 msgstr ""
 
 #. Template: AgentPreferences
-msgid "Personal preferences"
+msgid "Personal Preferences"
 msgstr ""
 
 #. Template: AgentPreferences
@@ -7852,10 +7840,6 @@ msgstr ""
 
 #. Template: SettingsList
 msgid "Reset to default"
-msgstr ""
-
-#. Template: AgentPreferencesOverview
-msgid "Personal Preferences"
 msgstr ""
 
 #. Template: AgentPreferencesOverview
@@ -8926,17 +8910,9 @@ msgstr ""
 
 #. Template: CustomerFooterJS
 msgid ""
-"Your browser was not able to communicate with OTRS properly, there seems to "
-"be something wrong with your network connection. You could either try "
-"reloading this page manually or wait until your browser has re-established "
-"the connection on its own."
-msgstr ""
-
-#. Template: CustomerFooterJS
-msgid ""
-"There was an error in communication with the server. Server might be "
-"experiencing some temporary problems, please reload this page to check if "
-"they have been resolved."
+"%s detected possible network issues. You could either try reloading this "
+"page manually or wait until your browser has re-established the connection "
+"on its own."
 msgstr ""
 
 #. Template: CustomerFooterJS
@@ -9014,6 +8990,10 @@ msgstr ""
 
 #. Template: CustomerLogin
 msgid "Not yet registered?"
+msgstr ""
+
+#. Template: CustomerLogin
+msgid "Back"
 msgstr ""
 
 #. Template: CustomerLogin
@@ -9271,6 +9251,10 @@ msgid "Notifications (OTRS Business Solution™)"
 msgstr ""
 
 #. Template: Header
+msgid "Personal preferences"
+msgstr ""
+
+#. Template: Header
 msgid "Logout"
 msgstr ""
 
@@ -9307,7 +9291,35 @@ msgid "Welcome to %s"
 msgstr ""
 
 #. Template: Installer
+msgid "Germany"
+msgstr ""
+
+#. Template: Installer
 msgid "Phone"
+msgstr ""
+
+#. Template: Installer
+msgid "United States"
+msgstr ""
+
+#. Template: Installer
+msgid "Mexico"
+msgstr ""
+
+#. Template: Installer
+msgid "Hungary"
+msgstr ""
+
+#. Template: Installer
+msgid "Brazil"
+msgstr ""
+
+#. Template: Installer
+msgid "Singapore"
+msgstr ""
+
+#. Template: Installer
+msgid "Hong Kong"
 msgstr ""
 
 #. Template: Installer
@@ -10577,7 +10589,7 @@ msgid "Auto Response added!"
 msgstr ""
 
 #. Perl Module: Kernel/Modules/AdminCommunicationLog.pm
-msgid "Invalid CommunicationID "
+msgid "Invalid CommunicationID!"
 msgstr ""
 
 #. Perl Module: Kernel/Modules/AdminCommunicationLog.pm
@@ -11099,7 +11111,7 @@ msgid "1 week"
 msgstr ""
 
 #. Perl Module: Kernel/Modules/AdminGenericInterfaceInvokerDefault.pm
-msgid "Need InvokerType"
+msgid "Could not determine config for invoker %s"
 msgstr ""
 
 #. Perl Module: Kernel/Modules/AdminGenericInterfaceInvokerDefault.pm
@@ -11107,15 +11119,7 @@ msgid "InvokerType %s is not registered"
 msgstr ""
 
 #. Perl Module: Kernel/Modules/AdminGenericInterfaceInvokerDefault.pm
-msgid "Need InvokerType!"
-msgstr ""
-
-#. Perl Module: Kernel/Modules/AdminGenericInterfaceInvokerDefault.pm
-msgid "Need Invoker"
-msgstr ""
-
-#. Perl Module: Kernel/Modules/AdminGenericInterfaceInvokerDefault.pm
-msgid "Could not determine config for invoker %s"
+msgid "MappingType %s is not registered"
 msgstr ""
 
 #. Perl Module: Kernel/Modules/AdminGenericInterfaceInvokerEvent.pm
@@ -11195,23 +11199,11 @@ msgid "Outgoing response data before mapping"
 msgstr ""
 
 #. Perl Module: Kernel/Modules/AdminGenericInterfaceOperationDefault.pm
-msgid "Need OperationType"
-msgstr ""
-
-#. Perl Module: Kernel/Modules/AdminGenericInterfaceOperationDefault.pm
-msgid "Operation %s is not registered"
+msgid "Could not determine config for operation %s"
 msgstr ""
 
 #. Perl Module: Kernel/Modules/AdminGenericInterfaceOperationDefault.pm
 msgid "OperationType %s is not registered"
-msgstr ""
-
-#. Perl Module: Kernel/Modules/AdminGenericInterfaceOperationDefault.pm
-msgid "Need Operation"
-msgstr ""
-
-#. Perl Module: Kernel/Modules/AdminGenericInterfaceOperationDefault.pm
-msgid "Could not determine config for operation %s"
 msgstr ""
 
 #. Perl Module: Kernel/Modules/AdminGenericInterfaceTransportHTTPREST.pm
@@ -13902,6 +13894,14 @@ msgid "You have Out of Office enabled, would you like to disable it?"
 msgstr ""
 
 #. Perl Module:
+#. Kernel/Output/HTML/Notification/PackageManagerCheckNotVerifiedPackages.pm
+msgid ""
+"The installation of packages which are not verified by the OTRS Group is "
+"activated. These packages could threaten your whole system! It is "
+"recommended not to use unverified packages."
+msgstr ""
+
+#. Perl Module:
 #. Kernel/Output/HTML/Notification/SystemConfigurationInvalidCheck.pm
 msgid ""
 "You have %s invalid setting(s) deployed. Click here to show invalid "
@@ -14375,6 +14375,19 @@ msgid ""
 " contracts.</p>"
 msgstr ""
 
+#. Perl Module: Kernel/System/Package.pm
+msgid ""
+"<p>The installation of packages which are not verified by the OTRS Group is "
+"not possible by default.</p>"
+msgstr ""
+
+#. Perl Module: Kernel/System/Package.pm
+msgid ""
+"<p>You can activate the installation of not verified packages in the <a "
+"href=\"%sAction=AdminSystemConfiguration;Subaction=View;Setting=Package%3A%3AAllowNotVerifiedPackages\""
+" target=\"_blank\">System Configuration</a>.</p>"
+msgstr ""
+
 #. Perl Module: Kernel/System/ProcessManagement/DB/Process.pm
 msgid "The process \"%s\" and all of its data has been imported successfully."
 msgstr ""
@@ -14788,11 +14801,6 @@ msgid ""
 msgstr ""
 
 #. Perl Module:
-#. Kernel/System/SupportDataCollector/Plugin/Database/mysql/TableCheck.pm
-msgid "Table check found some problems."
-msgstr ""
-
-#. Perl Module:
 #. Kernel/System/SupportDataCollector/Plugin/Database/mysql/Version.pm
 msgid "MySQL 5.x or higher is required."
 msgstr ""
@@ -15099,6 +15107,11 @@ msgid "Tickets Per Month (avg)"
 msgstr ""
 
 #. Perl Module:
+#. Kernel/System/SupportDataCollector/Plugin/OTRS/DatabaseRecords.pm
+msgid "Open Tickets"
+msgstr ""
+
+#. Perl Module:
 #. Kernel/System/SupportDataCollector/Plugin/OTRS/DefaultSOAPUser.pm
 msgid "Default SOAP Username And Password"
 msgstr ""
@@ -15126,14 +15139,6 @@ msgstr ""
 
 #. Perl Module: Kernel/System/SupportDataCollector/Plugin/OTRS/EmailQueue.pm
 msgid "Emails queued for sending"
-msgstr ""
-
-#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OTRS/ErrorLog.pm
-msgid "Error Log"
-msgstr ""
-
-#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OTRS/ErrorLog.pm
-msgid "There are error reports in your system log."
 msgstr ""
 
 #. Perl Module: Kernel/System/SupportDataCollector/Plugin/OTRS/FQDN.pm
@@ -15170,6 +15175,20 @@ msgstr ""
 #. Perl Module:
 #. Kernel/System/SupportDataCollector/Plugin/OTRS/LegacyConfigBackups.pm
 msgid "No legacy configuration backup files found."
+msgstr ""
+
+#. Perl Module:
+#. Kernel/System/SupportDataCollector/Plugin/OTRS/LegacyConfigBackups.pm
+msgid ""
+"Legacy configuration backup files found in %s, but they might still be "
+"required by some packages."
+msgstr ""
+
+#. Perl Module:
+#. Kernel/System/SupportDataCollector/Plugin/OTRS/LegacyConfigBackups.pm
+msgid ""
+"Legacy configuration backup files are no longer needed for the installed "
+"packages, please remove them from %s."
 msgstr ""
 
 #. Perl Module:
@@ -15262,11 +15281,6 @@ msgstr ""
 #. Perl Module:
 #. Kernel/System/SupportDataCollector/Plugin/OTRS/Ticket/InvalidUsersWithLockedTickets.pm
 msgid "There are invalid users with locked tickets."
-msgstr ""
-
-#. Perl Module:
-#. Kernel/System/SupportDataCollector/Plugin/OTRS/Ticket/OpenTickets.pm
-msgid "Open Tickets"
 msgstr ""
 
 #. Perl Module:
@@ -15578,6 +15592,14 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Ticket.pm
 msgid "Reset of unlock time."
+msgstr ""
+
+#. Perl Module: Kernel/System/Ticket/Article/Backend/Chat.pm
+msgid "Chat Participant"
+msgstr ""
+
+#. Perl Module: Kernel/System/Ticket/Article/Backend/Chat.pm
+msgid "Chat Message Text"
 msgstr ""
 
 #. Perl Module: Kernel/System/Web/InterfaceAgent.pm
@@ -16134,6 +16156,10 @@ msgid "Remove selection"
 msgstr ""
 
 #. JS File: Core.Agent.Admin.GenericAgent
+msgid "Do you really want to delete this generic agent job?"
+msgstr ""
+
+#. JS File: Core.Agent.Admin.GenericAgent
 msgid "Delete this Event Trigger"
 msgstr ""
 
@@ -16167,6 +16193,11 @@ msgstr ""
 
 #. JS File: Core.Agent.Admin.GenericInterfaceErrorHandling
 msgid "Delete error handling module"
+msgstr ""
+
+#. JS File: Core.Agent.Admin.GenericInterfaceInvoker
+msgid ""
+"It is not possible to add a new event trigger because the event is not set."
 msgstr ""
 
 #. JS File: Core.Agent.Admin.GenericInterfaceInvoker
@@ -16235,6 +16266,10 @@ msgstr ""
 
 #. JS File: Core.Agent.Admin.NotificationEvent
 msgid "Do you really want to delete this notification?"
+msgstr ""
+
+#. JS File: Core.Agent.Admin.PGP
+msgid "Do you really want to delete this key?"
 msgstr ""
 
 #. JS File: Core.Agent.Admin.PackageManager
@@ -16750,15 +16785,11 @@ msgid "Error: Browser Check failed!"
 msgstr ""
 
 #. JS File: Core.App
-msgid "Connection error"
-msgstr ""
-
-#. JS File: Core.App
 msgid "Reload page"
 msgstr ""
 
 #. JS File: Core.App
-msgid "Communication error"
+msgid "Reload page (%ss)"
 msgstr ""
 
 #. JS File: Core.Debug
@@ -17272,6 +17303,10 @@ msgid "Admin area navigation for the agent interface."
 msgstr ""
 
 #. SysConfig
+msgid "Admin modules overview."
+msgstr ""
+
+#. SysConfig
 msgid "Admin."
 msgstr ""
 
@@ -17297,6 +17332,10 @@ msgstr ""
 
 #. SysConfig
 msgid "Agent Preferences."
+msgstr ""
+
+#. SysConfig
+msgid "Agent Statistics."
 msgstr ""
 
 #. SysConfig
@@ -17508,7 +17547,7 @@ msgstr ""
 #. SysConfig
 msgid ""
 "Allows customers to set the ticket queue in the customer interface. If this "
-"is set to 'No', QueueDefault should be configured."
+"is not enabled, QueueDefault should be configured."
 msgstr ""
 
 #. SysConfig
@@ -17518,7 +17557,7 @@ msgstr ""
 #. SysConfig
 msgid ""
 "Allows customers to set the ticket type in the customer interface. If this "
-"is set to 'No', TicketTypeDefault should be configured."
+"is not enabled, TicketTypeDefault should be configured."
 msgstr ""
 
 #. SysConfig
@@ -17724,14 +17763,6 @@ msgstr ""
 
 #. SysConfig
 msgid "Attachment Name"
-msgstr ""
-
-#. SysConfig
-msgid "Attachments ↔ Templates"
-msgstr ""
-
-#. SysConfig
-msgid "Auto Responses ↔ Queues"
 msgstr ""
 
 #. SysConfig
@@ -18396,6 +18427,10 @@ msgid "Custom RSS Feed"
 msgstr ""
 
 #. SysConfig
+msgid "Custom RSS feed."
+msgstr ""
+
+#. SysConfig
 msgid ""
 "Custom text for the page shown to customers that have no tickets yet (if you"
 " need those text translated add them to a custom translation module)."
@@ -18418,6 +18453,10 @@ msgid "Customer Information Center Search."
 msgstr ""
 
 #. SysConfig
+msgid "Customer Information Center search."
+msgstr ""
+
+#. SysConfig
 msgid "Customer Information Center."
 msgstr ""
 
@@ -18435,6 +18474,10 @@ msgstr ""
 
 #. SysConfig
 msgid "Customer User Information Center Search."
+msgstr ""
+
+#. SysConfig
+msgid "Customer User Information Center search."
 msgstr ""
 
 #. SysConfig
@@ -18515,6 +18558,10 @@ msgstr ""
 
 #. SysConfig
 msgid "Danish"
+msgstr ""
+
+#. SysConfig
+msgid "Dashboard overview."
 msgstr ""
 
 #. SysConfig
@@ -18663,6 +18710,13 @@ msgstr ""
 
 #. SysConfig
 msgid "Define the start day of the week for the date picker."
+msgstr ""
+
+#. SysConfig
+msgid ""
+"Define which avatar default image should be used for the article view if no "
+"gravatar is assigned to the mail address. Check "
+"http://gravatar.com/site/implement/images/ for further information."
 msgstr ""
 
 #. SysConfig
@@ -19077,6 +19131,15 @@ msgstr ""
 
 #. SysConfig
 msgid ""
+"Defines if the communication between this system and OTRS Group servers that"
+" provide cloud services is possible. If set to 'Disable cloud services', "
+"some functionality will be lost such as system registration, support data "
+"sending, upgrading to and use of OTRS Business Solution™, OTRS Verify™, OTRS"
+" News and product News dashboard widgets, among others."
+msgstr ""
+
+#. SysConfig
+msgid ""
 "Defines if the enhanced mode should be used (enables use of table, replace, "
 "subscript, superscript, paste from word, etc.) in customer interface."
 msgstr ""
@@ -19331,7 +19394,21 @@ msgid ""
 "if the password needs to contain at least 2 letter characters (set to 0 or "
 "1). 'PasswordNeedDigit' controls the need of at least 1 digit (set to 0 or 1"
 " to control). 'PasswordMaxLoginFailed' allows to set an agent to invalid-"
-"temporarily if max failed logins reached."
+"temporarily if max failed logins reached. Please note: setting 'Active' to 0"
+" will only prevent agents from editing settings of this group in their "
+"personal preferences, but will still allow administrators to edit the "
+"settings of another user's behalf. Use 'PreferenceGroup' to control in which"
+" area these settings should be shown in the user interface."
+msgstr ""
+
+#. SysConfig
+msgid ""
+"Defines the config parameters of this item, to be shown in the preferences "
+"view. Please note: setting 'Active' to 0 will only prevent agents from "
+"editing settings of this group in their personal preferences, but will still"
+" allow administrators to edit the settings of another user's behalf. Use "
+"'PreferenceGroup' to control in which area these settings should be shown in"
+" the user interface."
 msgstr ""
 
 #. SysConfig
@@ -20264,6 +20341,12 @@ msgstr ""
 #. SysConfig
 msgid ""
 "Defines the module to display a notification in the agent interface, if the "
+"installation of not verified packages is activated (only shown to admins)."
+msgstr ""
+
+#. SysConfig
+msgid ""
+"Defines the module to display a notification in the agent interface, if the "
 "system is used by the admin user (normally you shouldn't work as admin)."
 msgstr ""
 
@@ -20645,6 +20728,13 @@ msgstr ""
 
 #. SysConfig
 msgid ""
+"Defines the shown links in the footer area of the customer and public "
+"interface of this OTRS system. The value in \"Key\" is the external URL, the"
+" value in \"Content\" is the shown label."
+msgstr ""
+
+#. SysConfig
+msgid ""
 "Defines the standard permissions available for customers within the "
 "application. If more permissions are needed, you can enter them here. "
 "Permissions must be hard coded to be effective. Please ensure, when adding "
@@ -20805,7 +20895,12 @@ msgid "Defines the username to access the SOAP handle (bin/cgi-bin/rpc.pl)."
 msgstr ""
 
 #. SysConfig
-msgid "Defines the users avatar."
+msgid ""
+"Defines the users avatar. Please note: setting 'Active' to 0 will only "
+"prevent agents from editing settings of this group in their personal "
+"preferences, but will still allow administrators to edit the settings of "
+"another user's behalf. Use 'PreferenceGroup' to control in which area these "
+"settings should be shown in the user interface."
 msgstr ""
 
 #. SysConfig
@@ -21046,6 +21141,10 @@ msgid ""
 msgstr ""
 
 #. SysConfig
+msgid "Disable cloud services"
+msgstr ""
+
+#. SysConfig
 msgid ""
 "Disables sending reminder notifications to the responsible agent of a ticket"
 " (Ticket::Responsible needs to be enabled)."
@@ -21053,17 +21152,8 @@ msgstr ""
 
 #. SysConfig
 msgid ""
-"Disables the communication between this system and OTRS Group servers that "
-"provides cloud services. If enabled, some functionality will be lost such as"
-" system registration, support data sending, upgrading to and use of OTRS "
-"Business Solution™, OTRS Verify™, OTRS News and product News dashboard "
-"widgets, among others."
-msgstr ""
-
-#. SysConfig
-msgid ""
 "Disables the redirection to the last screen overview / dashboard after a "
-"ticket is created."
+"ticket is closed."
 msgstr ""
 
 #. SysConfig
@@ -21791,6 +21881,10 @@ msgid "Frontend module registration for the customer interface."
 msgstr ""
 
 #. SysConfig
+msgid "Frontend module registration for the public interface."
+msgstr ""
+
+#. SysConfig
 msgid "Full value"
 msgstr ""
 
@@ -21903,7 +21997,11 @@ msgstr ""
 #. SysConfig
 msgid ""
 "Gives end users the possibility to override the separator character for CSV "
-"files, defined in the translation files."
+"files, defined in the translation files. Please note: setting 'Active' to 0 "
+"will only prevent agents from editing settings of this group in their "
+"personal preferences, but will still allow administrators to edit the "
+"settings of another user's behalf. Use 'PreferenceGroup' to control in which"
+" area these settings should be shown in the user interface."
 msgstr ""
 
 #. SysConfig
@@ -21941,10 +22039,9 @@ msgstr ""
 #. SysConfig
 msgid ""
 "Helps to extend your articles full-text search (From, To, Cc, Subject and "
-"Body search). Runtime will do full-text searches on live data (it works fine"
-" for up to 50.000 tickets). StaticDB will strip all articles and will build "
-"an index after article creation, increasing fulltext searches about 50%. To "
-"create an initial index use \"bin/otrs.Console.pl "
+"Body search). It will strip all articles and will build an index after "
+"article creation, increasing fulltext searches about 50%. To create an "
+"initial index use \"bin/otrs.Console.pl "
 "Maint::Ticket::FulltextIndexRebuild\"."
 msgstr ""
 
@@ -22035,7 +22132,7 @@ msgstr ""
 msgid ""
 "If \"HTTPBasicAuth\" was selected for Customer::AuthModule, you can specify "
 "to strip leading parts of user names (e. g. for domains like "
-"example_domain\\user to user)."
+"example_domain\\\\user to user)."
 msgstr ""
 
 #. SysConfig
@@ -22319,6 +22416,12 @@ msgstr ""
 
 #. SysConfig
 msgid ""
+"If this setting is enabled, it is possible to install packages which are not"
+" verified by OTRS Group. These packages could threaten your whole system!"
+msgstr ""
+
+#. SysConfig
+msgid ""
 "If this setting is enabled, local modifications will not be highlighted as "
 "errors in the package manager and support data collector."
 msgstr ""
@@ -22455,6 +22558,10 @@ msgid "JavaScript function for the search frontend."
 msgstr ""
 
 #. SysConfig
+msgid "Korean"
+msgstr ""
+
+#. SysConfig
 msgid "Language"
 msgstr ""
 
@@ -22515,10 +22622,6 @@ msgid "Link agents to roles."
 msgstr ""
 
 #. SysConfig
-msgid "Link attachments to templates."
-msgstr ""
-
-#. SysConfig
 msgid "Link customer users to customers."
 msgstr ""
 
@@ -22540,6 +22643,10 @@ msgstr ""
 
 #. SysConfig
 msgid "Link roles to groups."
+msgstr ""
+
+#. SysConfig
+msgid "Link templates to attachments."
 msgstr ""
 
 #. SysConfig
@@ -22654,6 +22761,10 @@ msgid "Loader module registration for the agent interface."
 msgstr ""
 
 #. SysConfig
+msgid "Loader module registration for the customer interface."
+msgstr ""
+
+#. SysConfig
 msgid "Lock / unlock this ticket"
 msgstr ""
 
@@ -22668,6 +22779,10 @@ msgstr ""
 #. SysConfig
 msgid "Locked ticket."
 msgstr "Locked ticket."
+
+#. SysConfig
+msgid "Logged in users."
+msgstr ""
 
 #. SysConfig
 msgid "Logged-In Users"
@@ -22768,10 +22883,6 @@ msgstr ""
 
 #. SysConfig
 msgid "Mark this ticket as junk!"
-msgstr ""
-
-#. SysConfig
-msgid "Marks articles for index rebuild right after the article's update."
 msgstr ""
 
 #. SysConfig
@@ -23078,6 +23189,10 @@ msgid "News about OTRS releases!"
 msgstr ""
 
 #. SysConfig
+msgid "News about OTRS."
+msgstr ""
+
+#. SysConfig
 msgid ""
 "Next possible ticket states after adding a phone note in the ticket phone "
 "inbound screen of the agent interface."
@@ -23219,6 +23334,10 @@ msgid "Out Of Office Time"
 msgstr ""
 
 #. SysConfig
+msgid "Out of Office users."
+msgstr ""
+
+#. SysConfig
 msgid ""
 "Overloads (redefines) existing functions in Kernel::System::Ticket. Used to "
 "easily add customizations."
@@ -23230,6 +23349,10 @@ msgstr ""
 
 #. SysConfig
 msgid "Overview Refresh Time"
+msgstr ""
+
+#. SysConfig
+msgid "Overview of all Tickets per assigned Queue."
 msgstr ""
 
 #. SysConfig
@@ -23271,29 +23394,51 @@ msgstr ""
 #. SysConfig
 msgid ""
 "Parameters for the CreateNextMask object in the preference view of the agent"
-" interface."
+" interface. Please note: setting 'Active' to 0 will only prevent agents from"
+" editing settings of this group in their personal preferences, but will "
+"still allow administrators to edit the settings of another user's behalf. "
+"Use 'PreferenceGroup' to control in which area these settings should be "
+"shown in the user interface."
 msgstr ""
 
 #. SysConfig
 msgid ""
 "Parameters for the CustomQueue object in the preference view of the agent "
-"interface."
+"interface. Please note: setting 'Active' to 0 will only prevent agents from "
+"editing settings of this group in their personal preferences, but will still"
+" allow administrators to edit the settings of another user's behalf. Use "
+"'PreferenceGroup' to control in which area these settings should be shown in"
+" the user interface."
 msgstr ""
 
 #. SysConfig
 msgid ""
 "Parameters for the CustomService object in the preference view of the agent "
-"interface."
+"interface. Please note: setting 'Active' to 0 will only prevent agents from "
+"editing settings of this group in their personal preferences, but will still"
+" allow administrators to edit the settings of another user's behalf. Use "
+"'PreferenceGroup' to control in which area these settings should be shown in"
+" the user interface."
 msgstr ""
 
 #. SysConfig
 msgid ""
 "Parameters for the RefreshTime object in the preference view of the agent "
-"interface."
+"interface. Please note: setting 'Active' to 0 will only prevent agents from "
+"editing settings of this group in their personal preferences, but will still"
+" allow administrators to edit the settings of another user's behalf. Use "
+"'PreferenceGroup' to control in which area these settings should be shown in"
+" the user interface."
 msgstr ""
 
 #. SysConfig
-msgid "Parameters for the column filters of the small ticket overview."
+msgid ""
+"Parameters for the column filters of the small ticket overview. Please note:"
+" setting 'Active' to 0 will only prevent agents from editing settings of "
+"this group in their personal preferences, but will still allow "
+"administrators to edit the settings of another user's behalf. Use "
+"'PreferenceGroup' to control in which area these settings should be shown in"
+" the user interface."
 msgstr ""
 
 #. SysConfig
@@ -23566,25 +23711,41 @@ msgstr ""
 #. SysConfig
 msgid ""
 "Parameters for the pages (in which the dynamic fields are shown) of the "
-"dynamic fields overview."
+"dynamic fields overview. Please note: setting 'Active' to 0 will only "
+"prevent agents from editing settings of this group in their personal "
+"preferences, but will still allow administrators to edit the settings of "
+"another user's behalf. Use 'PreferenceGroup' to control in which area these "
+"settings should be shown in the user interface."
 msgstr ""
 
 #. SysConfig
 msgid ""
 "Parameters for the pages (in which the tickets are shown) of the medium "
-"ticket overview."
+"ticket overview. Please note: setting 'Active' to 0 will only prevent agents"
+" from editing settings of this group in their personal preferences, but will"
+" still allow administrators to edit the settings of another user's behalf. "
+"Use 'PreferenceGroup' to control in which area these settings should be "
+"shown in the user interface."
 msgstr ""
 
 #. SysConfig
 msgid ""
 "Parameters for the pages (in which the tickets are shown) of the small "
-"ticket overview."
+"ticket overview. Please note: setting 'Active' to 0 will only prevent agents"
+" from editing settings of this group in their personal preferences, but will"
+" still allow administrators to edit the settings of another user's behalf. "
+"Use 'PreferenceGroup' to control in which area these settings should be "
+"shown in the user interface."
 msgstr ""
 
 #. SysConfig
 msgid ""
 "Parameters for the pages (in which the tickets are shown) of the ticket "
-"preview overview."
+"preview overview. Please note: setting 'Active' to 0 will only prevent "
+"agents from editing settings of this group in their personal preferences, "
+"but will still allow administrators to edit the settings of another user's "
+"behalf. Use 'PreferenceGroup' to control in which area these settings should"
+" be shown in the user interface."
 msgstr ""
 
 #. SysConfig
@@ -23781,6 +23942,10 @@ msgid "Queue view"
 msgstr ""
 
 #. SysConfig
+msgid "Queues ↔ Auto Responses"
+msgstr ""
+
+#. SysConfig
 msgid "Rebuild the ticket index for AgentTicketQueue."
 msgstr ""
 
@@ -23813,7 +23978,7 @@ msgid "Removes old system configuration deployments (Sunday mornings)."
 msgstr ""
 
 #. SysConfig
-msgid "Removes old ticket number counters (Sunday mornings)."
+msgid "Removes old ticket number counters (each 10 minutes)."
 msgstr ""
 
 #. SysConfig
@@ -24195,7 +24360,7 @@ msgstr ""
 #. SysConfig
 msgid ""
 "Sends the notifications which are configured in the admin interface under "
-"\"Notfication (Event)\"."
+"\"Ticket Notifications\"."
 msgstr ""
 
 #. SysConfig
@@ -24926,6 +25091,10 @@ msgid "Show article as rich text even if rich text writing is disabled."
 msgstr ""
 
 #. SysConfig
+msgid "Show command line output."
+msgstr ""
+
+#. SysConfig
 msgid "Show queues even when only locked tickets are in."
 msgstr ""
 
@@ -25035,6 +25204,61 @@ msgstr ""
 
 #. SysConfig
 msgid ""
+"Shows a link in the menu to add a phone call inbound in the ticket zoom view"
+" of the agent interface. Additional access control to show or not show this "
+"link can be done by using Key \"Group\" and Content like "
+"\"rw:group1;move_into:group2\". To cluster menu items use for Key "
+"\"ClusterName\" and for the Content any name you want to see in the UI. Use "
+"\"ClusterPriority\" to configure the order of a certain cluster within the "
+"toolbar."
+msgstr ""
+
+#. SysConfig
+msgid ""
+"Shows a link in the menu to add a phone call outbound in the ticket zoom "
+"view of the agent interface. Additional access control to show or not show "
+"this link can be done by using Key \"Group\" and Content like "
+"\"rw:group1;move_into:group2\". To cluster menu items use for Key "
+"\"ClusterName\" and for the Content any name you want to see in the UI. Use "
+"\"ClusterPriority\" to configure the order of a certain cluster within the "
+"toolbar."
+msgstr ""
+
+#. SysConfig
+msgid ""
+"Shows a link in the menu to change the customer who requested the ticket in "
+"the ticket zoom view of the agent interface. Additional access control to "
+"show or not show this link can be done by using Key \"Group\" and Content "
+"like \"rw:group1;move_into:group2\". To cluster menu items use for Key "
+"\"ClusterName\" and for the Content any name you want to see in the UI. Use "
+"\"ClusterPriority\" to configure the order of a certain cluster within the "
+"toolbar."
+msgstr ""
+
+#. SysConfig
+msgid ""
+"Shows a link in the menu to change the owner of a ticket in the ticket zoom "
+"view of the agent interface. Additional access control to show or not show "
+"this link can be done by using Key \"Group\" and Content like "
+"\"rw:group1;move_into:group2\". To cluster menu items use for Key "
+"\"ClusterName\" and for the Content any name you want to see in the UI. Use "
+"\"ClusterPriority\" to configure the order of a certain cluster within the "
+"toolbar."
+msgstr ""
+
+#. SysConfig
+msgid ""
+"Shows a link in the menu to change the responsible agent of a ticket in the "
+"ticket zoom view of the agent interface. Additional access control to show "
+"or not show this link can be done by using Key \"Group\" and Content like "
+"\"rw:group1;move_into:group2\". To cluster menu items use for Key "
+"\"ClusterName\" and for the Content any name you want to see in the UI. Use "
+"\"ClusterPriority\" to configure the order of a certain cluster within the "
+"toolbar."
+msgstr ""
+
+#. SysConfig
+msgid ""
 "Shows a link in the menu to close a ticket in every ticket overview of the "
 "agent interface."
 msgstr ""
@@ -25121,30 +25345,8 @@ msgstr ""
 
 #. SysConfig
 msgid ""
-"Shows a link in the menu to see the customer who requested the ticket in the"
-" ticket zoom view of the agent interface. Additional access control to show "
-"or not show this link can be done by using Key \"Group\" and Content like "
-"\"rw:group1;move_into:group2\". To cluster menu items use for Key "
-"\"ClusterName\" and for the Content any name you want to see in the UI. Use "
-"\"ClusterPriority\" to configure the order of a certain cluster within the "
-"toolbar."
-msgstr ""
-
-#. SysConfig
-msgid ""
 "Shows a link in the menu to see the history of a ticket in every ticket "
 "overview of the agent interface."
-msgstr ""
-
-#. SysConfig
-msgid ""
-"Shows a link in the menu to see the owner of a ticket in the ticket zoom "
-"view of the agent interface. Additional access control to show or not show "
-"this link can be done by using Key \"Group\" and Content like "
-"\"rw:group1;move_into:group2\". To cluster menu items use for Key "
-"\"ClusterName\" and for the Content any name you want to see in the UI. Use "
-"\"ClusterPriority\" to configure the order of a certain cluster within the "
-"toolbar."
 msgstr ""
 
 #. SysConfig
@@ -25152,17 +25354,6 @@ msgid ""
 "Shows a link in the menu to see the priority of a ticket in the ticket zoom "
 "view of the agent interface. Additional access control to show or not show "
 "this link can be done by using Key \"Group\" and Content like "
-"\"rw:group1;move_into:group2\". To cluster menu items use for Key "
-"\"ClusterName\" and for the Content any name you want to see in the UI. Use "
-"\"ClusterPriority\" to configure the order of a certain cluster within the "
-"toolbar."
-msgstr ""
-
-#. SysConfig
-msgid ""
-"Shows a link in the menu to see the responsible agent of a ticket in the "
-"ticket zoom view of the agent interface. Additional access control to show "
-"or not show this link can be done by using Key \"Group\" and Content like "
 "\"rw:group1;move_into:group2\". To cluster menu items use for Key "
 "\"ClusterName\" and for the Content any name you want to see in the UI. Use "
 "\"ClusterPriority\" to configure the order of a certain cluster within the "
@@ -25356,7 +25547,13 @@ msgid ""
 msgstr ""
 
 #. SysConfig
-msgid "Shows all the articles of the ticket (expanded) in the zoom view."
+msgid ""
+"Shows all the articles of the ticket (expanded) in the agent zoom view."
+msgstr ""
+
+#. SysConfig
+msgid ""
+"Shows all the articles of the ticket (expanded) in the customer zoom view."
 msgstr ""
 
 #. SysConfig
@@ -25825,6 +26022,14 @@ msgid "States"
 msgstr ""
 
 #. SysConfig
+msgid "Statistic Reports overview."
+msgstr ""
+
+#. SysConfig
+msgid "Statistics overview."
+msgstr ""
+
+#. SysConfig
 msgid "Status view"
 msgstr ""
 
@@ -25874,6 +26079,10 @@ msgstr ""
 
 #. SysConfig
 msgid "System Maintenance"
+msgstr ""
+
+#. SysConfig
+msgid "Templates ↔ Attachments"
 msgstr ""
 
 #. SysConfig
@@ -25953,6 +26162,12 @@ msgstr ""
 
 #. SysConfig
 msgid ""
+"The logo shown in the header of the agent interface for the skin \"High "
+"Contrast\". See \"AgentLogo\" for further description."
+msgstr ""
+
+#. SysConfig
+msgid ""
 "The logo shown in the header of the agent interface for the skin "
 "\"default\". See \"AgentLogo\" for further description."
 msgstr ""
@@ -25992,7 +26207,8 @@ msgstr ""
 #. SysConfig
 msgid ""
 "The logo shown on top of the login box of the agent interface. The URL to "
-"the image must be relative URL to the skin image directory."
+"the image can be a relative URL to the skin image directory, or a full URL "
+"to a remote web server."
 msgstr ""
 
 #. SysConfig
@@ -26304,11 +26520,21 @@ msgid ""
 msgstr ""
 
 #. SysConfig
-msgid "Transport selection for appointment notifications."
+msgid ""
+"Transport selection for appointment notifications. Please note: setting "
+"'Active' to 0 will only prevent agents from editing settings of this group "
+"in their personal preferences, but will still allow administrators to edit "
+"the settings of another user's behalf. Use 'PreferenceGroup' to control in "
+"which area these settings should be shown in the user interface."
 msgstr ""
 
 #. SysConfig
-msgid "Transport selection for ticket notifications."
+msgid ""
+"Transport selection for ticket notifications. Please note: setting 'Active' "
+"to 0 will only prevent agents from editing settings of this group in their "
+"personal preferences, but will still allow administrators to edit the "
+"settings of another user's behalf. Use 'PreferenceGroup' to control in which"
+" area these settings should be shown in the user interface."
 msgstr ""
 
 #. SysConfig

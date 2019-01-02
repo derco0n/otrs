@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 ## no critic (Modules::RequireExplicitPackage)
@@ -75,7 +75,7 @@ $Selenium->RunTest(
             JavaScript => 'return typeof($) === "function" && $(".fa-exclamation-triangle").length',
         );
 
-        my $Message = $Selenium->find_element( ".fa-exclamation-triangle", "css" )->get_attribute('title');
+        my $Message = $Selenium->execute_script("return \$('.fa-exclamation-triangle').attr('title');");
         $Self->True(
             $Message
                 =~ m{^This setting is currently being overridden in Kernel\/Config\/Files\/ZZZZUnitTest\d+.pm and can't thus be changed here!$}
@@ -192,9 +192,10 @@ $Selenium->RunTest(
             );
 
             # Update setting and save.
-            $Selenium->execute_script(
-                '$("#Ticket\\\\:\\\\:Frontend\\\\:\\\\:AgentTicketEscalationView\\\\#\\\\#\\\\#Order\\\\:\\\\:Default")
-                    .val("Down").trigger("redraw.InputField").trigger("change");'
+            $Selenium->InputFieldValueSet(
+                Element =>
+                    '#Ticket\\\\:\\\\:Frontend\\\\:\\\\:AgentTicketEscalationView\\\\#\\\\#\\\\#Order\\\\:\\\\:Default',
+                Value => 'Down',
             );
 
             $Selenium->execute_script("\$('.SettingsList li:nth-child(1) .SettingUpdateBox .Update').trigger('click')");

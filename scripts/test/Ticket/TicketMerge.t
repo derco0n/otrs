@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -310,7 +310,7 @@ $Helper->FixedTimeSet(
         ObjectParams => {
             String => '2017-09-27 10:00:00',
         },
-        )->ToEpoch()
+    )->ToEpoch()
 );
 
 # Create two more tickets.
@@ -369,8 +369,10 @@ $Self->Is(
 $Helper->FixedTimeAddSeconds(300);
 
 # Create user who will perform merge action.
+my $Language      = 'de';
 my $TestUserLogin = $Helper->TestUserCreate(
-    Groups => ['users'],
+    Groups   => ['users'],
+    Language => $Language,
 );
 my $UserID = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
     UserLogin => $TestUserLogin,
@@ -411,6 +413,7 @@ $Self->Is(
     TicketID => $TicketIDs[1],
     UserID   => 1,
 );
+
 $Self->Is(
     $MergeTicket{Changed},
     '2017-09-27 10:05:00',
@@ -420,6 +423,131 @@ $Self->Is(
     $MergeTicket{ChangeBy},
     $UserID,
     'After merge MergeTicket ChangeBy correct'
+);
+
+# Check translation of AutomaticMergeText, see more in bug #13967
+my @ArticleBoxUpdate = $ArticleObject->ArticleList(
+    TicketID => $MergeTicket{TicketID},
+);
+my $NewMetaArticle = pop @ArticleBoxUpdate;
+my %Article        = $ArticleBackendObject->ArticleGet( %{$NewMetaArticle} );
+
+$Kernel::OM->ObjectParamAdd(
+    'Kernel::Language' => {
+        UserLanguage => $Language,
+    },
+);
+my $LanguageObject = $Kernel::OM->Get('Kernel::Language');
+
+my $Body = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Frontend::AutomaticMergeText');
+$Body = $LanguageObject->Translate($Body);
+$Body =~ s{<OTRS_TICKET>}{$MergeTicket{TicketNumber}}xms;
+$Body =~ s{<OTRS_MERGE_TO_TICKET>}{$MainTicket{TicketNumber}}xms;
+
+$Self->Is(
+    $Body,
+    $Article{Body},
+    'Check article body of merged ticket'
+);
+
+# Linking objects and linking tickets.
+# See bug#12994 (https://bugs.otrs.org/show_bug.cgi?id=12994).
+my $RandomID = $Helper->GetRandomID();
+
+undef @TicketIDs;
+for my $Item ( 1 .. 6 ) {
+    my $TicketID = $TicketObject->TicketCreate(
+        Title        => 'Selenium test ',
+        Queue        => 'Junk',
+        Lock         => 'unlock',
+        Priority     => '3 normal',
+        State        => 'open',
+        CustomerNo   => '123465',
+        CustomerUser => 'customer@example.com',
+        OwnerID      => 1,
+        UserID       => 1,
+    );
+    $Self->True(
+        $TicketID,
+        'TicketCreated',
+    );
+
+    push @TicketIDs, $TicketID;
+}
+
+my @ItemData = (
+    {
+        SourceKey => $TicketIDs[0],
+        TargetKey => $TicketIDs[2],
+    },
+    {
+        SourceKey => $TicketIDs[1],
+        TargetKey => $TicketIDs[2],
+    },
+    {
+        SourceKey => $TicketIDs[0],
+        TargetKey => $TicketIDs[5],
+    },
+    {
+        SourceKey => $TicketIDs[1],
+        TargetKey => $TicketIDs[5],
+    },
+    {
+        SourceKey => $TicketIDs[0],
+        TargetKey => $TicketIDs[3],
+    },
+    {
+        SourceKey => $TicketIDs[1],
+        TargetKey => $TicketIDs[4],
+    },
+);
+
+# Create links between ticket.
+for my $Item (@ItemData) {
+    my $True = $LinkObject->LinkAdd(
+        %{$Item},
+        SourceObject => 'Ticket',
+        TargetObject => 'Ticket',
+        Type         => 'ParentChild',
+        State        => 'Valid',
+        UserID       => 1,
+    );
+    $Self->True(
+        $True,
+        "TicketID $Item->{SourceKey} is linked to $Item->{TargetKey}",
+    );
+}
+
+# Merging tickets.
+my $Success = $TicketObject->TicketMerge(
+    MainTicketID  => $TicketIDs[1],
+    MergeTicketID => $TicketIDs[0],
+    UserID        => 1,
+);
+$Self->True(
+    $Success,
+    "TicketID $TicketIDs[0] is successfully merged to TicketID $TicketIDs[1]",
+);
+
+# Get list of links merged to ticket.
+my $LinkList = $LinkObject->LinkListWithData(
+    Object => 'Ticket',
+    Key    => $TicketIDs[1],
+    State  => 'Valid',
+    Type   => 'ParentChild',    # (optional)
+    UserID => 1,
+);
+$Self->True(
+    $LinkList->{Ticket}->{ParentChild}->{Target}->{ $TicketIDs[3] },
+    "Child TicketID $TicketIDs[3] from parent TicketID $TicketIDs[0] is merged to TicketID $TicketIDs[1]"
+);
+$Self->True(
+    $LinkList->{Ticket}->{ParentChild}->{Target}->{ $TicketIDs[4] },
+    "Child TicketID $TicketIDs[4] persevered link with parent TicketID $TicketIDs[1]"
+);
+$Self->True(
+    $LinkList->{Ticket}->{ParentChild}->{Target}->{ $TicketIDs[2] },
+    "Mutual child TicketID $TicketIDs[2] is merged to TicketID $TicketIDs[1]"
 );
 
 # Cleanup is done by RestoreDatabase.

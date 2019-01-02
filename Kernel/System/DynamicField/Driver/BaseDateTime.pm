@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::DynamicField::Driver::BaseDateTime;
@@ -407,7 +407,7 @@ sub EditFieldValueValidate {
         return {
             ServerError  => 1,
             ErrorMessage => 'Invalid Date!'
-            }
+        };
     }
 
     my $ServerError;
@@ -624,7 +624,7 @@ EOF
             Sort           => 'IndividualKey',
             SortIndividual => [ 'Before', 'Last', 'Next', 'After' ],
             Name           => $FieldName . 'Start',
-            SelectedID => $Value->{Start}->{ $FieldName . 'Start' } || 'Last',
+            SelectedID     => $Value->{Start}->{ $FieldName . 'Start' } || 'Last',
         );
         $HTMLString .= ' ' . $Param{LayoutObject}->BuildSelection(
             Data       => [ 1 .. 59 ],
@@ -986,7 +986,7 @@ sub SearchFieldParameterBuild {
                     'Kernel::System::DateTime',
                     ObjectParams => {
                         Epoch => $Now - $DiffTimeSeconds,
-                        }
+                    }
                 );
 
                 # only search dates in the past (before the time stamp)
@@ -1002,7 +1002,7 @@ sub SearchFieldParameterBuild {
                     'Kernel::System::DateTime',
                     ObjectParams => {
                         Epoch => $Now - $DiffTimeSeconds,
-                        }
+                    }
                 );
 
                 # search dates in the past (after the time stamp and up to now)
@@ -1019,7 +1019,7 @@ sub SearchFieldParameterBuild {
                     'Kernel::System::DateTime',
                     ObjectParams => {
                         Epoch => $Now + $DiffTimeSeconds,
-                        }
+                    }
                 );
 
                 # search dates in the future (after now and up to the time stamp)
@@ -1036,7 +1036,7 @@ sub SearchFieldParameterBuild {
                     'Kernel::System::DateTime',
                     ObjectParams => {
                         Epoch => $Now + $DiffTimeSeconds,
-                        }
+                    }
                 );
 
                 # only search dates in the future (after the time stamp)
@@ -1137,18 +1137,18 @@ sub TemplateValueTypeGet {
     if ( $Param{FieldType} eq 'Edit' ) {
         return {
             $FieldName => $EditValueType,
-            }
+        };
     }
     elsif ( $Param{FieldType} eq 'Search' ) {
         return {
             'Search_' . $FieldName => $SearchValueType,
-            }
+        };
     }
     else {
         return {
             $FieldName             => $EditValueType,
             'Search_' . $FieldName => $SearchValueType,
-            }
+        };
     }
 }
 
@@ -1226,10 +1226,10 @@ sub ValueLookup {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

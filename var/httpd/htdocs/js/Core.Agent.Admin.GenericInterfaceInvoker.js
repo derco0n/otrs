@@ -1,9 +1,9 @@
 // --
-// Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+// Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 // --
 // This software comes with ABSOLUTELY NO WARRANTY. For details, see
-// the enclosed file COPYING for license information (AGPL). If you
-// did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+// the enclosed file COPYING for license information (GPL). If you
+// did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 // --
 
 "use strict";
@@ -40,11 +40,12 @@ Core.Agent.Admin.GenericInterfaceInvoker = (function (TargetNS) {
      */
     TargetNS.Init = function () {
         var Events = Core.Config.Get('Events'),
+            $EventListParent = $('.EventList').parent(),
             ElementID, EventName, ElementSelector;
 
         TargetNS.WebserviceID = parseInt(Core.Config.Get('WebserviceID'), 10);
         TargetNS.Invoker = Core.Config.Get('Invoker');
-        TargetNS.Action = 'AdminGenericInterfaceInvokerDefault';
+        TargetNS.Action = Core.Config.Get('Action');
 
         $('#MappingOutboundConfigureButton').on('click', function() {
             TargetNS.Redirect('MappingOutbound');
@@ -62,12 +63,19 @@ Core.Agent.Admin.GenericInterfaceInvoker = (function (TargetNS) {
         $('#DeleteButton').on('click', TargetNS.ShowDeleteDialog);
 
         $('#EventType').on('change', function (){
+            Core.UI.InputFields.Deactivate($EventListParent);
             TargetNS.ToogleEventSelect($(this).val());
+            Core.UI.InputFields.Activate($EventListParent);
         });
 
         $('#AddEvent').on('click', function (){
             TargetNS.AddEvent($('#EventType').val());
         });
+
+        // Initialize event trigger fields.
+        Core.UI.InputFields.Deactivate($EventListParent);
+        TargetNS.ToogleEventSelect($('#EventType').val());
+        Core.UI.InputFields.Activate($EventListParent);
 
         // Initialize delete action dialog event
         $.each(Events, function(){
@@ -115,13 +123,27 @@ Core.Agent.Admin.GenericInterfaceInvoker = (function (TargetNS) {
                 EventType: EventType
         };
 
-        if ($('#Asynchronous').is(':checked')) {
-            Data.Asynchronous = 1;
+        if (Data.NewEvent) {
+            if ($('#Asynchronous').is(':checked')) {
+                Data.Asynchronous = 1;
+            }
+
+            $('#AddEvent').prop('disabled', true);
+            Core.App.InternalRedirect(Data);
+        }
+        else{
+            Core.UI.Dialog.ShowDialog({
+                Title: Core.Language.Translate("Add Event Trigger"),
+                HTML: Core.Language.Translate("It is not possible to add a new event trigger because the event is not set."),
+                Modal: true,
+                CloseOnClickOutside: false,
+                CloseOnEscape: false,
+                PositionTop: '20%',
+                PositionLeft: 'Center',
+                Buttons: []
+            });
         }
 
-        $('#AddEvent').prop('disabled', true);
-
-        Core.App.InternalRedirect(Data);
     };
 
     /**

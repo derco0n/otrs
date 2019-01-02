@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Modules::AdminSystemConfiguration;
@@ -579,7 +579,7 @@ sub Run {
             );
         }
 
-        my $FormID = $ParamObject->GetParam( Param => 'FormID' ) || '';
+        my $FormID      = $ParamObject->GetParam( Param => 'FormID' ) || '';
         my %UploadStuff = $ParamObject->GetUploadAll(
             Param  => 'FileUpload',
             Source => 'string',
@@ -657,7 +657,7 @@ sub _GetCategoriesStrg {
     my $CategoriesStrg = $Kernel::OM->Get('Kernel::Output::HTML::Layout')->BuildSelection(
         Data         => \%CategoryData,
         Name         => 'Category',
-        SelectedID   => $Category || 'All',
+        SelectedID   => $Category || Translatable('All'),
         PossibleNone => 0,
         Translation  => 1,
         Sort         => 'AlphaNumericKey',

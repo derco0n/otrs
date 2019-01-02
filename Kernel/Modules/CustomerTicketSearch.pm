@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Modules::CustomerTicketSearch;
@@ -87,7 +87,7 @@ sub Run {
     my %GetParam;
 
     # get config data
-    my $StartHit = int( $ParamObject->GetParam( Param => 'StartHit' ) || 1 );
+    my $StartHit    = int( $ParamObject->GetParam( Param => 'StartHit' ) || 1 );
     my $SearchLimit = $ConfigObject->Get('Ticket::CustomerTicketSearch::SearchLimit')
         || 200;
     my $SearchPageShown = $ConfigObject->Get('Ticket::CustomerTicketSearch::SearchPageShown') || 40;
@@ -100,7 +100,7 @@ sub Run {
 
     # get search profile object
     my $SearchProfileObject = $Kernel::OM->Get('Kernel::System::SearchProfile');
-    my $TakeLastSearch = $ParamObject->GetParam( Param => 'TakeLastSearch' ) || '';
+    my $TakeLastSearch      = $ParamObject->GetParam( Param => 'TakeLastSearch' ) || '';
 
     # collect all searchable article field definitions and add the fields to the attributes array
     my %ArticleSearchableFields = $Kernel::OM->Get('Kernel::System::Ticket::Article')->ArticleSearchableFieldsList();
@@ -271,6 +271,10 @@ sub Run {
 
         if ( !$ProfileName ) {
             $ProfileName = "($Profile)";
+        }
+
+        if ( $ProfileName eq '(last-search)' ) {
+            $ProfileName = '(' . $LayoutObject->{LanguageObject}->Translate('last-search') . ')';
         }
 
         # store search URL in LastScreenOverview to make sure the
@@ -581,7 +585,7 @@ sub Run {
                 # Get ticket data.
                 my %Ticket = $TicketObject->TicketGet(
                     TicketID      => $TicketID,
-                    DynamicFields => 0,
+                    DynamicFields => 1,
                     Extended      => 1,
                     UserID        => $Self->{UserID},
                 );
@@ -735,7 +739,7 @@ sub Run {
                 'ticket_search_%s',
                 $CurSystemDateTimeObject->Format(
                     Format => '%Y-%m-%d_%H-%M'
-                    )
+                )
             );
 
             # get CSV object
@@ -829,7 +833,7 @@ sub Run {
                 if ( !%Article ) {
                     %Data = %Ticket;
                     $Data{Subject} = $Ticket{Title} || $LayoutObject->{LanguageObject}->Translate('Untitled');
-                    $Data{From} = '--';
+                    $Data{From}    = '--';
                 }
                 else {
                     %Data = ( %Ticket, %Article );
@@ -864,7 +868,7 @@ sub Run {
                 $UserInfo{CustomerName} = '(' . $UserInfo{CustomerName} . ')'
                     if ( $UserInfo{CustomerName} );
 
-                my %Info = ( %Data, %UserInfo );
+                my %Info    = ( %Data, %UserInfo );
                 my $Created = $LayoutObject->{LanguageObject}->FormatTimeString(
                     $Data{CreateTime} // $Data{Created},
                     'DateFormat',
@@ -1149,7 +1153,7 @@ sub Run {
                     # Get ticket data.
                     my %Ticket = $TicketObject->TicketGet(
                         TicketID      => $TicketID,
-                        DynamicFields => 0,
+                        DynamicFields => 1,
                         Extended      => 1,
                         UserID        => $Self->{UserID},
                     );
@@ -1195,7 +1199,7 @@ sub Run {
                     if ( !%Article ) {
                         %Data = %Ticket;
                         $Data{Subject} = $Ticket{Title} || $LayoutObject->{LanguageObject}->Translate('Untitled');
-                        $Data{Body} = $LayoutObject->{LanguageObject}->Translate(
+                        $Data{Body}    = $LayoutObject->{LanguageObject}->Translate(
                             'This item has no articles yet.'
                         );
                     }
@@ -1577,7 +1581,7 @@ sub Run {
                     if ( IsHashRefWithData($HistoricalValues) ) {
                         for my $Key ( sort keys %{$HistoricalValues} ) {
                             if ( !$Data->{$Key} ) {
-                                $Data->{$Key} = $HistoricalValues->{$Key}
+                                $Data->{$Key} = $HistoricalValues->{$Key};
                             }
                         }
                     }
@@ -1670,18 +1674,23 @@ sub MaskForm {
         SelectedID => $Param{ResultForm} || 'Normal',
         Class      => 'Modernize',
     );
+
+    my %Profiles = $Kernel::OM->Get('Kernel::System::SearchProfile')->SearchProfileList(
+        Base      => 'CustomerTicketSearch',
+        UserLogin => $Self->{UserLogin},
+    );
+
+    if ( $Profiles{'last-search'} ) {
+        $Profiles{'last-search'} = $LayoutObject->{LanguageObject}->Translate('last-search');
+    }
+
     $Param{ProfilesStrg} = $LayoutObject->BuildSelection(
-        Data => {
-            '', '-',
-            $Kernel::OM->Get('Kernel::System::SearchProfile')->SearchProfileList(
-                Base      => 'CustomerTicketSearch',
-                UserLogin => $Self->{UserLogin},
-            ),
-        },
-        Translation => 0,
-        Name        => 'Profile',
-        SelectedID  => $Param{Profile},
-        Class       => 'Modernize',
+        Data         => \%Profiles,
+        Translation  => 0,
+        Name         => 'Profile',
+        SelectedID   => $Param{Profile},
+        Class        => 'Modernize',
+        PossibleNone => 1,
     );
 
     my %Customers = $Kernel::OM->Get('Kernel::System::CustomerGroup')->GroupContextCustomers(

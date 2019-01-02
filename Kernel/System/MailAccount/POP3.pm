@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::MailAccount::POP3;
@@ -102,7 +102,7 @@ sub Fetch {
             Direction   => 'Incoming',
             AccountType => $Param{Type},
             AccountID   => $Param{ID},
-            }
+        }
     );
 
     $CommunicationLogObject->ObjectLogStart(
@@ -270,7 +270,7 @@ sub Fetch {
     }
     else {
 
-        my $MessageList = $POPOperation->( 'list', );
+        my $MessageList  = $POPOperation->( 'list', );
         my $MessageCount = $NOM eq '0E0' ? 0 : $NOM;
 
         $CommunicationLogObject->ObjectLog(
@@ -281,7 +281,7 @@ sub Fetch {
         );
 
         MESSAGE_NO:
-        for my $Messageno ( sort keys %{$MessageList} ) {
+        for my $Messageno ( sort { $a <=> $b } keys %{$MessageList} ) {
 
             # check if reconnect is needed
             if ( $FetchCounter >= $MaxPopEmailSession ) {
@@ -331,7 +331,7 @@ sub Fetch {
 
                 # convert size to KB, log error
                 my $MessageSizeKB = int( $MessageList->{$Messageno} / (1024) );
-                my $ErrorMessage = "$AuthType: Can't fetch email $NOM from $Param{Login}/$Param{Host}. "
+                my $ErrorMessage  = "$AuthType: Can't fetch email $NOM from $Param{Login}/$Param{Host}. "
                     . "Email too big ($MessageSizeKB KB - max $MaxEmailSize KB)!";
 
                 $CommunicationLogObject->ObjectLog(

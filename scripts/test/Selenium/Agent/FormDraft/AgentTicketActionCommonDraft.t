@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -268,22 +268,22 @@ $Selenium->RunTest(
 
             # Force sub menus to be visible in order to be able to click one of the links.
             if ( $Test->{Module} eq 'Note' ) {
-                $Selenium->WaitFor(
-                    JavaScript =>
-                        'return typeof($) === "function" && $("#nav-Communication ul").css({ "height": "auto", "opacity": "100" });'
+                $Selenium->execute_script(
+                    '$("#nav-Communication ul").css({ "height": "auto", "opacity": "100" });'
                 );
+                $Selenium->WaitFor( JavaScript => "return \$('#nav-Communication ul').css('opacity') == 1;" );
             }
             elsif ( $Test->{Module} eq 'Owner' || $Test->{Module} eq 'Responsible' ) {
-                $Selenium->WaitFor(
-                    JavaScript =>
-                        'return typeof($) === "function" && $("#nav-People ul").css({ "height": "auto", "opacity": "100" });'
+                $Selenium->execute_script(
+                    '$("#nav-People ul").css({ "height": "auto", "opacity": "100" });'
                 );
+                $Selenium->WaitFor( JavaScript => "return \$('#nav-People ul').css('opacity') == 1;" );
             }
             elsif ( $Test->{Module} eq 'FreeText' ) {
-                $Selenium->WaitFor(
-                    JavaScript =>
-                        'return typeof($) === "function" && $("#nav-Miscellaneous ul").css({ "height": "auto", "opacity": "100" });'
+                $Selenium->execute_script(
+                    '$("#nav-Miscellaneous ul").css({ "height": "auto", "opacity": "100" });'
                 );
+                $Selenium->WaitFor( JavaScript => "return \$('#nav-Miscellaneous ul').css('opacity') == 1;" );
             }
 
             # Click on module and switch window.
@@ -309,18 +309,25 @@ $Selenium->RunTest(
                             "return typeof(\$) === 'function' && \$('#$Test->{Fields}->{$Field}->{ID}').length"
                     );
 
-                    $Selenium->execute_script(
-                        "\$('#$Test->{Fields}->{$Field}->{ID}').val('$Test->{Fields}->{$Field}->{Value}').trigger('redraw.InputField').trigger('change');"
+                    $Selenium->InputFieldValueSet(
+                        Element => "#$Test->{Fields}->{$Field}->{ID}",
+                        Value   => $Test->{Fields}->{$Field}->{Value},
                     );
                 }
                 elsif ( $Test->{Fields}->{$Field}->{Type} eq 'Attachment' ) {
 
-                    # make the file upload field visible
+                    # Make the file upload field visible.
+                    $Selenium->VerifiedRefresh();
                     $Selenium->execute_script(
                         "\$('#FileUpload').css('display', 'block')"
                     );
+                    $Selenium->WaitFor(
+                        JavaScript =>
+                            'return typeof($) === "function" && $("#FileUpload:visible").length;'
+                    );
+                    sleep 1;
 
-                    # upload a file
+                    # Upload a file.
                     $Selenium->find_element( "#FileUpload", 'css' )
                         ->send_keys( $ConfigObject->Get('Home') . "/scripts/test/sample/Main/Main-Test1.pdf" );
 
@@ -367,7 +374,8 @@ $Selenium->RunTest(
             }
 
             # Create Draft and submit.
-            $Selenium->find_element( "#FormDraftSave", 'css' )->click();
+            sleep 1;
+            $Selenium->execute_script("\$('#FormDraftSave').click();");
             $Selenium->WaitFor(
                 JavaScript =>
                     'return typeof($) === "function" && $("#FormDraftTitle").length && $("#SaveFormDraft").length;'
@@ -388,7 +396,7 @@ $Selenium->RunTest(
                 "Draft for $Test->{Module} $Title is found",
             );
 
-            my $ArticleObject = $Kernel::OM->Get('Kernel::System::Ticket::Article');
+            my $ArticleObject        = $Kernel::OM->Get('Kernel::System::Ticket::Article');
             my $ArticleBackendObject = $ArticleObject->BackendForChannel( ChannelName => 'Phone' );
 
             # Create test Article to trigger that draft is outdated.
@@ -462,8 +470,9 @@ $Selenium->RunTest(
                         "Initial Draft value for $Test->{Module} field $FieldValue is correct - $Value"
                     );
 
-                    $Selenium->execute_script(
-                        "\$('#$ID').val('$Test->{Fields}->{$FieldValue}->{Update}').trigger('redraw.InputField').trigger('change');"
+                    $Selenium->InputFieldValueSet(
+                        Element => "#$ID",
+                        Value   => $Test->{Fields}->{$FieldValue}->{Update},
                     );
                 }
                 elsif ( $Test->{Fields}->{$FieldValue}->{Type} eq 'Attachment' ) {
@@ -484,12 +493,18 @@ $Selenium->RunTest(
                         $Test->{Module} . " - Only one file present"
                     );
 
-                    # add a second file
+                    # Add a second file.
+                    $Selenium->VerifiedRefresh();
                     $Selenium->execute_script(
                         "\$('#FileUpload').css('display', 'block')"
                     );
+                    $Selenium->WaitFor(
+                        JavaScript =>
+                            'return typeof($) === "function" && $("#FileUpload:visible").length;'
+                    );
+                    sleep 1;
 
-                    # upload a file
+                    # Upload a file.
                     $Selenium->find_element( "#FileUpload", 'css' )
                         ->send_keys( $ConfigObject->Get('Home') . "/scripts/test/sample/Main/Main-Test1.doc" );
 
@@ -550,7 +565,8 @@ $Selenium->RunTest(
             }
 
             # Try to add draft with same name.
-            $Selenium->find_element( "#FormDraftSave", 'css' )->click();
+            sleep 1;
+            $Selenium->execute_script("\$('#FormDraftSave').click();");
             $Selenium->WaitFor(
                 JavaScript =>
                     'return typeof($) === "function" && $("#FormDraftTitle").length && $("#SaveFormDraft").length;'
@@ -694,10 +710,10 @@ $Selenium->RunTest(
         }
 
         # Test for Save the draft without JSON error in window, bug#13556 https://bugs.otrs.org/show_bug.cgi?id=13556.
-        $Selenium->WaitFor(
-            JavaScript =>
-                'return typeof($) === "function" && $("#nav-Communication ul").css({ "height": "auto", "opacity": "100" });'
+        $Selenium->execute_script(
+            '$("#nav-Communication ul").css({ "height": "auto", "opacity": "100" });'
         );
+        $Selenium->WaitFor( JavaScript => "return \$('#nav-Communication ul').css('opacity') == 1;" );
 
         # Click on 'Note' and switch window.
         $Selenium->find_element("//a[contains(\@href, \'Action=AgentTicketNote;TicketID=$TicketID' )]")->click();
@@ -713,8 +729,8 @@ $Selenium->RunTest(
         );
 
         # Save form in Draft.
-        sleep 1;
-        $Selenium->find_element( "#FormDraftSave", 'css' )->click();
+        $Selenium->VerifiedRefresh();
+        $Selenium->execute_script("\$('#FormDraftSave').click();");
         $Selenium->WaitFor(
             JavaScript =>
                 'return typeof($) === "function" && $("#FormDraftTitle").length && $("#SaveFormDraft").length;'

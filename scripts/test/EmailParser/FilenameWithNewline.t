@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -42,7 +42,7 @@ $Self->Is(
 
 $Self->Is(
     $Attachments[2]->{'Filename'} || '',
-    'Test testtestt 1231234/34/Testtesttes testes testtesttestt - testtesttes dokumentów/Sprzedaż, testTE [...] [TE#123123123].eml',
+    'Test_testtestt_1231234_34_Testtesttes_testes_testtesttestt_-_testtesttes_dokumentów_Sprzedaż__testTE__...___TE#123123123_.eml',
     "Filename with multiple newlines removed",
 );
 

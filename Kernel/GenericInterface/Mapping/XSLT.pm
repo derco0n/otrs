@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::GenericInterface::Mapping::XSLT;
@@ -107,10 +107,10 @@ This data can be included in the C<XSLT> mapping as 'DataInclude' structure via 
 sub Map {
     my ( $Self, %Param ) = @_;
 
-    # Check data - only accept undef or hash ref.
-    if ( defined $Param{Data} && ref $Param{Data} ne 'HASH' ) {
+    # Check data - only accept undef or hash ref or array ref.
+    if ( defined $Param{Data} && ref $Param{Data} ne 'HASH' && ref $Param{Data} ne 'ARRAY' ) {
         return $Self->{DebuggerObject}->Error(
-            Summary => 'Got Data but it is not a hash ref in Mapping XSLT backend!'
+            Summary => 'Got Data but it is not a hash or array ref in Mapping XSLT backend!'
         );
     }
 
@@ -154,17 +154,24 @@ sub Map {
 
     # Prepare style sheet.
     my $LibXSLT = XML::LibXSLT->new();
+
+    # Remove template line breaks and white spaces to plain text lines on the fly, see bug# 14106.
+    my $Template =
+        $Config->{Template}
+        =~ s{ > [ \t\n]+ (?= [^< \t\n] ) }{>}xmsgr
+        =~ s{ (?<! [> \t\n] ) [ \t\n]+ < }{<}xmsgr;
+
     my ( $StyleDoc, $StyleSheet );
     eval {
         $StyleDoc = XML::LibXML->load_xml(
-            string   => $Config->{Template},
+            string   => $Template,
             no_cdata => 1,
         );
     };
     if ( !$StyleDoc ) {
         return $Self->{DebuggerObject}->Error(
             Summary => 'Could not load configured XSLT template',
-            Data    => $Config->{Template},
+            Data    => $Template,
         );
     }
     eval {
@@ -363,10 +370,10 @@ sub _RegExRecursion {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

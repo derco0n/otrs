@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -43,6 +43,37 @@ $Selenium->RunTest(
 
         my $RandomID = $Helper->GetRandomID();
 
+        # Create test DynamicField field.
+        my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
+        my $DynamicFieldName   = 'DFText' . $RandomID;
+        my $DynamicFieldID     = $DynamicFieldObject->DynamicFieldAdd(
+            Name       => $DynamicFieldName,
+            Label      => 'DFlabel' . $RandomID,
+            FieldOrder => 9990,
+            FieldType  => 'Text',
+            ObjectType => 'Ticket',
+            Config     => {
+                DefaultValue => '',
+                Link         => '',
+            },
+            Reorder => 1,
+            ValidID => 1,
+            UserID  => 1,
+        );
+        $Self->True(
+            $DynamicFieldID,
+            "DynamicFieldID $DynamicFieldID is created",
+        );
+
+        # Enable SearchOverviewDynamicField.
+        $Helper->ConfigSettingChange(
+            Key   => 'Ticket::Frontend::CustomerTicketSearch###SearchOverviewDynamicField',
+            Valid => 1,
+            Value => {
+                $DynamicFieldName => 1,
+            },
+        );
+
         # Create test customer user.
         my $TestCustomerUserLogin = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserAdd(
             Source         => 'CustomerUser',
@@ -60,10 +91,11 @@ $Selenium->RunTest(
             "CustomerUser $TestCustomerUserLogin is created",
         );
 
+        my $Language = 'de';
         $Kernel::OM->Get('Kernel::System::CustomerUser')->SetPreferences(
             UserID => $TestCustomerUserLogin,
             Key    => 'UserLanguage',
-            Value  => 'en',
+            Value  => $Language,
         );
 
         $Selenium->Login(
@@ -142,6 +174,24 @@ $Selenium->RunTest(
             TicketID => $TicketID,
         );
 
+        # Set DynamicField value.
+        my $ValueText = 'DFV' . $RandomID;
+        my $Success   = $Kernel::OM->Get('Kernel::System::DynamicFieldValue')->ValueSet(
+            FieldID    => $DynamicFieldID,
+            ObjectType => 'Ticket',
+            ObjectID   => $TicketID,
+            Value      => [
+                {
+                    ValueText => $ValueText,
+                },
+            ],
+            UserID => 1,
+        );
+        $Self->True(
+            $Success,
+            "Value for DynamicFieldID $DynamicFieldID is set to TicketID $TicketID '$ValueText' successfully",
+        );
+
         # input ticket number as search parameter
         $Selenium->find_element( "#TicketNumber", 'css' )->send_keys( $Ticket{TicketNumber} );
         $Selenium->find_element( "#Submit",       'css' )->VerifiedClick();
@@ -158,11 +208,26 @@ $Selenium->RunTest(
             'Internal article not found on page'
         );
 
+        # Verify translated 'Body' field label.
+        my $LanguageObject = Kernel::Language->new(
+            UserLanguage => $Language,
+        );
+
         # Check for search profile name.
-        my $SearchText = '← Change search options (last-search)';
-        $Self->True(
-            index( $Selenium->get_page_source(), $SearchText ) > -1,
+        my $SearchText = '← '
+            . $LanguageObject->Translate('Change search options') . ' ('
+            . $LanguageObject->Translate('last-search') . ')';
+        $Self->Is(
+            $Selenium->execute_script("return \$('.ActionRow a').text().trim()"),
+            $SearchText,
             "Search profile name 'last-search' found on page",
+        );
+
+        # Check if DynamicField value is available in CustomerTicketSearch result screen.
+        # See https://bugs.otrs.org/show_bug.cgi?id=13818.
+        $Self->True(
+            index( $Selenium->get_page_source(), "$ValueText" ) > -1,
+            "DynamicField value is found - $DynamicFieldName:$ValueText",
         );
 
         # click on '← Change search options'
@@ -171,34 +236,49 @@ $Selenium->RunTest(
         # input more search filters, result should be 'No data found'
         $Selenium->find_element( "#TicketNumber", 'css' )->clear();
         $Selenium->find_element( "#TicketNumber", 'css' )->send_keys("123456789012345");
-        $Selenium->execute_script("\$('#StateIDs').val([1, 4]).trigger('redraw.InputField').trigger('change');");
-        $Selenium->execute_script("\$('#PriorityIDs').val([2, 3]).trigger('redraw.InputField').trigger('change');");
+        $Selenium->InputFieldValueSet(
+            Element => '#StateIDs',
+            Value   => "[1, 4]",
+        );
+        $Selenium->InputFieldValueSet(
+            Element => '#PriorityIDs',
+            Value   => "[2, 3]",
+        );
         $Selenium->find_element( "#Submit", 'css' )->VerifiedClick();
 
         # check for expected result
-        $Self->True(
-            index( $Selenium->get_page_source(), "No data found." ) > -1,
+        $Self->Is(
+            $Selenium->execute_script("return \$('#EmptyMessage td').text().trim();"),
+            $LanguageObject->Translate('No data found.'),
             "Ticket is not found on page",
         );
 
         # check search filter data
-        $Self->True(
-            index( $Selenium->get_page_source(), "Search Results for:" ) > -1,
+        $Self->Is(
+            $Selenium->execute_script("return \$('.SearchTerms h2').text().trim();"),
+            $LanguageObject->Translate('Search Results for') . ':',
             "Filter data is found - Search Results for:",
         );
 
-        $Self->True(
-            index( $Selenium->get_page_source(), "TicketNumber: 123456789012345" ) > -1,
+        $Self->Is(
+            $Selenium->execute_script("return \$('.SearchTerms span:eq(0)').text().trim();"),
+            $LanguageObject->Translate('TicketNumber') . ': 123456789012345',
             "Filter data is found - TicketNumber: 123456789012345",
         );
 
-        $Self->True(
-            index( $Selenium->get_page_source(), "State: new+open" ) > -1,
+        $Self->Is(
+            $Selenium->execute_script("return \$('.SearchTerms span:eq(1)').text().trim();"),
+            $LanguageObject->Translate('State') . ': '
+                . $LanguageObject->Translate('new') . '+'
+                . $LanguageObject->Translate('open'),
             "Filter data is found - State: new+open",
         );
 
-        $Self->True(
-            index( $Selenium->get_page_source(), "Priority: 2 low+3 normal" ) > -1,
+        $Self->Is(
+            $Selenium->execute_script("return \$('.SearchTerms span:eq(2)').text().trim();"),
+            $LanguageObject->Translate('Priority') . ': '
+                . $LanguageObject->Translate('2 low') . '+'
+                . $LanguageObject->Translate('3 normal'),
             "Filter data is found - Priority: 2 low+3 normal",
         );
 
@@ -222,7 +302,7 @@ $Selenium->RunTest(
         );
 
         # clean up test data from the DB
-        my $Success = $TicketObject->TicketDelete(
+        $Success = $TicketObject->TicketDelete(
             TicketID => $TicketID,
             UserID   => 1,
         );
@@ -237,13 +317,21 @@ $Selenium->RunTest(
         }
         $Self->True(
             $Success,
-            "Ticket is deleted - $TicketID"
+            "TicketID $TicketID is deleted"
         );
 
-        my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+        # Delete test created DynamicField.
+        $Success = $DynamicFieldObject->DynamicFieldDelete(
+            ID     => $DynamicFieldID,
+            UserID => 1,
+        );
+        $Self->True(
+            $DynamicFieldID,
+            "DynamicFieldID $DynamicFieldID is deleted",
+        );
 
         # Delete test created customer user.
-        $Success = $DBObject->Do(
+        $Success = $Kernel::OM->Get('Kernel::System::DB')->Do(
             SQL  => "DELETE FROM customer_user WHERE login = ?",
             Bind => [ \$TestCustomerUserLogin ],
         );

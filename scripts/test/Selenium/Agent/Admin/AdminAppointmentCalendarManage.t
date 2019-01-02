@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -80,22 +80,24 @@ $Selenium->RunTest(
         my $CalendarName2 = "Calendar $RandomID 2";
         $Selenium->find_element( '.SidebarColumn ul.ActionList a#Add',   'css' )->VerifiedClick();
         $Selenium->find_element( 'form#CalendarFrom input#CalendarName', 'css' )->send_keys($CalendarName1);
-        $Selenium->execute_script(
-            "\$('#GroupID').val($GroupID).trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#GroupID',
+            Value   => $GroupID,
         );
         $Selenium->find_element( 'form#CalendarFrom button#Submit', 'css' )->VerifiedClick();
 
         # Verify download and copy-to-clipboard links.
         for my $Class (qw(DownloadLink CopyToClipboard)) {
-            my $Element = $Selenium->find_element( ".$Class", 'css' );
 
-            my $URL;
+            my $Attr;
             if ( $Class eq 'DownloadLink' ) {
-                $URL = $Element->get_attribute('href');
+                $Attr = 'href';
             }
             elsif ( $Class eq 'CopyToClipboard' ) {
-                $URL = $Element->get_attribute('data-clipboard-text');
+                $Attr = 'data-clipboard-text';
             }
+
+            my $URL = $Selenium->execute_script("return \$('.$Class').attr('$Attr');");
 
             $Self->True(
                 $URL,
@@ -114,8 +116,9 @@ $Selenium->RunTest(
         # Let's try to add calendar with same name.
         $Selenium->find_element( '.SidebarColumn ul.ActionList a#Add',   'css' )->VerifiedClick();
         $Selenium->find_element( 'form#CalendarFrom input#CalendarName', 'css' )->send_keys($CalendarName1);
-        $Selenium->execute_script(
-            "\$('#GroupID').val($GroupID).trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#GroupID',
+            Value   => $GroupID,
         );
         $Selenium->find_element( 'form#CalendarFrom button#Submit', 'css' )->VerifiedClick();
 
@@ -132,7 +135,10 @@ $Selenium->RunTest(
         $Selenium->find_element( 'form#CalendarFrom input#CalendarName', 'css' )->send_keys($CalendarName2);
 
         # Set it to invalid.
-        $Selenium->execute_script("\$('#ValidID').val('2').trigger('redraw.InputField').trigger('change');");
+        $Selenium->InputFieldValueSet(
+            Element => '#ValidID',
+            Value   => 2,
+        );
 
         # Add ticket appointment rule.
         $Selenium->execute_script(
@@ -144,13 +150,15 @@ $Selenium->RunTest(
 
         $Selenium->find_element( '#AddRuleButton', 'css' )->click();
         $Selenium->WaitFor( JavaScript => "return \$('#QueueID_1').length" );
-        $Selenium->execute_script(
-            "\$('#QueueID_1').val('$QueueID').trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#QueueID_1',
+            Value   => $QueueID,
         );
 
         # Add title as search parameter.
-        $Selenium->execute_script(
-            "\$('#SearchParams').val('Title').trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#SearchParams',
+            Value   => 'Title',
         );
         $Selenium->find_element( '.AddButton', 'css' )->click();
         $Selenium->WaitFor(
@@ -205,8 +213,9 @@ $Selenium->RunTest(
         $Selenium->find_element( $CalendarName2, 'link_text' )->VerifiedClick();
 
         # Set it to invalid-temporarily.
-        $Selenium->execute_script(
-            "\$('#ValidID').val(3).trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#ValidID',
+            Value   => 3,
         );
 
         # Verify rule has been stored properly.

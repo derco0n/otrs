@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package scripts::DBUpdateTo6;    ## no critic
@@ -61,7 +61,7 @@ sub Run {
     print "\n Migration started ... \n";
 
     my $SuccessfulMigration = 1;
-    my @Components = ( 'CheckPreviousRequirement', 'Run' );
+    my @Components          = ( 'CheckPreviousRequirement', 'Run' );
 
     COMPONENT:
     for my $Component (@Components) {
@@ -81,7 +81,7 @@ sub Run {
     }
 
     if ($TimingEnabled) {
-        my $GeneralStopTime = Time::HiRes::time();
+        my $GeneralStopTime      = Time::HiRes::time();
         my $GeneralExecutionTime = sprintf( "%.6f", $GeneralStopTime - $GeneralStartTime );
         print "    Migration took $GeneralExecutionTime seconds.\n\n";
     }
@@ -169,9 +169,9 @@ sub _ExecuteComponent {
         }
 
         if ($TimingEnabled) {
-            my $StopTaskTime = Time::HiRes::time();
+            my $StopTaskTime      = Time::HiRes::time();
             my $ExecutionTaskTime = sprintf( "%.6f", $StopTaskTime - $TaskStartTime );
-            print " ($ExecutionTaskTime seconds).";
+            print "        Time taken for task \"$Task->{Message}\": $ExecutionTaskTime seconds\n\n";
         }
 
         if ( !$Success ) {
@@ -329,6 +329,10 @@ sub _TasksGet {
             Message => 'Migrate package repository configuration',
             Module  => 'MigratePackageRepositoryConfiguration',
         },
+        {
+            Message => 'Migrate ticket search profiles',
+            Module  => 'MigrateTicketSearchProfiles',
+        },
 
         # ...
 
@@ -342,11 +346,19 @@ sub _TasksGet {
         },
         {
             Message => 'Refresh configuration cache another time',
-            Module  => 'RebuildConfig',
+            Module  => 'RebuildConfigCleanup',
         },
         {
-            Message => 'Check SysConfig consistency',
-            Module  => 'SysConfigCheck',
+            Message => 'Deploy ACLs',
+            Module  => 'ACLDeploy',
+        },
+        {
+            Message => 'Deploy processes',
+            Module  => 'ProcessDeploy',
+        },
+        {
+            Message => 'Check invalid settings',
+            Module  => 'InvalidSettingsCheck',
         },
     );
 
@@ -357,10 +369,10 @@ sub _TasksGet {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

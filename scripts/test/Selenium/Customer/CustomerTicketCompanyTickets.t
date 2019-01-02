@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -213,6 +213,11 @@ $Selenium->RunTest(
 
         $Selenium->VerifiedGet("${ScriptAlias}customer.pl?Action=CustomerTicketOverview;Subaction=CompanyTickets");
 
+        # Wait until new screen has loaded.
+        $Selenium->WaitFor(
+            JavaScript => "return typeof(\$) === 'function' && \$('.Overview .MasterAction a').length;"
+        );
+
         # search for both tickets on Company Tickets screen (default filter is Open)
         for my $Count ( 0 .. 1 ) {
             $Self->True(
@@ -227,12 +232,16 @@ $Selenium->RunTest(
         for my $Count ( 0 .. 1 ) {
 
             # select customer company
-            $Selenium->execute_script(
-                "\$('#CustomerIDs').val('$CustomerIDs[$Count]').trigger('redraw.InputField').trigger('change');"
+            $Selenium->InputFieldValueSet(
+                Element => '#CustomerIDs',
+                Value   => $CustomerIDs[$Count],
             );
 
-            # wait until new screen has loaded
-            $Selenium->WaitFor( JavaScript => "return typeof(\$) === 'function'" );
+            # Wait until new screen has loaded.
+            $Selenium->WaitFor(
+                JavaScript => "return typeof(\$) === 'function' && \$('.Overview .MasterAction a').length;"
+            );
+            sleep 1;
 
             $Self->True(
                 $Selenium->find_element(

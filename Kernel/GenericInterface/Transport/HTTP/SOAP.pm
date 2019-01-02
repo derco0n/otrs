@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::GenericInterface::Transport::HTTP::SOAP;
@@ -23,7 +23,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::GenericInterface::Transport::SOAP - GenericInterface network transport interface for HTTP::SOAP
+Kernel::GenericInterface::Transport::HTTP::SOAP - GenericInterface network transport interface for HTTP::SOAP
 
 =head1 PUBLIC INTERFACE
 
@@ -440,7 +440,7 @@ sub ProviderGenerateResponse {
     if ($SOAPResult) {
         push @CallData, $SOAPResult;
     }
-    my $Serialized = SOAP::Serializer->autotype(0)->default_ns( $Config->{NameSpace} )->envelope(@CallData);
+    my $Serialized      = SOAP::Serializer->autotype(0)->default_ns( $Config->{NameSpace} )->envelope(@CallData);
     my $SerializedFault = $@ || '';
     if ($SerializedFault) {
         return $Self->_Output(
@@ -1002,7 +1002,7 @@ sub _Output {
 
     # Set keep-alive.
     my $ConfigKeepAlive = $Kernel::OM->Get('Kernel::Config')->Get('SOAP::Keep-Alive');
-    my $Connection = $ConfigKeepAlive ? 'Keep-Alive' : 'close';
+    my $Connection      = $ConfigKeepAlive ? 'Keep-Alive' : 'close';
 
     # Prepare additional headers.
     my $AdditionalHeaderStrg = '';
@@ -1454,10 +1454,10 @@ sub _SOAPOutputTypesGet {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

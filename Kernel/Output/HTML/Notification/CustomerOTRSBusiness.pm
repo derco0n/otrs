@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Output::HTML::Notification::CustomerOTRSBusiness;
@@ -38,10 +38,16 @@ sub Run {
 
     if ( $EntitlementStatus eq 'warning-error' || $EntitlementStatus eq 'forbidden' ) {
 
-        my $OTRSBusinessLabel = $OTRSBusinessObject->OTRSSTORMIsInstalled()
-            ?
-            '<b>STORM powered by OTRS</b>™'
-            : '<b>OTRS Business Solution</b>™';
+        my $OTRSBusinessLabel;
+        if ( $OTRSBusinessObject->OTRSSTORMIsInstalled() ) {
+            $OTRSBusinessLabel = '<b>STORM powered by OTRS</b>™';
+        }
+        elsif ( $OTRSBusinessObject->OTRSCONTROLIsInstalled() ) {
+            $OTRSBusinessLabel = '<b>CONTROL powered by OTRS</b>™';
+        }
+        else {
+            $OTRSBusinessLabel = '<b>OTRS Business Solution</b>™';
+        }
 
         # get layout object
         my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');

@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 ## no critic (Modules::RequireExplicitPackage)
@@ -23,16 +23,18 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
-                Click => 'label',    # make sure that label is working as well
+                # Make sure that label is working as well.
+                # Normal click, it's not jQuery object.
+                Click => 'label',
             },
             {
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => 'label',
@@ -47,16 +49,18 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
-                Click => 'label',    # make sure that label is working as well
+                # Make sure that label is working as well.
+                # Normal click, it's not jQuery object.
+                Click => 'label',
             },
             {
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => 'label',
@@ -71,7 +75,7 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
                 # wait until DatePicker is initialized
@@ -96,7 +100,7 @@ my @Tests = (
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => 'select',
@@ -111,7 +115,7 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
                 # wait until DatePicker is initialized
@@ -146,7 +150,7 @@ my @Tests = (
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => 'select',
@@ -161,7 +165,7 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
                 Select => '.Setting input',
@@ -176,7 +180,7 @@ my @Tests = (
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => 'input',
@@ -191,7 +195,7 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
                 Select => '.Setting input',
@@ -209,10 +213,10 @@ my @Tests = (
                 ExpectAlert => 'Setting value is not valid!',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
-                Click => '.Cancel',
+                JqueryClick => '.Cancel',
             },
         ],
         ExpectedResult => '/usr',
@@ -224,7 +228,7 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
                 # wait until select is initialized
@@ -232,9 +236,10 @@ my @Tests = (
             },
             {
                 # Select '1 very low'.
-                JS => "\$('.WidgetSimple[data-name=\"ExampleEntityPriority\"] "
-                    . " select').val('1 very low')"
-                    . ".trigger('redraw.InputField').trigger('change');",
+                InputFieldValueSet => {
+                    Element => '.WidgetSimple[data-name=\"ExampleEntityPriority\"] select',
+                    Value   => '1 very low',
+                },
             },
             {
                 # Wait until option is selected.
@@ -246,7 +251,7 @@ my @Tests = (
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => 'select',
@@ -261,7 +266,7 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
                 # wait until select is initialized
@@ -269,9 +274,10 @@ my @Tests = (
             },
             {
                 # Select 'Raw'.
-                JS => "\$('.WidgetSimple[data-name=\"ExampleEntityQueue\"] "
-                    . " select').val('Raw')"
-                    . ".trigger('redraw.InputField').trigger('change');",
+                InputFieldValueSet => {
+                    Element => '.WidgetSimple[data-name=\"ExampleEntityQueue\"] select',
+                    Value   => 'Raw',
+                },
             },
             {
                 # Wait until option is selected.
@@ -283,7 +289,7 @@ my @Tests = (
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => 'select',
@@ -298,7 +304,7 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
                 Select => '.Setting input',
@@ -313,7 +319,7 @@ my @Tests = (
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => 'input',
@@ -328,7 +334,7 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
                 Select => '.Setting input',
@@ -346,10 +352,10 @@ my @Tests = (
                 ExpectAlert => 'Setting value is not valid!',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
-                Click => '.Cancel',
+                JqueryClick => '.Cancel',
             },
         ],
         ExpectedResult => '/etc/localtime',
@@ -358,11 +364,12 @@ my @Tests = (
         Name     => 'ExampleFrontendRegistration###AgentTest',
         Commands => [
             {
-                Click => '.Header',
+                # Normal click, it's not jQuery object.
+                Click => '.Header a',
             },
             {
                 # Disable setting.
-                Click => 'a.SettingEnabled',
+                JqueryClick => 'a.SettingEnabled',
             },
             {
                 Deploy => 1,
@@ -374,11 +381,12 @@ my @Tests = (
         Name     => 'ExampleFrontendRegistration###AgentTest',
         Commands => [
             {
-                Click => '.Header',
+                # Normal click, it's not jQuery object.
+                Click => '.Header a',
             },
             {
                 # Enable setting.
-                Click => 'a.SettingDisabled',
+                JqueryClick => 'a.SettingDisabled',
             },
             {
                 Deploy => 1,
@@ -399,14 +407,14 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
                 Select => '.Setting input',
             },
             {
                 # Add new Group item.
-                Click => '.HashItem:nth-of-type(2) .AddArrayItem',
+                JqueryClick => '.HashItem:nth-of-type(2) .AddArrayItem',
             },
             {
                 Select => '.HashItem:nth-of-type(2) input.Entry',
@@ -421,7 +429,7 @@ my @Tests = (
                 Write => '#',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => 'input',
@@ -442,7 +450,7 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
                 Select => '.Setting input',
@@ -457,7 +465,7 @@ my @Tests = (
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => 'input',
@@ -472,7 +480,7 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
                 # wait until select is initialized
@@ -480,9 +488,10 @@ my @Tests = (
             },
             {
                 # Select Kernel::System::Log::File
-                JS => "\$('.WidgetSimple[data-name=\"ExamplePerlModule\"] "
-                    . " select').val('Kernel::System::Log::File')"
-                    . ".trigger('redraw.InputField').trigger('change');",
+                InputFieldValueSet => {
+                    Element => '.WidgetSimple[data-name=\"ExamplePerlModule\"] select',
+                    Value   => 'Kernel::System::Log::File',
+                },
             },
             {
                 # Wait until option is selected.
@@ -494,7 +503,7 @@ my @Tests = (
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => 'select',
@@ -509,7 +518,7 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
                 # wait until select is initialized
@@ -517,9 +526,10 @@ my @Tests = (
             },
             {
                 # Select option-2.
-                JS => "\$('.WidgetSimple[data-name=\"ExampleSelect\"] "
-                    . " select').val('option-2')"
-                    . ".trigger('redraw.InputField').trigger('change');",
+                InputFieldValueSet => {
+                    Element => '.WidgetSimple[data-name=\"ExampleSelect\"] select',
+                    Value   => 'option-2',
+                },
             },
             {
                 # Wait until option is selected.
@@ -531,7 +541,7 @@ my @Tests = (
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => 'select',
@@ -549,7 +559,7 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
                 Select => '.Setting input',
@@ -564,7 +574,7 @@ my @Tests = (
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => '.Setting input',
@@ -582,7 +592,7 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
                 Select => '.Setting input',
@@ -597,7 +607,7 @@ my @Tests = (
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => '.Setting input',
@@ -615,7 +625,7 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
                 Select => 'textarea',
@@ -630,7 +640,7 @@ my @Tests = (
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => 'textarea',
@@ -648,7 +658,7 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
                 Select => 'textarea',
@@ -663,7 +673,7 @@ my @Tests = (
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => 'textarea',
@@ -681,7 +691,7 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
                 # wait until select is initialized
@@ -689,9 +699,10 @@ my @Tests = (
             },
             {
                 # Select Europe/Berlin
-                JS => "\$('.WidgetSimple[data-name=\"ExampleTimeZone\"] "
-                    . " select').val('Europe/Berlin')"
-                    . ".trigger('redraw.InputField').trigger('change');",
+                InputFieldValueSet => {
+                    Element => '.WidgetSimple[data-name=\"ExampleTimeZone\"] select',
+                    Value   => 'Europe/Berlin',
+                },
             },
             {
                 # Wait until option is selected.
@@ -703,7 +714,7 @@ my @Tests = (
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 Select => 'select',
@@ -718,26 +729,26 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
                 # wait until select is initialized
                 Select => 'select',
             },
             {
-                Click => '.ArrayItem:nth-of-type(1) .RemoveButton',
+                JqueryClick => '.ArrayItem:nth-of-type(1) .RemoveButton',
             },
             {
-                Click => '.ArrayItem:nth-of-type(1) .RemoveButton',
+                JqueryClick => '.ArrayItem:nth-of-type(1) .RemoveButton',
             },
             {
-                Click => '.ArrayItem:nth-of-type(1) .RemoveButton',
+                JqueryClick => '.ArrayItem:nth-of-type(1) .RemoveButton',
             },
             {
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 ElementMissing => '.AddArrayItem',
@@ -752,14 +763,14 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
                 # wait until Add item button is shown
                 Select => '.AddArrayItem',
             },
             {
-                Click => '.AddArrayItem',
+                JqueryClick => '.AddArrayItem',
             },
             {
                 # Select month 04
@@ -778,7 +789,7 @@ my @Tests = (
                 Write => 'Vacation day 1',
             },
             {
-                Click => '.AddArrayItem',
+                JqueryClick => '.AddArrayItem',
             },
             {
                 # Select month 11
@@ -798,7 +809,7 @@ my @Tests = (
             },
 
             {
-                Click => '.AddArrayItem',
+                JqueryClick => '.AddArrayItem',
             },
             {
                 # Select month 02
@@ -821,7 +832,7 @@ my @Tests = (
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 ElementMissing => '.AddArrayItem',
@@ -846,20 +857,20 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
                 # wait until select is initialized
                 Select => 'select',
             },
             {
-                Click => '.ArrayItem:nth-of-type(1) .RemoveButton',
+                JqueryClick => '.ArrayItem:nth-of-type(1) .RemoveButton',
             },
             {
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 ElementMissing => '.AddArrayItem',
@@ -874,14 +885,14 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
                 # wait until Add item button is shown
                 Select => '.AddArrayItem',
             },
             {
-                Click => '.AddArrayItem',
+                JqueryClick => '.AddArrayItem',
             },
 
             #MDY
@@ -910,7 +921,7 @@ my @Tests = (
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 ElementMissing => '.AddArrayItem',
@@ -931,29 +942,33 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
                 # wait until select is initialized
                 Select => '.Update',
             },
             {
+                # Normal click, it's not jQuery object.
                 Click => ' .WorkingHoursItem:nth-of-type(9)',
             },
             {
+                # Normal click, it's not jQuery object.
                 Click => ' .WorkingHoursItem:nth-of-type(10)',
             },
             {
+                # Normal click, it's not jQuery object.
                 Click => ' .WorkingHoursItem:nth-of-type(34)',
             },
             {
+                # Normal click, it's not jQuery object.
                 Click => ' .WorkingHoursItem:nth-of-type(35)',
             },
             {
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 ElementMissing => '.Update',
@@ -968,29 +983,33 @@ my @Tests = (
                 Hover => '.Content',
             },
             {
-                Click => '.SettingEdit',
+                JqueryClick => '.SettingEdit',
             },
             {
                 # wait until select is initialized
                 Select => '.Update',
             },
             {
+                # Normal click, it's not jQuery object.
                 Click => ' .WorkingHoursItem:nth-of-type(9)',
             },
             {
+                # Normal click, it's not jQuery object.
                 Click => ' .WorkingHoursItem:nth-of-type(10)',
             },
             {
+                # Normal click, it's not jQuery object.
                 Click => ' .WorkingHoursItem:nth-of-type(34)',
             },
             {
+                # Normal click, it's not jQuery object.
                 Click => ' .WorkingHoursItem:nth-of-type(35)',
             },
             {
                 Hover => '.Setting',
             },
             {
-                Click => '.Update',
+                JqueryClick => '.Update',
             },
             {
                 ElementMissing => '.Update',
@@ -1017,7 +1036,8 @@ my @Tests = (
             },
             {
                 # Expand setting bar.
-                Click => '.Header',
+                # Normal click, it's not jQuery object.
+                Click => '.Header a',
             },
             {
                 # Edit alias button is not visible.
@@ -1025,11 +1045,11 @@ my @Tests = (
             },
             {
                 # Enable setting.
-                Click => '.SettingDisabled',
+                JqueryClick => '.SettingDisabled',
             },
             {
                 # wait and edit
-                Click => '.EditAlias',
+                JqueryClick => '.EditAlias',
             },
             {
                 Select => 'input#ZZZExampleStringDisabled',
@@ -1041,14 +1061,14 @@ my @Tests = (
                 Write => 'abc',
             },
             {
-                Click => '.SaveAlias',
+                JqueryClick => '.SaveAlias',
             },
             {
                 ElementMissing => '.SaveAlias:visible',
             },
             {
                 # Disable the setting.
-                Click => '.SettingEnabled',
+                JqueryClick => '.SettingEnabled',
             },
         ],
         ExpectedResult => 'abc',
@@ -1063,7 +1083,8 @@ my @Tests = (
             },
             {
                 # Expand setting bar.
-                Click => '.Header',
+                # Normal click, it's not jQuery object.
+                Click => '.Header a',
             },
             {
                 # Edit alias button is not visible.
@@ -1071,11 +1092,11 @@ my @Tests = (
             },
             {
                 # Enable setting.
-                Click => '.SettingDisabled',
+                JqueryClick => '.SettingDisabled',
             },
             {
                 # wait and edit
-                Click => '.EditAlias',
+                JqueryClick => '.EditAlias',
             },
             {
                 Select => 'input#ZZZZExampleFileInvalidDisabled',
@@ -1087,7 +1108,7 @@ my @Tests = (
                 ExpectAlert => 'Setting value is not valid!',
             },
             {
-                Click => '.SaveAlias',
+                JqueryClick => '.SaveAlias',
             },
             {
                 Select => '.SaveAlias',
@@ -1102,14 +1123,14 @@ my @Tests = (
                 Write => '/etc/hosts',
             },
             {
-                Click => '.SaveAlias',
+                JqueryClick => '.SaveAlias',
             },
             {
                 ElementMissing => '.SaveAlias:visible',
             },
             {
                 # Disable the setting.
-                Click => '.SettingEnabled',
+                JqueryClick => '.SettingEnabled',
             },
         ],
         ExpectedResult => '/etc/hosts',
@@ -1170,7 +1191,7 @@ $Selenium->RunTest(
         $Selenium->VerifiedGet("${ScriptAlias}index.pl?Action=AdminSystemConfiguration");
 
         my $OTRSBusinessIsInstalled = $Kernel::OM->Get('Kernel::System::OTRSBusiness')->OTRSBusinessIsInstalled();
-        my $OBTeaserFound = index( $Selenium->get_page_source(), 'supports versioning, rollback and' ) > -1;
+        my $OBTeaserFound           = index( $Selenium->get_page_source(), 'supports versioning, rollback and' ) > -1;
         if ( !$OTRSBusinessIsInstalled ) {
             $Self->True(
                 $OBTeaserFound,
@@ -1209,7 +1230,54 @@ $Selenium->RunTest(
                         JavaScript => 'return $("' . $Prefix . '").hasClass("HasOverlay") == 0',
                     );
 
-                    $Selenium->find_element( "$Prefix $Value", "css" )->click();
+                    # Give JS some time to do the stuff.
+                    Time::HiRes::sleep(0.2);
+
+                    $Selenium->execute_script(
+                        '$("' . "$Prefix $Value" . '").click();'
+                    );
+
+                    if ($AlertText) {
+                        $Selenium->WaitFor(
+                            AlertPresent => 1,
+                        );
+
+                        # Verify alert message.
+                        $Self->Is(
+                            $AlertText,
+                            $Selenium->get_alert_text(),
+                            "$Test->{Name} - Check alert text - $AlertText",
+                        );
+
+                        # Accept alert.
+                        $Selenium->accept_alert();
+
+                        # Reset alert text.
+                        $AlertText = '';
+                    }
+                    else {
+                        $Selenium->WaitFor(
+                            Time       => 120,
+                            JavaScript => 'return $("' . $Prefix . '").hasClass("HasOverlay") == 0',
+                        );
+                    }
+                }
+                elsif ( $CommandType eq 'JqueryClick' ) {
+                    $Selenium->WaitFor(
+                        JavaScript => 'return $("' . "$Prefix $Value" . '").length',
+                    );
+                    $Selenium->WaitFor(
+                        JavaScript => 'return $("' . $Prefix . '").hasClass("HasOverlay") == 0',
+                    );
+
+                    $Selenium->WaitForjQueryEventBound(
+                        CSSSelector => "$Prefix $Value",
+                    );
+
+                    $Selenium->execute_script(
+                        '$("' . "$Prefix $Value" . '").click();'
+                    );
+
                     if ($AlertText) {
                         $Selenium->WaitFor(
                             AlertPresent => 1,
@@ -1297,6 +1365,19 @@ $Selenium->RunTest(
 
                     $Selenium->execute_script(
                         $Command->{JS},
+                    );
+                }
+                elsif ( $CommandType eq 'InputFieldValueSet' ) {
+
+                    # Wait for any tasks to complete.
+                    $Selenium->WaitFor(
+                        JavaScript => 'return typeof($) === "function" && $("' . $Prefix
+                            . '").hasClass("HasOverlay") == 0',
+                    );
+
+                    $Selenium->InputFieldValueSet(
+                        Element => $Value->{Element},
+                        Value   => $Value->{Value},
                     );
                 }
                 elsif ( $CommandType eq 'WaitForJS' ) {
@@ -1416,7 +1497,7 @@ $Selenium->RunTest(
             index(
                 $Selenium->get_page_source(),
                 "This group doesn't contain any settings. Please try navigating to one of its sub groups or another group."
-                ) > -1,
+            ) > -1,
             "Invisible setting not found."
         );
 

@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Modules::AdminProcessManagementActivityDialog;
@@ -769,7 +769,7 @@ sub _ShowEdit {
                 Name => 'EditWarning',
                 Data => {
                     ActivityList => join( ', ', @{$AffectedActivities} ),
-                    }
+                }
             );
         }
 
@@ -840,11 +840,11 @@ sub _ShowEdit {
 
     # create permission selection
     $Param{PermissionSelection} = $LayoutObject->BuildSelection(
-        Data       => $Kernel::OM->Get('Kernel::Config')->Get('System::Permission') || ['rw'],
-        Name       => 'Permission',
-        ID         => 'Permission',
-        SelectedID => $ActivityDialogData->{Config}->{Permission}                   || '',
-        Sort       => 'AlphanumericKey',
+        Data         => $Kernel::OM->Get('Kernel::Config')->Get('System::Permission') || ['rw'],
+        Name         => 'Permission',
+        ID           => 'Permission',
+        SelectedID   => $ActivityDialogData->{Config}->{Permission} || '',
+        Sort         => 'AlphanumericKey',
         Translation  => 1,
         PossibleNone => 1,
         Class        => 'Modernize' . ( $Param{PermissionServerError} || '' ),
@@ -961,7 +961,7 @@ sub _GetParams {
         $GetParam->{$ParamName} = $ParamObject->GetParam( Param => $ParamName ) || '';
     }
 
-    my $Fields = $ParamObject->GetParam( Param => 'Fields' ) || '';
+    my $Fields     = $ParamObject->GetParam( Param => 'Fields' ) || '';
     my $JSONObject = $Kernel::OM->Get('Kernel::System::JSON');
 
     if ($Fields) {
@@ -1027,7 +1027,7 @@ sub _PushSessionScreen {
 
     # add screen to the screen path
     push @{ $Self->{ScreensPath} }, {
-        Action => $Self->{Action} || '',
+        Action    => $Self->{Action} || '',
         Subaction => $Param{Subaction},
         ID        => $Param{ID},
         EntityID  => $Param{EntityID},
@@ -1061,7 +1061,7 @@ sub _PopupResponse {
             Value => {
                 ConfigJSON => $Param{ConfigJSON},
                 %{ $Param{Screen} },
-                }
+            }
         );
     }
     elsif ( $Param{ClosePopup} && $Param{ClosePopup} eq 1 ) {
@@ -1071,7 +1071,7 @@ sub _PopupResponse {
             Key   => 'ClosePopup',
             Value => {
                 ConfigJSON => $Param{ConfigJSON},
-                }
+            }
         );
     }
 

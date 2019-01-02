@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -224,6 +224,44 @@ $Selenium->RunTest(
             "$TemplateID is assigned to the queue.",
         );
 
+        # Create test user with admin permissions.
+        my $UserName = "Name$RandomID";
+        my $UserID   = $Kernel::OM->Get('Kernel::System::User')->UserAdd(
+            UserFirstname => $UserName,
+            UserLastname  => $UserName,
+            UserLogin     => $UserName,
+            UserEmail     => "$UserName\@example.com",
+            ValidID       => 1,
+            ChangeUserID  => 1,
+        );
+        $Self->True(
+            $UserID,
+            "UserID $UserID is created",
+        );
+
+        my $GroupObject = $Kernel::OM->Get('Kernel::System::Group');
+
+        my $GroupID = $GroupObject->GroupLookup(
+            Group => 'admin',
+        );
+        $Success = $GroupObject->PermissionGroupUserAdd(
+            GID        => $GroupID,
+            UID        => $UserID,
+            Permission => {
+                ro        => 1,
+                move_into => 1,
+                create    => 1,
+                owner     => 1,
+                priority  => 1,
+                rw        => 1,
+            },
+            UserID => 1,
+        );
+        $Self->True(
+            $Success,
+            "UserID '$UserID' set permission for 'admin' group"
+        );
+
         # Create test customer.
         my $TestCustomer       = 'Customer' . $RandomID;
         my $CustomerEmail      = "$TestCustomer\@localhost.com";
@@ -367,8 +405,9 @@ $Selenium->RunTest(
         $Selenium->VerifiedGet("${ScriptAlias}index.pl?Action=AgentTicketZoom;TicketID=$TicketID");
 
         # Click on reply.
-        $Selenium->execute_script(
-            "\$('#ResponseID$ArticleID').val('$TemplateID').trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => "#ResponseID$ArticleID",
+            Value   => $TemplateID,
         );
 
         # Switch to compose window.
@@ -376,29 +415,54 @@ $Selenium->RunTest(
         my $Handles = $Selenium->get_window_handles();
         $Selenium->switch_to_window( $Handles->[1] );
 
-        # Wait without jQuery because it might not be loaded yet.
-        $Selenium->WaitFor( JavaScript => 'return document.getElementById("ToCustomer");' );
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("#ToCustomer").length;' );
+        sleep 2;
+
+        # Check duplication of customer user who doesn't exist in the system (see bug#13784).
+        $Selenium->find_element( "#ToCustomer", 'css' )->send_keys( 'Test', "\N{U+E007}" );
+        $Selenium->WaitFor( JavaScript => 'return $("#RemoveCustomerTicket_2").length;' );
+        $Selenium->find_element( "#ToCustomer", 'css' )->send_keys( 'Test', "\N{U+E007}" );
+
+        $Selenium->WaitFor(
+            JavaScript =>
+                'return typeof($) === "function" && $(".Dialog.Modal.Alert:visible").length;'
+        );
+        $Self->Is(
+            $Selenium->execute_script('return $(".Dialog.Modal.Alert").length;'),
+            1,
+            "Alert dialog is found.",
+        );
+
+        $Selenium->execute_script("\$('#DialogButton1').click();");
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && !$(".Dialog.Modal").length;' );
+
+        # Change focus from #ToCustomer input field.
+        $Selenium->find_element( "body", 'css' )->click();
+
+        $Selenium->WaitFor( JavaScript => 'return $("#RemoveCustomerTicket_2").length;' );
+
+        # Remove entered 'Test' for customer user.
+        $Selenium->find_element( "#RemoveCustomerTicket_2", 'css' )->click();
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && !$("#RemoveCustomerTicket_2").length;' );
 
         # Input required field and select customer.
         $Selenium->find_element( "#ToCustomer", 'css' )->send_keys($TestCustomer);
-        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("li.ui-menu-item:visible").length' );
-        $Selenium->execute_script("\$('li.ui-menu-item:contains($TestCustomer)').click()");
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("li.ui-menu-item:visible").length;' );
+        $Selenium->execute_script("\$('li.ui-menu-item:contains($TestCustomer)').click();");
+
+        $Selenium->WaitFor(
+            JavaScript =>
+                'return typeof($) === "function" && $(".Dialog.Modal.Alert:visible").length;'
+        );
 
         $Self->Is(
-            $Selenium->execute_script('return $(".Dialog.Modal.Alert") > -1'),
-            0,
+            $Selenium->execute_script('return $(".Dialog.Modal.Alert").length;'),
+            1,
             "Error message found.",
         );
 
-        $Selenium->WaitFor(
-            JavaScript => 'return typeof($) === "function" && $(".Dialog.Modal.Alert:visible").length'
-        );
-
-        $Selenium->find_element( "#DialogButton1", 'css' )->click();
-
-        $Selenium->WaitFor(
-            JavaScript => 'return typeof($) === "function" && !$(".Dialog.Modal").length'
-        );
+        $Selenium->execute_script("\$('#DialogButton1').click();");
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && !$(".Dialog.Modal").length;' );
 
         # Check AgentTicketCompose page.
         for my $ID (
@@ -406,13 +470,13 @@ $Selenium->RunTest(
             FileUpload StateID IsVisibleForCustomer submitRichText)
             )
         {
-            $Selenium->WaitFor( JavaScript => "return typeof(\$) === 'function' && \$('#$ID').length" );
+            $Selenium->WaitFor( JavaScript => "return typeof(\$) === 'function' && \$('#$ID').length;" );
             my $Element = $Selenium->find_element( "#$ID", 'css' );
             $Element->is_enabled();
         }
 
         $Self->Is(
-            $Selenium->execute_script('return $("#IsVisibleForCustomer").val()'),
+            $Selenium->execute_script('return $("#IsVisibleForCustomer").val();'),
             1,
             "Default customer visibility is honored",
         );
@@ -452,7 +516,7 @@ $Selenium->RunTest(
             'Kernel::System::DateTime',
             ObjectParams => {
                 Epoch => $CreatedTicketData{RealTillTimeNotUsed},
-                }
+            }
         )->ToString();
 
         $RealTillTimeNotUsed = $LanguageObject->FormatTimeString(
@@ -517,13 +581,113 @@ $Selenium->RunTest(
         $Selenium->switch_to_window( $Handles->[1] );
 
         # Wait until page has loaded, if necessary.
-        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $(".CancelClosePopup").length' );
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $(".CancelClosePopup").length;' );
 
         # Verify that compose worked as expected.
         my $HistoryText = "Sent email to \"\"$TestCustomer $TestCustomer\"";
         $Self->True(
             index( $Selenium->get_page_source(), $HistoryText ) > -1,
             'Compose executed correctly'
+        );
+
+        $Selenium->close();
+        $Selenium->switch_to_window( $Handles->[0] );
+        $Selenium->WaitFor( WindowCount => 1 );
+
+        $Helper->ConfigSettingChange(
+            Valid => 1,
+            Key   => 'Ticket::Frontend::ResponseFormat',
+            Value => '[% Data.TicketNumber | html%]',
+        );
+
+        # Test ticket lock and owner after closing AgentTicketCompose popup (see bug#12479).
+        # Enable RequiredLock for AgentTicketCompose.
+        $Helper->ConfigSettingChange(
+            Valid => 1,
+            Key   => 'Ticket::Frontend::AgentTicketCompose###RequiredLock',
+            Value => 1,
+        );
+
+        # Set test created user as ticket owner.
+        my $OwnerSet = $TicketObject->TicketOwnerSet(
+            TicketID  => $TicketID,
+            UserID    => 1,
+            NewUserID => $UserID,
+        );
+        $Self->Is(
+            $OwnerSet,
+            1,
+            "UserID '$UserID' is set successfully as ticket owner for TicketID '$TicketID'"
+        );
+
+        # Navigate to created test ticket in AgentTicketZoom page.
+        $Selenium->VerifiedGet("${ScriptAlias}index.pl?Action=AgentTicketZoom;TicketID=$TicketID");
+
+        my %TicketDataBeforeUndo = $TicketObject->TicketGet(
+            TicketID => $TicketID,
+        );
+        $Self->Is(
+            $TicketDataBeforeUndo{Lock},
+            'unlock',
+            "Before undo - Ticket lock is 'unlock'"
+        );
+        $Self->Is(
+            $TicketDataBeforeUndo{OwnerID},
+            $UserID,
+            "Before undo - Ticket owner is test user $UserID"
+        );
+
+        # Click on reply.
+        $Selenium->InputFieldValueSet(
+            Element => "#ResponseID$ArticleID",
+            Value   => $TemplateID,
+        );
+
+        # Switch to compose window.
+        $Selenium->WaitFor( WindowCount => 2 );
+        $Handles = $Selenium->get_window_handles();
+        $Selenium->switch_to_window( $Handles->[1] );
+
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $(".UndoClosePopup").length;' );
+        sleep 2;
+
+        # Check if Ticket number is shown correctly in text field.
+        # See bug#133995 https://bugs.otrs.org/show_bug.cgi?id=13995
+        my $TicketNumber = $TicketObject->TicketNumberLookup(
+            TicketID => $TicketID,
+        );
+        $Self->Is(
+            $Selenium->execute_script('return $("#RichText").val().trim();'),
+            $TicketNumber,
+            "Text field contains ticket number $TicketNumber"
+        );
+
+        # Click on 'Undo&Close' to close popup and set state and owner to the previous values.
+        $Selenium->find_element( ".UndoClosePopup", 'css' )->click();
+        $Selenium->WaitFor( WindowCount => 1 );
+        $Selenium->switch_to_window( $Handles->[0] );
+
+        # Clean Ticket cache, to get refreshed test ticket data.
+        my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+        $CacheObject->CleanUp( Type => 'Ticket' );
+
+        # Refresh screen.
+        $Selenium->VerifiedRefresh();
+        sleep 2;
+
+        my %TicketDataAfterUndo = $TicketObject->TicketGet(
+            TicketID => $TicketID,
+        );
+
+        $Self->Is(
+            $TicketDataAfterUndo{Lock},
+            'unlock',
+            "After undo - Ticket lock is still 'unlock'"
+        );
+        $Self->Is(
+            $TicketDataAfterUndo{OwnerID},
+            $UserID,
+            "After undo - Ticket owner is still test user $UserID"
         );
 
         # Delete test ticket.
@@ -578,10 +742,37 @@ $Selenium->RunTest(
             );
         }
 
-        my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+        # Delete group-user relation.
+        $Success = $DBObject->Do(
+            SQL  => "DELETE FROM group_user WHERE group_id = ?",
+            Bind => [ \$GroupID ],
+        );
+        $Self->True(
+            $Success,
+            "Relation for group ID $GroupID is deleted",
+        );
+
+        # Delete test created user.
+        $Success = $DBObject->Do(
+            SQL  => "DELETE FROM user_preferences WHERE user_id = ?",
+            Bind => [ \$UserID ],
+        );
+        $Self->True(
+            $Success,
+            "User preferences for $UserID is deleted",
+        );
+
+        $Success = $DBObject->Do(
+            SQL  => "DELETE FROM users WHERE id = ?",
+            Bind => [ \$UserID ],
+        );
+        $Self->True(
+            $Success,
+            "UserID $UserID is deleted",
+        );
 
         # Make sure the cache is correct.
-        for my $Cache (qw( Ticket CustomerUser )) {
+        for my $Cache (qw( Ticket CustomerUser User )) {
             $CacheObject->CleanUp(
                 Type => $Cache,
             );

@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Modules::AdminCustomerUser;
@@ -102,7 +102,7 @@ sub Run {
         $LayoutObject->ChallengeTokenCheck();
 
         # get user data
-        my $UserID = $ParamObject->GetParam( Param => 'ID' ) || '';
+        my $UserID   = $ParamObject->GetParam( Param => 'ID' ) || '';
         my %UserData = $CustomerUserObject->CustomerUserDataGet(
             User  => $UserID,
             Valid => 1,
@@ -644,7 +644,7 @@ sub Run {
 
                     my $ValueSet = $DynamicFieldBackendObject->ValueSet(
                         DynamicFieldConfig => $DynamicFieldConfig,
-                        ObjectName         => $GetParam{UserLogin},
+                        ObjectName         => $User,
                         Value              => $GetParam{ $Entry->[0] },
                         UserID             => $Self->{UserID},
                     );
@@ -668,7 +668,7 @@ sub Run {
 
                     # get user data
                     my %UserData = $CustomerUserObject->CustomerUserDataGet(
-                        User => $GetParam{UserLogin}
+                        User => $User,
                     );
                     my $Module = $Preferences{$Group}->{Module};
                     if ( !$MainObject->Require($Module) ) {
@@ -820,7 +820,7 @@ sub Run {
         );
 
         my $Notification = $ParamObject->GetParam( Param => 'Notification' ) || '';
-        my $Output = $NavBar;
+        my $Output       = $NavBar;
         $Output .= $LayoutObject->Notify( Info => Translatable('Customer user updated!') )
             if ( $Notification && $Notification eq 'Update' );
 
@@ -963,7 +963,7 @@ sub _Overview {
                 $LayoutObject->Block(
                     Name => 'OverviewResultRow',
                     Data => {
-                        Valid => $ValidList{ $UserData{ValidID} || '' } || '-',
+                        Valid       => $ValidList{ $UserData{ValidID} || '' } || '-',
                         Search      => $Param{Search},
                         CustomerKey => $ListKey,
                         %UserData,

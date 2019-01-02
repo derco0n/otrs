@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -429,7 +429,7 @@ $Self->True(
             {
                 "[%]{'Contact'}[%]{'role'}" => 'admin',
             }
-            ]
+        ]
     );
     $Self->True(
         scalar @Keys == 1 && $Keys[0] eq '123',
@@ -442,7 +442,7 @@ $Self->True(
             {
                 "[%]{'Contact'}[%]{'role'}" => 'superuser',
             },
-            ]
+        ]
     );
     $Self->False(
         scalar @Keys,
@@ -456,7 +456,7 @@ $Self->True(
                 "[%]{'Contact'}[%]{'role'}" => 'superuser',
                 "[%]{'Contact'}[%]{'role'}" => 'admin',
             },
-            ]
+        ]
     );
     $Self->True(
         scalar @Keys == 1 && $Keys[0] eq '123',
@@ -472,7 +472,7 @@ $Self->True(
             {
                 "[%]{'Contact'}[%]{'role'}" => 'admin',
             },
-            ]
+        ]
     );
     $Self->False(
         scalar @Keys,

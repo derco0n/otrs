@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::CustomerUser::LDAP;
@@ -135,7 +135,7 @@ sub new {
     $Self->{AlwaysFilter} = $Self->{CustomerUserMap}->{Params}->{AlwaysFilter} || '';
 
     $Self->{ExcludePrimaryCustomerID} = $Self->{CustomerUserMap}->{CustomerUserExcludePrimaryCustomerID} || 0;
-    $Self->{SearchPrefix} = $Self->{CustomerUserMap}->{CustomerUserSearchPrefix};
+    $Self->{SearchPrefix}             = $Self->{CustomerUserMap}->{CustomerUserSearchPrefix};
     if ( !defined $Self->{SearchPrefix} ) {
         $Self->{SearchPrefix} = '';
     }
@@ -343,7 +343,8 @@ sub CustomerName {
         push @NameParts, $NameParts{$CustomerUserNameField};
     }
 
-    my $Name = join ' ', @NameParts;
+    my $JoinCharacter = $Self->{CustomerUserMap}->{CustomerUserNameFieldsJoin} // ' ';
+    my $Name          = join $JoinCharacter, @NameParts;
 
     # cache request
     if ( $Self->{CacheObject} ) {

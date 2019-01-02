@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -160,7 +160,7 @@ $Selenium->RunTest(
         $Selenium->VerifiedGet("${ScriptAlias}index.pl?Action=AgentCustomerInformationCenter");
         $Selenium->WaitFor(
             JavaScript =>
-                'return typeof($) === "function" && $("#AgentCustomerInformationCenterSearchCustomerID").length'
+                'return typeof($) === "function" && $("#AgentCustomerInformationCenterSearchCustomerID").length;'
         );
 
         # Input search parameters for CustomerUser.
@@ -178,32 +178,41 @@ $Selenium->RunTest(
         # Input search parameters CustomerID.
         $Selenium->find_element( "#AgentCustomerInformationCenterSearchCustomerID", 'css' )
             ->send_keys($TestCustomerUserLogin);
-        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("li.ui-menu-item:visible").length' );
-        $Selenium->execute_script("\$('li.ui-menu-item:contains($TestCustomerUserLogin)').click()");
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("li.ui-menu-item:visible").length;' );
+        $Selenium->execute_script("\$('li.ui-menu-item:contains($TestCustomerUserLogin)').click();");
+
+        $Selenium->WaitFor(
+            JavaScript => 'return typeof($) === "function" && $(".ContentColumn .WidgetSimple .Header h2").length;'
+        );
 
         # Check customer information center page.
         $Self->True(
             index( $Selenium->get_page_source(), "Customer Information Center" ) > -1,
             "Found looked value on page",
         );
-        $Self->True(
-            index( $Selenium->get_page_source(), "Customer Users" ) > -1,
-            "Customer Users widget found on page",
+
+        my @Header = (
+            'Customer Users',
+            'Reminder Tickets',
+            'Escalated Tickets',
+            'New Tickets',
+            'Open Tickets / Need to be answered',
         );
-        $Self->True(
-            index( $Selenium->get_page_source(), "Reminder Tickets" ) > -1,
-            "Reminder Tickets widget found on page",
-        );
-        $Self->True(
-            index( $Selenium->get_page_source(), "Escalated Tickets" ) > -1,
-            "Escalated Tickets widget found on page",
-        );
-        $Self->True(
-            index( $Selenium->get_page_source(), "Open Tickets / Need to be answered" ) > -1,
-            "Open Tickets / Need to be answered widget found on page",
-        );
-        $Self->True(
-            index( $Selenium->get_page_source(), "Settings" ) > -1,
+
+        my $Count = 0;
+        for my $Title (@Header) {
+
+            # Check widget title.
+            $Self->True(
+                index( $Selenium->get_page_source(), $Title ) > -1,
+                "$Title widget found on page",
+            );
+            $Count++;
+        }
+
+        $Self->Is(
+            $Selenium->execute_script("return \$('.SidebarColumn .WidgetSimple .Header h2:eq(0)').text();"),
+            'Settings',
             "Setting for toggle widgets found on page",
         );
 
@@ -222,7 +231,7 @@ $Selenium->RunTest(
             )->VerifiedClick();
 
             # Wait until page has loaded, if necessary.
-            $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("body").length' );
+            $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("body").length;' );
 
             # Check for test ticket numbers on search screen.
             for my $CheckTicketNumbers ( @{ $TicketData{$TestLinks}->{TicketNumbers} } ) {
@@ -238,7 +247,7 @@ $Selenium->RunTest(
             )->click();
 
             # Wait until search dialog has been loaded.
-            $Selenium->WaitFor( JavaScript => 'return $("#SearchFormSubmit").length' );
+            $Selenium->WaitFor( JavaScript => 'return $("#SearchFormSubmit").length;' );
 
             # Verify state search attributes are shown in search screen, see bug #10853.
             $Selenium->find_element( "#StateIDs", 'css' );
@@ -265,9 +274,9 @@ $Selenium->RunTest(
         $Selenium->find_element( "#ToCustomer", 'css' )->send_keys( $CustomerUserIDs[0] );
 
         # Click on wanted element in dropdown menu.
-        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("li.ui-menu-item:visible").length' );
-        $Selenium->execute_script("\$('li.ui-menu-item:contains($CustomerUserIDs[0])').click()");
-        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $(".Dialog.Modal").length' );
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("li.ui-menu-item:visible").length;' );
+        $Selenium->execute_script("\$('li.ui-menu-item:contains($CustomerUserIDs[0])').click();");
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $(".Dialog.Modal").length;' );
 
         $Self->Is(
             $Selenium->execute_script('return $(".Dialog.Modal .Header h1").text().trim();'),
@@ -277,7 +286,7 @@ $Selenium->RunTest(
 
         # Close error message.
         $Selenium->find_element( "#DialogButton1", 'css' )->click();
-        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && !$(".Dialog.Modal").length' );
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && !$(".Dialog.Modal").length;' );
 
         # Go to previous.
         $Selenium->VerifiedGet(
@@ -298,11 +307,11 @@ $Selenium->RunTest(
         # Select input field and type inside.
         $Selenium->find_element( "#FromCustomer", 'css' )->send_keys( $CustomerUserIDs[0] );
 
-        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("li.ui-menu-item:visible").length' );
-        $Selenium->execute_script("\$('li.ui-menu-item:contains($CustomerUserIDs[0])').click()");
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("li.ui-menu-item:visible").length;' );
+        $Selenium->execute_script("\$('li.ui-menu-item:contains($CustomerUserIDs[0])').click();");
 
         # Error is expected.
-        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $(".Dialog.Modal").length' );
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $(".Dialog.Modal").length;' );
 
         $Self->Is(
             $Selenium->execute_script('return $(".Dialog.Modal .Header h1").text().trim();'),
@@ -348,7 +357,7 @@ $Selenium->RunTest(
             "Deleted CustomerUser - $CustomerID",
         );
 
-        # make sure cache is correct.
+        # Make sure cache is correct.
         $Kernel::OM->Get('Kernel::System::Cache')->CleanUp( Type => 'Ticket' );
     }
 );

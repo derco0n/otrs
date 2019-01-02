@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 ## no critic (Modules::RequireExplicitPackage)
@@ -45,8 +45,9 @@ $Selenium->RunTest(
 
         # Change test user time zone preference to -5 hours. Displayed out of office date values
         #   should not be converted to local time zone, see bug#12471.
-        $Selenium->execute_script(
-            "\$('#UserTimeZone').val('Pacific/Easter').trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#UserTimeZone',
+            Value   => 'Pacific/Easter',
         );
         $Selenium->execute_script(
             "\$('#UserTimeZone').closest('.WidgetSimple').find('.SettingUpdateBox').find('button').trigger('click');"

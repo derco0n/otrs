@@ -1,14 +1,14 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 [% RenderBlockStart("OverviewNavBar") %]
 <div class="OverviewBox ARIARoleMain [% Data.View | html %]">
-    <h1>[% Translate(Data.TitleName) | html %]: [% Translate(Data.TitleValue) | html %]</h1>
+    <h1>[% Translate(Data.TitleName) | html %]: [% IF Env("Action") == 'AgentTicketQueue' %][% Data.TitleValue | html %][% ELSE %][% Translate(Data.TitleValue) | html %][% END %]</h1>
 
     [% Data.DataInTheMiddle %]
 
@@ -20,12 +20,12 @@
 [% RenderBlockStart("OverviewNavBarFilterItem") %]
 [% RenderBlockStart("OverviewNavBarFilterItemSelected") %]
                     <li class="Active [% Data.CSS | html %]">
-                        <a name="OverviewControl" href="[% Env("Baselink") %]Action=[% Env("Action") %];[% Data.FilterLink %]Filter=[% Data.Filter | uri %]">[% Translate(Data.Name) | html %]<span>[% Data.Count | html %]</span></a>
+                        <a name="OverviewControl" href="[% Env("Baselink") %]Action=[% Env("Action") %];[% Data.LinkFilter %]Filter=[% Data.Filter | uri %]">[% Translate(Data.Name) | html %]<span>[% Data.Count | html %]</span></a>
                     </li>
 [% RenderBlockEnd("OverviewNavBarFilterItemSelected") %]
 [% RenderBlockStart("OverviewNavBarFilterItemSelectedNot") %]
                     <li class="[% Data.CSS | html %]">
-                        <a name="OverviewControl" href="[% Env("Baselink") %]Action=[% Env("Action") %];[% Data.FilterLink %]Filter=[% Data.Filter | uri %]">[% Translate(Data.Name) | html %]<span>[% Data.Count | html %]</span></a>
+                        <a name="OverviewControl" href="[% Env("Baselink") %]Action=[% Env("Action") %];[% Data.LinkFilter %]Filter=[% Data.Filter | uri %]">[% Translate(Data.Name) | html %]<span>[% Data.Count | html %]</span></a>
                     </li>
 [% RenderBlockEnd("OverviewNavBarFilterItemSelectedNot") %]
 [% RenderBlockStart("OverviewNavBarFilterItemSplit") %]

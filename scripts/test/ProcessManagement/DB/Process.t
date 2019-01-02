@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 ## no critic (Modules::RequireExplicitPackage)
@@ -93,7 +93,7 @@ $Self->IsNot(
 );
 
 my @AddedActivities = ( $AcitivityID1, $AcitivityID2, $AcitivityID3 );
-my $ActivityList = $ActivityObject->ActivityList(
+my $ActivityList    = $ActivityObject->ActivityList(
     UseEntities => 1,
     UserID      => $UserID,
 );
@@ -243,7 +243,7 @@ my @Tests = (
                 Description => 'a Description',
                 Path        => {
                     $ActivityEntityID1 => {},
-                    }
+                }
             },
             UserID => $UserID,
         },
@@ -275,7 +275,7 @@ my @Tests = (
                 Path        => {
                     $ActivityEntityID1 => {},
                     $ActivityEntityID2 => {},
-                    }
+                }
             },
             UserID => $UserID,
         },
@@ -294,7 +294,7 @@ my @Tests = (
                     $ActivityEntityID1 => {},
                     $ActivityEntityID2 => {},
                     $ActivityEntityID3 => {},
-                    }
+                }
             },
             UserID => $UserID,
         },
@@ -313,7 +313,7 @@ my @Tests = (
                     $ActivityEntityID1 => {},
                     $ActivityEntityID2 => {},
                     $ActivityEntityID3 => {},
-                    }
+                }
             },
             UserID => $UserID,
         },
@@ -908,7 +908,7 @@ for my $Test (@Tests) {
 
     # get the old process (if any)
     my $OldProcess = $ProcessObject->ProcessGet(
-        ID => $Test->{Config}->{ID} || 0,
+        ID     => $Test->{Config}->{ID} || 0,
         UserID => $Test->{Config}->{UserID},
     );
 
@@ -1204,6 +1204,7 @@ for my $Test (@Tests) {
                 \%TestProcessListCopy,
                 "$Test->{Name} | List is different as in no State filter",
             );
+
             $Self->IsNot(
                 scalar keys %ProcessListCopy,
                 scalar keys %TestProcessListCopy,

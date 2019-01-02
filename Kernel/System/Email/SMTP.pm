@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::Email::SMTP;
@@ -88,9 +88,7 @@ sub Check {
         $Self->{MailHost},
         ( $Self->{SMTPPort} ? ':' . $Self->{SMTPPort} : '' ),
         $Self->{FQDN},
-        $Self->{SMTPType},
-        ;
-
+        $Self->{SMTPType};
     TRY:
     for my $Try ( 1 .. 3 ) {
 
@@ -329,7 +327,7 @@ sub Send {
 
         while ( my $DataLength = length $Data ) {
             my $TmpChunkSize = ( $ChunkSize > $DataLength ) ? $DataLength : $ChunkSize;
-            my $Chunk = substr $Data, 0, $TmpChunkSize;
+            my $Chunk        = substr $Data, 0, $TmpChunkSize;
 
             $SMTP->( 'datasend', $Chunk, ) || die "error sending data chunk";
 

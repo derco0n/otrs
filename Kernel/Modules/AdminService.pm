@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Modules::AdminService;
@@ -84,7 +84,7 @@ sub Run {
 
         if ( length $ServiceName > 200 ) {
             $Error{'NameInvalid'} = 'ServerError';
-            $Error{LongName} = 1;
+            $Error{LongName}      = 1;
         }
 
         if ( !%Error ) {
@@ -323,9 +323,10 @@ sub _MaskNew {
     my $ListType = $ConfigObject->Get('Ticket::Frontend::ListType');
 
     # generate ParentOptionStrg
-    my %ServiceList = $ServiceObject->ServiceList(
-        Valid        => 1,
-        KeepChildren => $ConfigObject->Get('Ticket::Service::KeepChildren') // 0,
+    my $KeepChildren = $ConfigObject->Get('Ticket::Service::KeepChildren') // 0;
+    my %ServiceList  = $ServiceObject->ServiceList(
+        Valid        => !$KeepChildren,
+        KeepChildren => $KeepChildren,
         UserID       => $Self->{UserID},
     );
     $ServiceData{ParentOptionStrg} = $LayoutObject->BuildSelection(

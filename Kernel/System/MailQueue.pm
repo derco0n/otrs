@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::MailQueue;
@@ -149,7 +149,7 @@ sub Create {
     }
 
     # Recipient can be a Scalar or ArrayRef
-    my $Recipient = $Param{Recipient} // [];
+    my $Recipient    = $Param{Recipient} // [];
     my $RecipientRef = ref $Recipient;
 
     if ( !$RecipientRef ) {
@@ -308,9 +308,9 @@ sub List {
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
     return if !$DBObject->Prepare(
-        SQL   => join( ' ', @SQL ),
-        Bind  => $Binds,
-        Limit => $Param{Limit},
+        SQL    => join( ' ', @SQL ),
+        Bind   => $Binds,
+        Limit  => $Param{Limit},
         Encode => [ 1, 1, 1, 1, 1, 0 ],
     );
 
@@ -1126,11 +1126,11 @@ sub _SendEventNotification {
         return {
             Status  => 'Failed',
             Message => 'Status unknown.',
-            }
+        };
     }
 
     my $ArticleObject = $Kernel::OM->Get('Kernel::System::Ticket::Article');
-    my $TicketID = $ArticleObject->TicketIDLookup( ArticleID => $Param{ArticleID} );
+    my $TicketID      = $ArticleObject->TicketIDLookup( ArticleID => $Param{ArticleID} );
 
     my $PostMasterUserID = $Kernel::OM->Get('Kernel::Config')->Get('PostmasterUserID') || 1;
 
@@ -1501,7 +1501,7 @@ sub _DBInsert {
 
     if ( $Param{ID} ) {
         unshift @Cols,  'id';
-        unshift @Binds, \$Param{ID},
+        unshift @Binds, \$Param{ID};
     }
 
     my @Placeholders = map {'?'} @Cols;
@@ -1539,10 +1539,10 @@ sub _DBInsert {
     # Get the newly inserted record to get the id.
     return $Error->(
         Action => 'get-id',
-        ) if !$DBObject->Prepare(
+    ) if !$DBObject->Prepare(
         SQL  => 'SELECT id FROM mail_queue WHERE insert_fingerprint = ?',
         Bind => [ \$InsertFingerprint ],
-        );
+    );
 
     my @Row = $DBObject->FetchrowArray();
     return $Success->(
@@ -1654,11 +1654,11 @@ sub _GetCommunicationLog {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut
 

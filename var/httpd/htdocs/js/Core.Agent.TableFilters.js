@@ -1,9 +1,9 @@
 // --
-// Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+// Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 // --
 // This software comes with ABSOLUTELY NO WARRANTY. For details, see
-// the enclosed file COPYING for license information (AGPL). If you
-// did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+// the enclosed file COPYING for license information (GPL). If you
+// did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 // --
 
 "use strict";
@@ -270,11 +270,24 @@ Core.Agent.TableFilters = (function (TargetNS) {
      * @name SetAllocationList
      * @memberof Core.Agent.TableFilters
      * @function
+     * @param {String} Name - Widget link table object name.
      * @description
      *      Initialize allocation list.
      */
-    TargetNS.SetAllocationList = function () {
-        $('.AllocationListContainer').each(function() {
+    TargetNS.SetAllocationList = function (Name) {
+        var AllocationListArray = [];
+
+        // Narrow down case when there are multiple link object tables, to updated only expected one.
+        if (typeof Name !== 'undefined') {
+            AllocationListArray.push($('#Widget' + Name + ' .AllocationListContainer'));
+        }
+        else {
+            $('.AllocationListContainer').each(function() {
+                AllocationListArray.push($(this));
+            });
+        }
+
+        $.each(AllocationListArray, function() {
 
             var $ContainerObj = $(this),
                 DataEnabledJSON = $ContainerObj.closest('form.WidgetSettingsForm').find('input.ColumnsEnabledJSON').val(),

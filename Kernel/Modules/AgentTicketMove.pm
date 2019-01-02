@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Modules::AgentTicketMove;
@@ -427,13 +427,13 @@ sub Run {
             %GetParam,
             %ACLCompatGetParam,
             TicketID => $Self->{TicketID},
-            QueueID  => $GetParam{DestQueueID} || 1,
+            QueueID  => $GetParam{DestQueueID} || $Ticket{QueueID},
         );
         my $NextPriorities = $Self->_GetPriorities(
             %GetParam,
             %ACLCompatGetParam,
             TicketID => $Self->{TicketID},
-            QueueID  => $GetParam{DestQueueID} || 1,
+            QueueID  => $GetParam{DestQueueID} || $Ticket{QueueID},
         );
 
         # update Dynamc Fields Possible Values via AJAX
@@ -498,7 +498,7 @@ sub Run {
 
         my $StandardTemplates = $Self->_GetStandardTemplates(
             %GetParam,
-            QueueID => $GetParam{DestQueueID} || '',
+            QueueID  => $GetParam{DestQueueID} || '',
             TicketID => $Self->{TicketID},
         );
 
@@ -896,25 +896,34 @@ sub Run {
             # get lock state && write (lock) permissions
             if ( !$TicketObject->TicketLockGet( TicketID => $Self->{TicketID} ) ) {
 
-                # set owner
-                $TicketObject->TicketOwnerSet(
-                    TicketID  => $Self->{TicketID},
-                    UserID    => $Self->{UserID},
-                    NewUserID => $Self->{UserID},
-                );
-
-                # set lock
-                my $Success = $TicketObject->TicketLockSet(
+                my $Lock = $TicketObject->TicketLockSet(
                     TicketID => $Self->{TicketID},
                     Lock     => 'lock',
                     UserID   => $Self->{UserID}
                 );
 
-                # show lock state
-                if ($Success) {
+                if ($Lock) {
+
+                    # Set new owner if ticket owner is different then logged user.
+                    if ( $Ticket{OwnerID} != $Self->{UserID} ) {
+
+                        # Remember previous owner, which will be used to restore ticket owner on undo action.
+                        $Param{PreviousOwner} = $Ticket{OwnerID};
+
+                        $TicketObject->TicketOwnerSet(
+                            TicketID  => $Self->{TicketID},
+                            UserID    => $Self->{UserID},
+                            NewUserID => $Self->{UserID},
+                        );
+                    }
+
+                    # Show lock state.
                     $LayoutObject->Block(
                         Name => 'PropertiesLock',
-                        Data => { %Param, TicketID => $Self->{TicketID} },
+                        Data => {
+                            %Param,
+                            TicketID => $Self->{TicketID}
+                        },
                     );
                     $TicketUnlock = 1;
                 }
@@ -978,7 +987,7 @@ sub Run {
             %GetParam,
             %ACLCompatGetParam,
             TicketID => $Self->{TicketID},
-            QueueID  => $GetParam{DestQueueID} || 1,
+            QueueID  => $GetParam{DestQueueID} || $Ticket{QueueID},
         );
 
         # get next priorities
@@ -986,7 +995,7 @@ sub Run {
             %GetParam,
             %ACLCompatGetParam,
             TicketID => $Self->{TicketID},
-            QueueID  => $GetParam{DestQueueID} || 1,
+            QueueID  => $GetParam{DestQueueID} || $Ticket{QueueID},
         );
 
         # get old owners
@@ -1185,7 +1194,7 @@ sub Run {
             TicketID             => $Self->{TicketID},
             IsVisibleForCustomer => 0,
             SenderType           => 'agent',
-            From                 => "$Self->{UserFullname} <$Self->{UserEmail}>",
+            From                 => "\"$Self->{UserFullname}\" <$Self->{UserEmail}>",
             Subject              => $GetParam{Subject},
             Body                 => $GetParam{Body},
             MimeType             => $MimeType,
@@ -1422,7 +1431,7 @@ sub AgentMove {
                 DiffTime         => $ConfigObject->Get('Ticket::Frontend::PendingDiffTime')
                     || 0,
                 %Param,
-                Class => $Param{DateInvalid} || ' ',
+                Class                => $Param{DateInvalid} || ' ',
                 Validate             => 1,
                 ValidateDateInFuture => 1,
                 Calendar             => $Calendar,
@@ -1580,9 +1589,9 @@ sub AgentMove {
 
         if ( IsHashRefWithData( \%StandardTemplates ) ) {
             $Param{StandardTemplateStrg} = $LayoutObject->BuildSelection(
-                Data       => $QueueStandardTemplates    || {},
-                Name       => 'StandardTemplateID',
-                SelectedID => $Param{StandardTemplateID} || '',
+                Data         => $QueueStandardTemplates || {},
+                Name         => 'StandardTemplateID',
+                SelectedID   => $Param{StandardTemplateID} || '',
                 PossibleNone => 1,
                 Sort         => 'AlphanumericValue',
                 Translation  => 1,
@@ -1618,7 +1627,7 @@ sub AgentMove {
                         ? 'Validate_Required'
                         : ''
                     ),
-                    }
+                }
             );
         }
 
@@ -1769,7 +1778,7 @@ sub _GetUsers {
 
     # show all users who are rw in the queue group
     elsif ( $Param{QueueID} ) {
-        my $GID = $Kernel::OM->Get('Kernel::System::Queue')->GetQueueGroupID( QueueID => $Param{QueueID} );
+        my $GID        = $Kernel::OM->Get('Kernel::System::Queue')->GetQueueGroupID( QueueID => $Param{QueueID} );
         my %MemberList = $Kernel::OM->Get('Kernel::System::Group')->PermissionGroupGet(
             GroupID => $GID,
             Type    => 'owner',

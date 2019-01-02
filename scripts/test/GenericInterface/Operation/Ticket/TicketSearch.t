@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 ## no critic (Modules::RequireExplicitPackage)
@@ -548,7 +548,7 @@ $Self->True(
     "TicketCreate() successful for Ticket Four ID $TicketID4",
 );
 
-my $ArticleObject = $Kernel::OM->Get('Kernel::System::Ticket::Article');
+my $ArticleObject        = $Kernel::OM->Get('Kernel::System::Ticket::Article');
 my $ArticleBackendObject = $ArticleObject->BackendForChannel( ChannelName => 'Internal' );
 
 # first article
@@ -1432,7 +1432,7 @@ my @Tests = (
                 ObjectParams => {
                     Epoch => $StartTime->ToEpoch() + 10,
                 },
-                )->ToString(),
+            )->ToString(),
             SortBy  => 'Ticket',    # force order, because the Age (default) can be the same
             OrderBy => 'Down',
         },
@@ -2016,7 +2016,7 @@ for my $Test (@Tests) {
             SessionID => $NewSessionID,
             TicketID  => [ $TicketID1, $TicketID2, $TicketID3, $TicketID4 ],
             %{ $Test->{RequestData} },
-            }
+        }
     );
 
     # check result

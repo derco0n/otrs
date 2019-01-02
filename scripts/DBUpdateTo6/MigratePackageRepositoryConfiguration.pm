@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package scripts::DBUpdateTo6::MigratePackageRepositoryConfiguration;    ## no critic
@@ -17,7 +17,6 @@ use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
     'Kernel::Config',
-    'Kernel::System::SysConfig',
 );
 
 =head1 NAME
@@ -29,6 +28,8 @@ scripts::DBUpdateTo6::MigratePackageRepositoryConfiguration -  Migrate package r
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    my $Verbose = $Param{CommandlineOptions}->{Verbose} || 0;
+
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
     my $ConfigKey    = 'Package::RepositoryList';
     my %RepositoryList;
@@ -39,7 +40,7 @@ sub Run {
     return 1 if !%RepositoryList;
 
     my @FrameworkVersionParts = split /\./, $ConfigObject->Get('Version');
-    my $FrameworkVersion = $FrameworkVersionParts[0];
+    my $FrameworkVersion      = $FrameworkVersionParts[0];
 
     my $CurrentITSMRepository = "http://ftp.otrs.org/pub/otrs/itsm/packages$FrameworkVersion/";
 
@@ -60,35 +61,25 @@ sub Run {
     # Make sure that current ITSM repository is in the list
     $RepositoryList{$CurrentITSMRepository} = "OTRS::ITSM $FrameworkVersion Master";
 
-    my $SysConfigObject = $Kernel::OM->Get('Kernel::System::SysConfig');
+    my $ContinueOnModified = $Param{ContinueOnModified} // 0;
 
-    my $ExclusiveLockGUID = $SysConfigObject->SettingLock(
-        Name   => $ConfigKey,
-        Force  => 1,
-        UserID => 1,
+    return $Self->SettingUpdate(
+        Name               => $ConfigKey,
+        IsValid            => 1,
+        EffectiveValue     => \%RepositoryList,
+        ContinueOnModified => $ContinueOnModified,
+        Verbose            => $Verbose,
     );
-
-    my %Result = $SysConfigObject->SettingUpdate(
-        Name              => $ConfigKey,
-        IsValid           => 1,
-        EffectiveValue    => \%RepositoryList,
-        ExclusiveLockGUID => $ExclusiveLockGUID,
-        UserID            => 1,
-    );
-
-    return if !$Result{Success};
-
-    return 1;
 }
 
 1;
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::UnitTest::Selenium;
@@ -19,6 +19,7 @@ use Time::HiRes();
 use Kernel::Config;
 use Kernel::System::User;
 use Kernel::System::UnitTest::Helper;
+use Kernel::System::VariableCheck qw(IsArrayRefWithData);
 
 our @ObjectDependencies = (
     'Kernel::Config',
@@ -113,6 +114,8 @@ sub new {
     );
     $Self->{UnitTestDriverObject} = $Param{UnitTestDriverObject};
     $Self->{SeleniumTestsActive}  = 1;
+
+    $Self->{UnitTestDriverObject}->{SeleniumData} = { %{ $Self->get_capabilities() }, %{ $Self->status() } };
 
     #$Self->debug_on();
 
@@ -365,11 +368,15 @@ wait with increasing sleep intervals until the given condition is true or the wa
 Exactly one condition (JavaScript or WindowCount) must be specified.
 
     my $Success = $SeleniumObject->WaitFor(
-        JavaScript   => 'return $(".someclass").length',   # Javascript code that checks condition
-        AlertPresent => 1,                                 # Wait until an alert, confirm or prompt dialog is present
-        WindowCount  => 2,                                 # Wait until this many windows are open
-        Callback     => sub { ... }                        # Wait until function returns true
-        Time         => 20,                                # optional, wait time in seconds (default 20)
+        AlertPresent   => 1,                                 # Wait until an alert, confirm or prompt dialog is present
+        Callback       => sub { ... }                        # Wait until function returns true
+        ElementExists  => 'xpath-selector'                   # Wait until an element is present
+        ElementExists  => ['css-selector', 'css'],
+        ElementMissing => 'xpath-selector',                  # Wait until an element is not present
+        ElementMissing => ['css-selector', 'css'],
+        JavaScript     => 'return $(".someclass").length',   # Javascript code that checks condition
+        WindowCount    => 2,                                 # Wait until this many windows are open
+        Time           => 20,                                # optional, wait time in seconds (default 20)
     );
 
 =cut
@@ -377,8 +384,16 @@ Exactly one condition (JavaScript or WindowCount) must be specified.
 sub WaitFor {
     my ( $Self, %Param ) = @_;
 
-    if ( !$Param{JavaScript} && !$Param{WindowCount} && !$Param{AlertPresent} && !$Param{Callback} ) {
-        die "Need JavaScript, WindowCount or AlertPresent.";
+    if (
+        !$Param{JavaScript}
+        && !$Param{WindowCount}
+        && !$Param{AlertPresent}
+        && !$Param{Callback}
+        && !$Param{ElementExists}
+        && !$Param{ElementMissing}
+        )
+    {
+        die "Need JavaScript, WindowCount, ElementExists, ElementMissing or AlertPresent.";
     }
 
     local $Self->{SuppressCommandRecording} = 1;
@@ -386,10 +401,11 @@ sub WaitFor {
     $Param{Time} //= 20;
     my $WaitedSeconds = 0;
     my $Interval      = 0.1;
+    my $WaitSeconds   = 0.5;
 
     while ( $WaitedSeconds <= $Param{Time} ) {
         if ( $Param{JavaScript} ) {
-            return 1 if $Self->execute_script( $Param{JavaScript} )
+            return 1 if $Self->execute_script( $Param{JavaScript} );
         }
         elsif ( $Param{WindowCount} ) {
             return 1 if scalar( @{ $Self->get_window_handles() } ) == $Param{WindowCount};
@@ -402,9 +418,25 @@ sub WaitFor {
         elsif ( $Param{Callback} ) {
             return 1 if $Param{Callback}->();
         }
+        elsif ( $Param{ElementExists} ) {
+            my @Arguments
+                = ref( $Param{ElementExists} ) eq 'ARRAY' ? @{ $Param{ElementExists} } : $Param{ElementExists};
+            if ( eval { $Self->find_element(@Arguments) } ) {
+                Time::HiRes::sleep($WaitSeconds);
+                return 1;
+            }
+        }
+        elsif ( $Param{ElementMissing} ) {
+            my @Arguments
+                = ref( $Param{ElementMissing} ) eq 'ARRAY' ? @{ $Param{ElementMissing} } : $Param{ElementMissing};
+            if ( !eval { $Self->find_element(@Arguments) } ) {
+                Time::HiRes::sleep($WaitSeconds);
+                return 1;
+            }
+        }
         Time::HiRes::sleep($Interval);
         $WaitedSeconds += $Interval;
-        $Interval += 0.1;
+        $Interval      += 0.1;
     }
 
     my $Argument = '';
@@ -634,14 +666,124 @@ sub DEMOLISH {
     return;
 }
 
+=head1 DEPRECATED FUNCTIONS
+
+=head2 WaitForjQueryEventBound()
+
+waits until event handler is bound to the selected C<jQuery> element. Deprecated - it will be removed in the future releases.
+
+    $SeleniumObject->WaitForjQueryEventBound(
+        CSSSelector => 'li > a#Test',       # (required) css selector
+        Event       => 'click',             # (optional) Specify event name. Default 'click'.
+    );
+
+=cut
+
+sub WaitForjQueryEventBound {
+    my ( $Self, %Param ) = @_;
+
+    # Check needed stuff.
+    if ( !$Param{CSSSelector} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Need CSSSelector!",
+        );
+        return;
+    }
+
+    my $Event = $Param{Event} || 'click';
+
+    # Wait for jQuery initialization.
+    $Self->WaitFor(
+        JavaScript =>
+            'return Object.keys($("' . $Param{CSSSelector} . '")[0]).length > 0'
+    );
+
+    # Get jQuery object keys.
+    my $Keys = $Self->execute_script(
+        'return Object.keys($("' . $Param{CSSSelector} . '")[0]);'
+    );
+
+    if ( !IsArrayRefWithData($Keys) ) {
+        die "Couldn't determine jQuery object id";
+    }
+
+    my $JQueryObjectID;
+
+    KEY:
+    for my $Key ( @{$Keys} ) {
+        if ( $Key =~ m{^jQuery\d+$} ) {
+            $JQueryObjectID = $Key;
+            last KEY;
+        }
+    }
+
+    if ( !$JQueryObjectID ) {
+        die "Couldn't determine jQuery object id.";
+    }
+
+    # Wait until click event is bound to the element.
+    $Self->WaitFor(
+        JavaScript =>
+            'return $("' . $Param{CSSSelector} . '")[0].' . $JQueryObjectID . '.events
+                && $("' . $Param{CSSSelector} . '")[0].' . $JQueryObjectID . '.events.' . $Event . '
+                && $("' . $Param{CSSSelector} . '")[0].' . $JQueryObjectID . '.events.' . $Event . '.length > 0;',
+    );
+
+    return 1;
+}
+
+=head2 InputFieldValueSet()
+
+sets modernized input field value.
+
+    $SeleniumObject->InputFieldValueSet(
+        Element => 'css-selector',              # (required) css selector
+        Value   => 3,                           # (optional) Value
+    );
+
+=cut
+
+sub InputFieldValueSet {
+    my ( $Self, %Param ) = @_;
+
+    # Check needed stuff.
+    if ( !$Param{Element} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Need Element!",
+        );
+        die 'Missing Element.';
+    }
+    my $Value = $Param{Value} // '';
+
+    if ( $Value !~ m{^\[} && $Value !~ m{^".*"$} ) {
+
+        # Quote text of Value is not array and if not already quoted.
+        $Value = "\"$Value\"";
+    }
+
+    # Set selected value.
+    $Self->execute_script(
+        "\$('$Param{Element}').val($Value).trigger('redraw.InputField').trigger('change');"
+    );
+
+    # Wait until selection tree is closed.
+    $Self->WaitFor(
+        ElementMissing => [ '.InputField_ListContainer', 'css' ],
+    );
+
+    return 1;
+}
+
 1;
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

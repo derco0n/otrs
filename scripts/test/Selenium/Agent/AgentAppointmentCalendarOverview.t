@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -217,7 +217,7 @@ $Selenium->RunTest(
         );
 
         # Verify copy-to-clipboard link.
-        my $URL = $Selenium->find_element( '.CopyToClipboard', 'css' )->get_attribute('data-clipboard-text');
+        my $URL = $Selenium->execute_script("return \$('.CopyToClipboard').attr('data-clipboard-text');");
 
         $Self->True(
             $URL,
@@ -248,10 +248,9 @@ $Selenium->RunTest(
         # Enter some data.
         $Selenium->find_element( "#Title",    'css' )->send_keys('Appointment 1');
         $Selenium->find_element( "#Location", 'css' )->send_keys('Straubing');
-        $Selenium->execute_script(
-            "\$('#CalendarID').val("
-                . $Calendar1{CalendarID}
-                . ").trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#CalendarID',
+            Value   => $Calendar1{CalendarID},
         );
         $Selenium->find_element( '#EndHour',     'css' )->send_keys('18');
         $Selenium->find_element( '.PluginField', 'css' )->send_keys($TicketNumber);
@@ -273,7 +272,7 @@ $Selenium->RunTest(
         );
 
         # Check location link contains correct value.
-        my $LocationLinkURL = $Selenium->find_element( '.LocationLink', 'css' )->get_attribute('href');
+        my $LocationLinkURL = $Selenium->execute_script("return \$('.LocationLink').attr('href');");
         $Self->True(
             $LocationLinkURL =~ /Straubing$/,
             'Location link contains correct value',
@@ -302,10 +301,7 @@ $Selenium->RunTest(
         $Selenium->VerifiedGet("${ScriptAlias}index.pl?Action=AgentTicketZoom;TicketID=${TicketID}");
 
         # Find link to the appointment on page.
-        my $LinkedAppointment = $Selenium->find_element(
-            "//a[contains(\@href, \'Action=AgentAppointmentCalendarOverview;AppointmentID=' )]"
-        );
-        $Selenium->VerifiedGet( $LinkedAppointment->get_attribute('href') );
+        $Selenium->find_element( '.LinkObjectLink', 'css' )->click();
         $Selenium->WaitFor( JavaScript => "return typeof(\$) === 'function' && \$('#Title').length" );
 
         $Self->Is(
@@ -331,7 +327,7 @@ $Selenium->RunTest(
         );
 
         # Check location link contains correct value.
-        $LocationLinkURL = $Selenium->find_element( '.LocationLink', 'css' )->get_attribute('href');
+        $LocationLinkURL = $Selenium->execute_script("return \$('.LocationLink').attr('href');");
         $Self->True(
             $LocationLinkURL =~ /Straubing$/,
             'Location link contains correct value',
@@ -354,10 +350,9 @@ $Selenium->RunTest(
 
         # Enter some data.
         $Selenium->find_element( 'Title', 'name' )->send_keys('Appointment 2');
-        $Selenium->execute_script(
-            "\$('#CalendarID').val("
-                . $Calendar2{CalendarID}
-                . ").trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#CalendarID',
+            Value   => $Calendar2{CalendarID},
         );
 
         $Selenium->find_element( '#AllDay', 'css' )->click();
@@ -406,14 +401,14 @@ $Selenium->RunTest(
 
         # Enter some data.
         $Selenium->find_element( 'Title', 'name' )->send_keys('Appointment 3');
-        $Selenium->execute_script(
-            "\$('#CalendarID').val("
-                . $Calendar3{CalendarID}
-                . ").trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#CalendarID',
+            Value   => $Calendar3{CalendarID},
         );
         $Selenium->find_element( 'EndHour', 'name' )->send_keys('18');
-        $Selenium->execute_script(
-            "\$('#RecurrenceType').val('Daily').trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#RecurrenceType',
+            Value   => 'Daily',
         );
 
         # Click on Save.

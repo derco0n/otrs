@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::ProcessManagement::TransitionAction::TicketArticleCreate;
@@ -21,6 +21,7 @@ our @ObjectDependencies = (
     'Kernel::System::Ticket',
     'Kernel::System::Ticket::Article',
     'Kernel::System::User',
+    'Kernel::System::HTMLUtils',
 );
 
 =head1 NAME
@@ -112,8 +113,21 @@ sub Run {
     # Override UserID if specified as a parameter in the TA config.
     $Param{UserID} = $Self->_OverrideUserID(%Param);
 
+    # Convert DynamicField value to HTML string, see bug#14229.
+    my $HTMLUtilsObject = $Kernel::OM->Get('Kernel::System::HTMLUtils');
+    if ( $Param{Config}->{Body} =~ /OTRS_TICKET_DynamicField_/ ) {
+        for my $Match ( sort keys %{ $Param{Ticket} } ) {
+            if ( $Match =~ /DynamicField_/ && $Param{Ticket}->{$Match} ) {
+                $Param{Ticket}->{$Match} = $HTMLUtilsObject->ToHTML(
+                    String => $Param{Ticket}->{$Match},
+                );
+            }
+        }
+    }
+
     # Use ticket attributes if needed.
     $Self->_ReplaceTicketAttributes(%Param);
+    $Self->_ReplaceAdditionalAttributes(%Param);
 
     # Convert scalar items into array references.
     for my $Attribute (
@@ -180,10 +194,10 @@ sub Run {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

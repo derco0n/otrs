@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -72,11 +72,16 @@ $Selenium->RunTest(
         # after that open popup with adjusted height.
         my $ParentWindowHeight = $Selenium->get_window_size()->{"height"};
 
-        # Force sub menus to be visible in order to be able to click one of the links.
+        # Wait until page has loaded, if necessary.
         $Selenium->WaitFor(
-            JavaScript =>
-                'return typeof($) === "function" && $("#nav-Communication ul").css({ "height": "auto", "opacity": "100" });'
+            JavaScript => "return typeof(\$) === 'function' && \$.active == 0"
         );
+
+        # Force sub menus to be visible in order to be able to click one of the links.
+        $Selenium->execute_script(
+            '$("#nav-Communication ul").css({ "height": "auto", "opacity": "100" });'
+        );
+        $Selenium->WaitFor( JavaScript => "return \$('#nav-Communication ul').css('opacity') == 1;" );
 
         # Click on 'Note' and switch window.
         $Selenium->find_element("//a[contains(\@href, \'Action=AgentTicketNote;TicketID=$TicketID' )]")->click();
@@ -102,7 +107,7 @@ $Selenium->RunTest(
         );
 
         # Close note window.
-        $Selenium->find_element( ".CancelClosePopup", 'css' )->click();
+        $Selenium->close();
         $Selenium->WaitFor( WindowCount => 1 );
 
         # Switch window back to agent ticket zoom view of created test ticket.
@@ -114,11 +119,16 @@ $Selenium->RunTest(
             "Core.UI.Popup.ProfileAdd('Default', { WindowURLParams: 'dependent=yes,location=no,menubar=no,resizable=yes,scrollbars=yes,status=no,toolbar=no', Left: 100, Top: 100, Width: 1040, Height: 1700 });"
         );
 
-        # Force sub menus to be visible in order to be able to click one of the links.
+        # Wait until page has loaded, if necessary.
         $Selenium->WaitFor(
-            JavaScript =>
-                'return typeof($) === "function" && $("#nav-Communication ul").css({ "height": "auto", "opacity": "100" });'
+            JavaScript => "return typeof(\$) === 'function' && \$.active == 0"
         );
+
+        # Force sub menus to be visible in order to be able to click one of the links.
+        $Selenium->execute_script(
+            '$("#nav-Communication ul").css({ "height": "auto", "opacity": "100" });'
+        );
+        $Selenium->WaitFor( JavaScript => "return \$('#nav-Communication ul').css('opacity') == 1;" );
 
         # Click on 'Note' and switch window.
         $Selenium->find_element("//a[contains(\@href, \'Action=AgentTicketNote;TicketID=$TicketID' )]")->click();

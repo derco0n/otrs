@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::Ticket::Article::Backend::MIMEBase::ArticleStorageFS;
@@ -77,7 +77,7 @@ sub new {
     # Turn on special cache used for speeding up article storage methods in huge systems with many
     #   nodes and slow FS access. It will be used only in environments with configured Memcached
     #   backend (see config above).
-    $Self->{ArticleStorageCache} = 1;
+    $Self->{ArticleStorageCache}    = 1;
     $Self->{ArticleStorageCacheTTL} = $ConfigObject->Get('Cache::ArticleStorageCache::TTL') || 60 * 60 * 24;
 
     return $Self;
@@ -311,12 +311,6 @@ sub ArticleWriteAttachment {
     # define path
     $Param{Path} = $Self->{ArticleDataDir} . '/' . $ContentPath . '/' . $Param{ArticleID};
 
-    # strip spaces from filenames
-    $Param{Filename} =~ s/ /_/g;
-
-    # strip dots from filenames
-    $Param{Filename} =~ s/^\.//g;
-
     # get main object
     my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
 
@@ -365,11 +359,12 @@ sub ArticleWriteAttachment {
 
     # write attachment content type to fs
     my $SuccessContentType = $MainObject->FileWrite(
-        Directory  => $Param{Path},
-        Filename   => "$Param{Filename}.content_type",
-        Mode       => 'binmode',
-        Content    => \$Param{ContentType},
-        Permission => 660,
+        Directory       => $Param{Path},
+        Filename        => "$Param{Filename}.content_type",
+        Mode            => 'binmode',
+        Content         => \$Param{ContentType},
+        Permission      => 660,
+        NoFilenameClean => 1,
     );
     return if !$SuccessContentType;
 
@@ -381,22 +376,24 @@ sub ArticleWriteAttachment {
     # write attachment content id to fs
     if ( $Param{ContentID} ) {
         $MainObject->FileWrite(
-            Directory  => $Param{Path},
-            Filename   => "$Param{Filename}.content_id",
-            Mode       => 'binmode',
-            Content    => \$Param{ContentID},
-            Permission => 660,
+            Directory       => $Param{Path},
+            Filename        => "$Param{Filename}.content_id",
+            Mode            => 'binmode',
+            Content         => \$Param{ContentID},
+            Permission      => 660,
+            NoFilenameClean => 1,
         );
     }
 
     # write attachment content alternative to fs
     if ( $Param{ContentAlternative} ) {
         $MainObject->FileWrite(
-            Directory  => $Param{Path},
-            Filename   => "$Param{Filename}.content_alternative",
-            Mode       => 'binmode',
-            Content    => \$Param{ContentAlternative},
-            Permission => 660,
+            Directory       => $Param{Path},
+            Filename        => "$Param{Filename}.content_alternative",
+            Mode            => 'binmode',
+            Content         => \$Param{ContentAlternative},
+            Permission      => 660,
+            NoFilenameClean => 1,
         );
     }
 
@@ -406,11 +403,12 @@ sub ArticleWriteAttachment {
         my ( $Disposition, $FileName ) = split ';', $Param{Disposition};
 
         $MainObject->FileWrite(
-            Directory  => $Param{Path},
-            Filename   => "$Param{Filename}.disposition",
-            Mode       => 'binmode',
-            Content    => \$Disposition || '',
-            Permission => 660,
+            Directory       => $Param{Path},
+            Filename        => "$Param{Filename}.disposition",
+            Mode            => 'binmode',
+            Content         => \$Disposition || '',
+            Permission      => 660,
+            NoFilenameClean => 1,
         );
     }
 
@@ -627,7 +625,7 @@ sub ArticleAttachmentIndexRaw {
 
             # converted article body should be inline
             elsif ( $Filename =~ m{file-[12]} ) {
-                $Disposition = 'inline'
+                $Disposition = 'inline';
             }
 
             # all others including attachments with content id that are not images
@@ -747,7 +745,7 @@ sub ArticleAttachment {
     my $ContentPath = $Self->_ArticleContentPathGet(
         ArticleID => $Param{ArticleID},
     );
-    my %Data = %{ $Index{ $Param{FileID} } // {} };
+    my %Data    = %{ $Index{ $Param{FileID} } // {} };
     my $Counter = 0;
 
     # get main object
@@ -830,7 +828,7 @@ sub ArticleAttachment {
 
                     # converted article body should be inline
                     elsif ( $Filename =~ m{file-[12]} ) {
-                        $Data{Disposition} = 'inline'
+                        $Data{Disposition} = 'inline';
                     }
 
                     # all others including attachments with content id that are not images
@@ -914,10 +912,10 @@ sub ArticleAttachment {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

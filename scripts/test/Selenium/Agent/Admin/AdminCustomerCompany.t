@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -92,7 +92,10 @@ $Selenium->RunTest(
         my $RandomID = 'TestCustomerCompany' . $Helper->GetRandomID();
         $Selenium->find_element( "#CustomerID",          'css' )->send_keys($RandomID);
         $Selenium->find_element( "#CustomerCompanyName", 'css' )->send_keys($RandomID);
-        $Selenium->execute_script("\$('#ValidID').val('1').trigger('redraw.InputField').trigger('change');");
+        $Selenium->InputFieldValueSet(
+            Element => '#ValidID',
+            Value   => 1,
+        );
         $Selenium->find_element( "#CustomerCompanyComment", 'css' )->send_keys('Selenium test customer company');
         $Selenium->find_element( "#CustomerCompanyZIP",     'css' )->send_keys('0');
         $Selenium->find_element( "#Submit",                 'css' )->VerifiedClick();
@@ -187,7 +190,10 @@ $Selenium->RunTest(
         }
 
         # Set test customer company to invalid and clear comment.
-        $Selenium->execute_script("\$('#ValidID').val('2').trigger('redraw.InputField').trigger('change');");
+        $Selenium->InputFieldValueSet(
+            Element => '#ValidID',
+            Value   => 2,
+        );
         $Selenium->find_element( "#CustomerCompanyComment", 'css' )->clear();
         $Selenium->find_element( "#Submit",                 'css' )->VerifiedClick();
 

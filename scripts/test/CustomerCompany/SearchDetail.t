@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -186,7 +186,7 @@ my %ReferenceCustomerCompanySearchFields = (
 
 my $CustomerCompanyObject = $Kernel::OM->Get('Kernel::System::CustomerCompany');
 
-my @CustomerCompanySearchFields = $CustomerCompanyObject->CustomerCompanySearchFields();
+my @CustomerCompanySearchFields       = $CustomerCompanyObject->CustomerCompanySearchFields();
 my %LookupCustomerCompanySearchFields = map { $_->{Name} => $_ } @CustomerCompanySearchFields;
 
 for my $FieldName ( sort keys %ReferenceCustomerCompanySearchFields ) {
@@ -765,7 +765,7 @@ for my $Test (@SearchTests) {
 
         # get defined expected result count (defined in search test case!)
         if ( exists $Test->{ResultData}->{Count} ) {
-            $ExpectedCount = $Test->{ResultData}->{Count}
+            $ExpectedCount = $Test->{ResultData}->{Count};
         }
 
         # check the number of customer company in the returned arrayref
@@ -790,7 +790,7 @@ for my $Test (@SearchTests) {
 
         # check if all ids that belongs to this searchtest are returned
         my @ReferenceCustomerCompanyIDs = keys %{ $CustomerCompanyiesForSearchTest{$TestCount} };
-        my %ReturnedCustomerCompanyIDs = map { $_ => 1 } @{$CustomerCompanyIDs};
+        my %ReturnedCustomerCompanyIDs  = map { $_ => 1 } @{$CustomerCompanyIDs};
         for my $CustomerCompany (@ReferenceCustomerCompanyIDs) {
             $Self->True(
                 $ReturnedCustomerCompanyIDs{$CustomerCompany},

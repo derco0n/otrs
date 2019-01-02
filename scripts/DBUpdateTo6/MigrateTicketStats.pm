@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package scripts::DBUpdateTo6::MigrateTicketStats;    ## no critic
@@ -40,9 +40,9 @@ sub Run {
     # Change parameters directly in the database, since at this point in migration not all used ticket statistic
     #   modules might be available.
     #
-    # Use LIKE in Where clause for xml_content_value as on oracle this is the datatype CLOB
-    #   which can not be compared to with =, only with LIKE
-    #   For further detials please check ORA-00932: inconsistent datatypes: expected - got CLOB
+    # Use LIKE in WHERE clause for xml_content_value as on Oracle this is the datatype CLOB which can not be compared to
+    #   with =, only with LIKE. For further details please check ORA-00932: inconsistent datatypes: expected - got CLOB.
+    SEARCHPARAM:
     for my $SearchParam ( sort keys %SearchParamMap ) {
         return if !$DBObject->Prepare(
             SQL => '
@@ -61,6 +61,7 @@ sub Run {
         while ( my @Row = $DBObject->FetchrowArray() ) {
             $Update{ $Row[0] } = $Row[1];
         }
+        next SEARCHPARAM if !%Update;
 
         for my $XMLKey ( sort keys %Update ) {
             return if !$DBObject->Prepare(
@@ -86,10 +87,10 @@ sub Run {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 ## no critic (Modules::RequireExplicitPackage)
@@ -107,13 +107,42 @@ $Selenium->RunTest(
 
         # check for some settings
         for my $ID (
-            qw(CurPw NewPw NewPw1 UserLanguage OutOfOfficeOn OutOfOfficeOff UserGoogleAuthenticatorSecretKey)
+            qw(CurPw NewPw NewPw1 UserTimeZone_Search UserLanguage_Search OutOfOfficeOn OutOfOfficeOff UserGoogleAuthenticatorSecretKey GenerateUserGoogleAuthenticatorSecretKey)
             )
         {
+
+            # Scroll to element view if necessary.
+            $Selenium->execute_script("\$('#$ID')[0].scrollIntoView(true);");
+
             my $Element = $Selenium->find_element( "#$ID", 'css' );
-            $Element->is_enabled();
-            $Element->is_displayed();
+
+            $Self->True(
+                $Element->is_enabled(),
+                "$ID is enabled."
+            );
+
+            $Self->True(
+                $Element->is_displayed(),
+                "$ID is displayed."
+            );
         }
+
+        # Click on "Generate" button.
+        $Selenium->find_element( "#GenerateUserGoogleAuthenticatorSecretKey", 'css' )->click();
+
+        # Wait until generated key is there.
+        $Selenium->WaitFor(
+            JavaScript =>
+                "return \$('#UserGoogleAuthenticatorSecretKey').val().length"
+        );
+
+        my $SecretKey = $Selenium->execute_script(
+            "return \$('#UserGoogleAuthenticatorSecretKey').val();"
+        );
+        $Self->True(
+            $SecretKey =~ m{[A-Z2-7]{16}} ? 1 : 0,
+            'Secret key is valid.'
+        );
 
         # check some of AgentPreferences default values
         $Self->Is(
@@ -128,8 +157,9 @@ $Selenium->RunTest(
         for my $Language (@Languages) {
 
             # change AgentPreference language
-            $Selenium->execute_script(
-                "\$('#UserLanguage').val('$Language').trigger('redraw.InputField').trigger('change');"
+            $Selenium->InputFieldValueSet(
+                Element => '#UserLanguage',
+                Value   => $Language,
             );
             $Selenium->execute_script(
                 "\$('#UserLanguage').closest('.WidgetSimple').find('.SettingUpdateBox').find('button').trigger('click');"
@@ -231,7 +261,7 @@ $Selenium->RunTest(
             index(
                 $Selenium->get_page_source(),
                 "Avatars have been disabled by the system administrator. You'll see your initials instead."
-                ) > -1,
+            ) > -1,
             "Avatars disabled message found"
         );
 
@@ -246,7 +276,7 @@ $Selenium->RunTest(
             index(
                 $Selenium->get_page_source(),
                 "You can change your avatar image by registering with your email address"
-                ) > -1,
+            ) > -1,
             "Gravatar message found"
         );
 
@@ -413,7 +443,10 @@ JAVASCRIPT
         );
 
         # edit some of checked stored values
-        $Selenium->execute_script("\$('#UserSkin').val('ivory').trigger('redraw.InputField').trigger('change');");
+        $Selenium->InputFieldValueSet(
+            Element => '#UserSkin',
+            Value   => 'ivory',
+        );
         $Selenium->execute_script(
             "\$('#UserSkin').closest('.WidgetSimple').find('.SettingUpdateBox').find('button').trigger('click');"
         );
@@ -455,6 +488,8 @@ JAVASCRIPT
             "ivory",
             "#UserSkin updated value",
         );
+
+        # Enable two factor authenticator.
 
         if ( $Kernel::OM->Get('Kernel::System::OTRSBusiness')->OTRSBusinessIsInstalled() ) {
 
@@ -527,8 +562,9 @@ JAVASCRIPT
             my $CategoriesVisible = $Selenium->execute_script("return \$('#Category:visible').length;");
 
             if ($CategoriesVisible) {
-                $Selenium->execute_script(
-                    "\$('#Category').val('OTRSFree').trigger('redraw.InputField').trigger('change');"
+                $Selenium->InputFieldValueSet(
+                    Element => '#Category',
+                    Value   => 'OTRS',
                 );
             }
 

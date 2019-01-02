@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Output::HTML::Dashboard::TicketStatsGeneric;
@@ -110,7 +110,7 @@ sub Run {
             'Kernel::System::DateTime',
             ObjectParams => {
                 TimeZone => $TimeZone,
-                }
+            }
         );
         if ($DaysBack) {
             $DateTimeObject->Subtract( Days => $DaysBack );
@@ -121,7 +121,7 @@ sub Run {
         $DateTimeObject->ToOTRSTimeZone();
 
         my $DateTimeValues = $DateTimeObject->Get();
-        my $WeekDay = $DateTimeValues->{DayOfWeek} == 7 ? 0 : $DateTimeValues->{DayOfWeek};
+        my $WeekDay        = $DateTimeValues->{DayOfWeek} == 7 ? 0 : $DateTimeValues->{DayOfWeek};
 
         unshift(
             @TicketWeekdays,
@@ -147,7 +147,7 @@ sub Run {
 
             # search with user permissions
             Permission => $Self->{Config}->{Permission} || 'ro',
-            UserID => $Self->{UserID},
+            UserID     => $Self->{UserID},
         ) || 0;
         if ( $CountCreated && $CountCreated > $Max ) {
             $Max = $CountCreated;
@@ -170,7 +170,7 @@ sub Run {
 
             # search with user permissions
             Permission => $Self->{Config}->{Permission} || 'ro',
-            UserID => $Self->{UserID},
+            UserID     => $Self->{UserID},
         ) || 0;
         if ( $CountClosed && $CountClosed > $Max ) {
             $Max = $CountClosed;

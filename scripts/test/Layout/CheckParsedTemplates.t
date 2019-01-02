@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -59,7 +59,7 @@ my $StartTime = time();
 # --------------------------------------------------------------------#
 
 # check the header
-my $Header = $LayoutObject->Header( Title => 'HeaderTest' );
+my $Header     = $LayoutObject->Header( Title => 'HeaderTest' );
 my $HeaderFlag = 1;
 if (
     $Header =~ m{ \$ (QData|LQData|Data|Env|QEnv|Config|Include) }msx
@@ -116,7 +116,7 @@ if ( !opendir $DIR, $DTLDirectory ) {
 my @Files = ();
 while ( defined( my $Filename = readdir $DIR ) ) {
     if ( $Filename =~ m{ \. dtl $}xms ) {
-        push( @Files, "$DTLDirectory/$Filename" )
+        push( @Files, "$DTLDirectory/$Filename" );
     }
 }
 closedir $DIR;

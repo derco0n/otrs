@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::Web::InterfaceAgent;
@@ -232,7 +232,7 @@ sub Run {
 
         # get params
         my $PostUser = $ParamObject->GetParam( Param => 'User' ) || '';
-        my $PostPw = $ParamObject->GetParam(
+        my $PostPw   = $ParamObject->GetParam(
             Param => 'Password',
             Raw   => 1
         ) || '';
@@ -271,7 +271,7 @@ sub Run {
                             HTTPOnly => 1,
                         ),
                     },
-                    }
+                }
             );
             my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
 
@@ -587,7 +587,7 @@ sub Run {
         # redirect to alternate login
         if ( $ConfigObject->Get('LogoutURL') ) {
             print $LayoutObject->Redirect(
-                ExtURL => $ConfigObject->Get('LogoutURL') . "?Reason=Logout",
+                ExtURL => $ConfigObject->Get('LogoutURL'),
             );
             return 1;
         }
@@ -655,7 +655,7 @@ sub Run {
         );
 
         # verify user is valid when requesting password reset
-        my @ValidIDs = $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet();
+        my @ValidIDs    = $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet();
         my $UserIsValid = grep { $UserData{ValidID} && $UserData{ValidID} == $_ } @ValidIDs;
         if ( !$UserData{UserID} || !$UserIsValid ) {
 
@@ -1022,17 +1022,30 @@ sub Run {
         my $Home = $ConfigObject->Get('Home');
         my $File = "$Home/Kernel/Config/Files/User/$UserData{UserID}.pm";
         if ( -e $File ) {
-            if ( !require $File ) {
-                die "ERROR: $!\n";
-            }
+            eval {
+                if ( require $File ) {
 
-            # prepare file
-            $File =~ s/\Q$Home\E//g;
-            $File =~ s/^\///g;
-            $File =~ s/\/\//\//g;
-            $File =~ s/\//::/g;
-            $File =~ s/\.pm$//g;
-            $File->Load($ConfigObject);
+                    # Prepare file.
+                    $File =~ s/\Q$Home\E//g;
+                    $File =~ s/^\///g;
+                    $File =~ s/\/\//\//g;
+                    $File =~ s/\//::/g;
+                    $File =~ s/\.pm$//g;
+                    $File->Load($ConfigObject);
+                }
+                else {
+                    die "Cannot load file $File: $!\n";
+                }
+            };
+
+            # Log error and continue.
+            if ($@) {
+                my $ErrorMessage = $@;
+                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => $ErrorMessage,
+                );
+            }
         }
 
         # pre application module
@@ -1207,10 +1220,10 @@ sub DESTROY {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

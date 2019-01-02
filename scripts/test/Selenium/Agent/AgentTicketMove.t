@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -113,6 +113,23 @@ $Selenium->RunTest(
             );
         }
 
+        # Set previous ACLs on invalid.
+        my $ACLList = $ACLObject->ACLList(
+            ValidIDs => ['1'],
+            UserID   => 1,
+        );
+
+        for my $Item ( sort keys %{$ACLList} ) {
+
+            $ACLObject->ACLUpdate(
+                ID   => $Item,
+                Name => $ACLList->{$Item},
+                ,
+                ValidID => 2,
+                UserID  => 1,
+            );
+        }
+
         # Create test ACL with possible not selection of test queues.
         my $ACLID = $ACLObject->ACLAdd(
             Name           => 'AACL' . $Helper->GetRandomID(),
@@ -189,13 +206,16 @@ $Selenium->RunTest(
             qw(DestQueueID NewUserID NewStateID)
             )
         {
-            $Selenium->WaitFor( JavaScript => "return typeof(\$) === 'function' && \$('#$ID').length" );
+            $Selenium->WaitFor( JavaScript => "return typeof(\$) === 'function' && \$('#$ID').length;" );
             my $Element = $Selenium->find_element( "#$ID", 'css' );
             $Element->is_enabled();
         }
 
         # Change ticket queue.
-        $Selenium->execute_script("\$('#DestQueueID').val('4').trigger('redraw.InputField').trigger('change');");
+        $Selenium->InputFieldValueSet(
+            Element => '#DestQueueID',
+            Value   => 4,
+        );
         $Selenium->find_element( "#submitRichText", 'css' )->click();
 
         # Return back to zoom view and click on history and switch to its view.
@@ -205,7 +225,7 @@ $Selenium->RunTest(
         # Wait for reload to kick in.
         $Selenium->WaitFor(
             JavaScript =>
-                'return typeof(Core) == "object" && typeof(Core.App) == "object" && Core.App.PageLoadComplete'
+                'return typeof(Core) == "object" && typeof(Core.App) == "object" && Core.App.PageLoadComplete;'
         );
 
         # Force sub menus to be visible in order to be able to click one of the links.
@@ -218,7 +238,7 @@ $Selenium->RunTest(
         $Selenium->switch_to_window( $Handles->[1] );
 
         # Wait until page has loaded, if necessary.
-        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $(".CancelClosePopup").length' );
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $(".CancelClosePopup").length;' );
 
         # Confirm ticket move action.
         my $MoveMsg = "Changed queue to \"Misc\" (4) from \"Raw\" (2).";
@@ -278,7 +298,15 @@ $Selenium->RunTest(
 
         # Reload the page, to get the new sys config option.
         $Selenium->VerifiedGet("${ScriptAlias}index.pl?Action=AgentTicketZoom;TicketID=$TicketID");
-        $Selenium->execute_script("\$('#DestQueueID').val('4').trigger('redraw.InputField').trigger('change');");
+        $Selenium->InputFieldValueSet(
+            Element => '#DestQueueID',
+            Value   => 4,
+        );
+
+        # Wait for Asynchronous widget to load.
+        $Selenium->WaitFor(
+            JavaScript => "return typeof(\$) === 'function' && \$('.SidebarColumn .WidgetSimple').length;"
+        );
 
         # Check that nothing happens, after the queue selection in the dropdown.
         $Self->True(
@@ -289,27 +317,33 @@ $Selenium->RunTest(
 
         $Self->Is(
             $Selenium->execute_script(
-                "return \$('p.Value[title=\"Misc\"]').text()"
+                "return \$('p.Value[title=\"Misc\"]').text();"
             ),
             'Misc',
             'The Queue was not changed.',
-        );
+        ) || die;
 
-        $Selenium->execute_script("\$('#DestQueueID').val('2').trigger('redraw.InputField').trigger('change');");
+        $Selenium->InputFieldValueSet(
+            Element => '#DestQueueID',
+            Value   => 2,
+        );
 
         # Wait for reload to kick in.
         $Selenium->WaitFor(
+            JavaScript => "return typeof(\$) === 'function' && \$('.SidebarColumn .WidgetSimple').length;"
+        );
+        $Selenium->WaitFor(
             JavaScript =>
-                'return typeof(Core) == "object" && typeof(Core.App) == "object" && Core.App.PageLoadComplete'
+                "return typeof(Core) == 'object' && typeof(Core.App) == 'object' && Core.App.PageLoadComplete && \$('p.Value[title=\"Raw\"]').text() === 'Raw';"
         );
 
         $Self->Is(
             $Selenium->execute_script(
-                "return \$('p.Value[title=\"Raw\"]').text()"
+                "return \$('p.Value[title=\"Raw\"]').text();"
             ),
             'Raw',
             'The Queue was changed.',
-        );
+        ) || die;
 
         # Delete test ACL.
         my $Success = $ACLObject->ACLDelete(

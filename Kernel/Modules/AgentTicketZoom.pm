@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Modules::AgentTicketZoom;
@@ -768,6 +768,16 @@ sub Run {
         elsif ( $EventTypeFilterSessionString eq 'off' ) {
             $EventTypeFilterSessionString = '';
         }
+
+        # Set article filter with value if it exists.
+        elsif (
+            $EventTypeFilterSessionString
+            && $EventTypeFilterSessionString =~ m{ EventTypeFilter < ( [^<>]+ ) > }xms
+            )
+        {
+            my @IDs = split /,/, $1;
+            $Self->{EventTypeFilter}->{EventTypeID} = \@IDs;
+        }
     }
 
     # return if HTML email
@@ -1316,7 +1326,7 @@ sub MaskAgentZoom {
 
     # get MoveQueuesStrg
     if ( $ConfigObject->Get('Ticket::Frontend::MoveType') =~ /^form$/i ) {
-        $MoveQueues{0} = '- ' . $LayoutObject->{LanguageObject}->Translate('Move') . ' -';
+        $MoveQueues{0}         = '- ' . $LayoutObject->{LanguageObject}->Translate('Move') . ' -';
         $Param{MoveQueuesStrg} = $LayoutObject->AgentQueueListOption(
             Name           => 'DestQueueID',
             Data           => \%MoveQueues,
@@ -1606,7 +1616,7 @@ sub MaskAgentZoom {
             );
 
             if ($ACL) {
-                %{$NextActivityDialogs} = $TicketObject->TicketAclData()
+                %{$NextActivityDialogs} = $TicketObject->TicketAclData();
             }
 
             $LayoutObject->Block(
@@ -1906,7 +1916,7 @@ sub MaskAgentZoom {
                     1 => Translatable('Visible only'),
                     2 => Translatable('Visible and invisible'),
                 },
-                SelectedID => $Self->{ArticleFilter}->{CustomerVisibility} // 2,
+                SelectedID  => $Self->{ArticleFilter}->{CustomerVisibility} // 2,
                 Translation => 1,
                 Sort        => 'NumericKey',
                 Name        => 'CustomerVisibilityFilter',
@@ -2281,17 +2291,15 @@ sub _ArticleTree {
                 );
             }
 
-            # Determine communication direction
-            if ( !$Article{IsVisibleForCustomer} ) {
+            # Determine communication direction.
+            if ( $Article{ChannelName} eq 'Internal' ) {
                 $LayoutObject->Block( Name => 'TreeItemDirectionInternal' );
             }
+            elsif ( $ArticleSenderTypeList{ $Article{SenderTypeID} } eq 'customer' ) {
+                $LayoutObject->Block( Name => 'TreeItemDirectionIncoming' );
+            }
             else {
-                if ( $ArticleSenderTypeList{ $Article{SenderTypeID} } eq 'customer' ) {
-                    $LayoutObject->Block( Name => 'TreeItemDirectionIncoming' );
-                }
-                else {
-                    $LayoutObject->Block( Name => 'TreeItemDirectionOutgoing' );
-                }
+                $LayoutObject->Block( Name => 'TreeItemDirectionOutgoing' );
             }
 
             # Get attachment index (excluding body attachments).
@@ -2518,36 +2526,8 @@ sub _ArticleTree {
         HISTORYITEM:
         for my $Item ( reverse @HistoryLines ) {
 
-            if ( grep { $_ eq $Item->{HistoryType} } @TypesDodge ) {
-                next HISTORYITEM;
-            }
-
-            $Item->{Counter} = $ItemCounter++;
-
-            # check which color the item should have
-            if ( $Item->{HistoryType} eq 'NewTicket' ) {
-
-                # if the 'NewTicket' item has an article, display this "creation article" event separately
-                if ( $Item->{ArticleID} ) {
-                    push @{ $Param{Items} }, {
-                        %{$Item},
-                        Counter             => $Item->{Counter}++,
-                        Class               => 'NewTicket',
-                        Name                => '',
-                        ArticleID           => '',
-                        HistoryTypeReadable => Translatable('Ticket Created'),
-                        Orientation         => 'Right',
-                    };
-                }
-                else {
-                    $Item->{Class} = 'NewTicket';
-                    delete $Item->{ArticleID};
-                    delete $Item->{Name};
-                }
-            }
-
             # special treatment for certain types, e.g. external notes from customers
-            elsif (
+            if (
                 $Item->{ArticleID}
                 && $Item->{HistoryType} eq 'AddNote'
                 && IsHashRefWithData( $ArticlesByArticleID->{ $Item->{ArticleID} } )
@@ -2639,6 +2619,33 @@ sub _ArticleTree {
                 $Item->{Class} = 'TypeOutgoing';
             }
 
+            if ( grep { $_ eq $Item->{HistoryType} } @TypesDodge ) {
+                next HISTORYITEM;
+            }
+
+            $Item->{Counter} = $ItemCounter++;
+
+            if ( $Item->{HistoryType} eq 'NewTicket' ) {
+
+                # if the 'NewTicket' item has an article, display this "creation article" event separately
+                if ( $Item->{ArticleID} ) {
+                    push @{ $Param{Items} }, {
+                        %{$Item},
+                        Counter             => $Item->{Counter}++,
+                        Class               => 'NewTicket',
+                        Name                => '',
+                        ArticleID           => '',
+                        HistoryTypeReadable => Translatable('Ticket Created'),
+                        Orientation         => 'Right',
+                    };
+                }
+                else {
+                    $Item->{Class} = 'NewTicket';
+                    delete $Item->{ArticleID};
+                    delete $Item->{Name};
+                }
+            }
+
             # remove article information from types which should not display articles
             if ( !grep { $_ eq $Item->{HistoryType} } @TypesWithArticles ) {
                 delete $Item->{ArticleID};
@@ -2688,6 +2695,10 @@ sub _ArticleTree {
 
                 # remove empty lines
                 $Item->{ArticleData}->{ArticlePlain} =~ s{^[\n\r]+}{}xmsg;
+
+                # Modify plain text and body to avoid '</script>' tag issue (see bug#14023).
+                $Item->{ArticleData}->{ArticlePlain} =~ s{</script>}{<###/script>}xmsg;
+                $Item->{ArticleData}->{Body}         =~ s{</script>}{<###/script>}xmsg;
 
                 my %ArticleFlagsAll = $ArticleObject->ArticleFlagGet(
                     ArticleID => $Item->{ArticleID},
@@ -2815,6 +2826,11 @@ sub _ArticleTree {
 
         # Include current article ID only if it's selected.
         $Param{CurrentArticleID} //= $Self->{ArticleID};
+
+        # Modify body text to avoid '</script>' tag issue (see bug#14023).
+        for my $ArticleBoxItem (@ArticleBox) {
+            $ArticleBoxItem->{Body} =~ s{</script>}{<###/script>}xmsg;
+        }
 
         # send data to JS
         $LayoutObject->AddJSData(

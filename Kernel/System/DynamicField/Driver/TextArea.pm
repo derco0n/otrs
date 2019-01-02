@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::DynamicField::Driver::TextArea;
@@ -167,7 +167,7 @@ sub EditFieldRender {
     # Notice that some browsers count new lines \n\r as only 1 character. In these cases the
     # validation framework might generate an error while the user is still capable to enter text in the
     # text-area. Otherwise the maxlength property will prevent to enter more text than the maximum.
-    my $MaxLength = $Param{MaxLength} // $Self->{MaxLength};
+    my $MaxLength  = $Param{MaxLength} // $Self->{MaxLength};
     my $HTMLString = <<"EOF";
 <textarea class="$FieldClass" id="$FieldName" name="$FieldName" title="$FieldLabelEscaped" rows="$RowsNumber" cols="$ColsNumber" data-maxlength="$MaxLength">$ValueEscaped</textarea>
 EOF
@@ -387,10 +387,10 @@ EOF
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

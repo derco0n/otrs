@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Modules::AgentTicketSearch;
@@ -285,9 +285,9 @@ sub Run {
 
         # get array params
         for my $Key (
-            qw(StateIDs StateTypeIDs QueueIDs PriorityIDs OwnerIDs
+            qw(StateIDs States StateTypeIDs QueueIDs Queues PriorityIDs Priorities OwnerIDs
             CreatedQueueIDs CreatedUserIDs WatchUserIDs ResponsibleIDs
-            TypeIDs ServiceIDs SLAIDs LockIDs)
+            TypeIDs Types ServiceIDs Services SLAIDs SLAs LockIDs Locks)
             )
         {
 
@@ -432,6 +432,10 @@ sub Run {
 
         if ( !$Self->{ProfileName} ) {
             $Self->{ProfileName} = "($Self->{Profile})";
+        }
+
+        if ( $Self->{ProfileName} eq '(last-search)' ) {
+            $Self->{ProfileName} = '(' . $LayoutObject->{LanguageObject}->Translate('last-search') . ')';
         }
 
         # save search profile (under last-search or real profile name)
@@ -793,11 +797,29 @@ sub Run {
                     UserID        => $Self->{UserID},
                 );
 
-                # Get the first article of the ticket.
+                # Get last customer article.
                 my @Articles = $ArticleObject->ArticleList(
-                    TicketID  => $TicketID,
-                    OnlyFirst => 1,
+                    TicketID   => $TicketID,
+                    SenderType => 'customer',
+                    OnlyLast   => 1,
                 );
+
+                # If the ticket has no customer article, get the last agent article.
+                if ( !@Articles ) {
+                    @Articles = $ArticleObject->ArticleList(
+                        TicketID   => $TicketID,
+                        SenderType => 'agent',
+                        OnlyLast   => 1,
+                    );
+                }
+
+                # Finally, if everything failed, get latest article.
+                if ( !@Articles ) {
+                    @Articles = $ArticleObject->ArticleList(
+                        TicketID => $TicketID,
+                        OnlyLast => 1,
+                    );
+                }
 
                 my %Article = $ArticleObject->BackendForArticle( %{ $Articles[0] } )->ArticleGet(
                     %{ $Articles[0] },
@@ -950,7 +972,7 @@ sub Run {
                 'ticket_search_%s',
                 $CurDateTimeObject->Format(
                     Format => '%Y-%m-%d_%H-%M'
-                    )
+                )
             );
 
             # get CSV object
@@ -1006,19 +1028,35 @@ sub Run {
                     UserID        => $Self->{UserID},
                 );
 
-                # Get the first article of the ticket.
+                # Get last customer article.
                 my @Articles = $ArticleObject->ArticleList(
-                    TicketID  => $TicketID,
-                    UserID    => $Self->{UserID},
-                    OnlyFirst => 1,
+                    TicketID   => $TicketID,
+                    SenderType => 'customer',
+                    OnlyLast   => 1,
                 );
+
+                # If the ticket has no customer article, get the last agent article.
+                if ( !@Articles ) {
+                    @Articles = $ArticleObject->ArticleList(
+                        TicketID   => $TicketID,
+                        SenderType => 'agent',
+                        OnlyLast   => 1,
+                    );
+                }
+
+                # Finally, if everything failed, get latest article.
+                if ( !@Articles ) {
+                    @Articles = $ArticleObject->ArticleList(
+                        TicketID => $TicketID,
+                        OnlyLast => 1,
+                    );
+                }
 
                 my %Article = $ArticleObject->BackendForArticle( %{ $Articles[0] } )->ArticleGet(
                     %{ $Articles[0] },
                     DynamicFields => 1,
                 );
 
-                # get first article data
                 my %Data;
 
                 if ( !%Article ) {
@@ -1027,7 +1065,7 @@ sub Run {
 
                     # Set missing information.
                     $Data{Subject} = $Data{Title} || Translatable('Untitled');
-                    $Data{From} = '--';
+                    $Data{From}    = '--';
                 }
                 else {
                     %Data = ( %Ticket, %Article );
@@ -1062,7 +1100,7 @@ sub Run {
                 $UserInfo{CustomerName} = '(' . $UserInfo{CustomerName} . ')'
                     if ( $UserInfo{CustomerName} );
 
-                my %Info = ( %Data, %UserInfo );
+                my %Info    = ( %Data, %UserInfo );
                 my $Created = $LayoutObject->{LanguageObject}->FormatTimeString(
                     $Data{CreateTime} // $Data{Created},
                     'DateFormat',
@@ -1226,7 +1264,7 @@ sub Run {
                 'ticket_search_%s.pdf',
                 $CurDateTimeObject->Format(
                     Format => '%Y-%m-%d_%H-%M'
-                    )
+                )
             );
 
             my $PDFString = $PDFObject->DocumentOutput();
@@ -1316,8 +1354,7 @@ sub Run {
                 Bulk      => 1,
                 Limit     => $Self->{SearchLimit},
 
-                Filter     => $Self->{Filter},
-                FilterLink => $FilterLink,
+                Filter => $Self->{Filter},
 
                 OrderBy      => $Self->{OrderBy},
                 SortBy       => $Self->{SortBy},
@@ -1383,7 +1420,7 @@ sub Run {
         );
     }
     elsif ( $Self->{Subaction} eq 'AJAX' ) {
-        my $Profile = $ParamObject->GetParam( Param => 'Profile' ) || '';
+        my $Profile     = $ParamObject->GetParam( Param => 'Profile' ) || '';
         my $EmptySearch = $ParamObject->GetParam( Param => 'EmptySearch' );
         if ( !$Profile ) {
             $EmptySearch = 1;
@@ -1718,7 +1755,7 @@ sub Run {
                     if ( IsHashRefWithData($HistoricalValues) ) {
                         for my $Key ( sort keys %{$HistoricalValues} ) {
                             if ( !$Data->{$Key} ) {
-                                $Data->{$Key} = $HistoricalValues->{$Key}
+                                $Data->{$Key} = $HistoricalValues->{$Key};
                             }
                         }
                     }
@@ -1954,12 +1991,18 @@ sub Run {
             Base      => 'TicketSearch',
             UserLogin => $Self->{UserLogin},
         );
+
+        if ( $Profiles{'last-search'} ) {
+            $Profiles{'last-search'} = $LayoutObject->{LanguageObject}->Translate('last-search');
+        }
+
         $Param{ProfilesStrg} = $LayoutObject->BuildSelection(
             Data         => \%Profiles,
             Name         => 'Profile',
             ID           => 'SearchProfile',
             SelectedID   => $Profile,
             Class        => 'Modernize',
+            Translation  => 0,
             PossibleNone => 1,
         );
 

@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::Console::Command::Maint::Stats::Generate;
@@ -144,7 +144,7 @@ sub PreRun {
 
     # if params have been passed, we build up a body containing the configured params
     # which is then used as default
-    $Self->{Params} = $Self->GetOption('params');
+    $Self->{Params}   = $Self->GetOption('params');
     $Self->{MailBody} = $Self->GetOption('mail-body') || '';
     if ( !$Self->{MailBody} && $Self->{Params} ) {
         $Self->{MailBody} .= "Stats with following options:\n\n";
@@ -257,7 +257,7 @@ sub Run {
             StatID   => $Self->{StatID},
             GetParam => \%GetParam,
             UserID   => 1,
-            )
+        )
     };
 
     # generate output

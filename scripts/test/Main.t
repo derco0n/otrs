@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -13,7 +13,6 @@ use utf8;
 use vars (qw($Self));
 
 use File::Path;
-use Unicode::Normalize;
 use JSON::PP;
 
 # get needed objects
@@ -26,7 +25,7 @@ my @Tests = (
     {
         Name         => 'FilenameCleanUp() - Local',
         FilenameOrig => 'me_t o/alal.xml',
-        FilenameNew  => 'me_t o_alal.xml',
+        FilenameNew  => 'me_t_o_alal.xml',
         Type         => 'Local',
     },
     {
@@ -62,15 +61,27 @@ my @Tests = (
     {
         Name         => 'FilenameCleanUp() - Local',
         FilenameOrig => 'me_to/a+lal Grüße 0.xml',
-        FilenameNew  => 'me_to_a+lal Grüße 0.xml',
+        FilenameNew  => 'me_to_a+lal_Grüße_0.xml',
         Type         => 'Local',
+    },
+    {
+        Name         => 'FilenameCleanUp() - leading dots - Local',
+        FilenameOrig => '....test.xml',
+        FilenameNew  => 'test.xml',
+        Type         => 'Local',
+    },
+    {
+        Name         => 'FilenameCleanUp() - leading dots - Attachment',
+        FilenameOrig => '....test.xml',
+        FilenameNew  => 'test.xml',
+        Type         => 'Attachment',
     },
     {
         Name => 'FilenameCleanUp() - Attachment',
         FilenameOrig =>
             'me_to/a+lal123456789012345678901234567890Liebe Grüße aus Straubing123456789012345678901234567890123456789012345678901234567890.xml',
         FilenameNew =>
-            'me_to_a+lal123456789012345678901234567890Liebe_Gruesse_aus_Straubing123456789012345678901234567.xml',
+            'me_to_a+lal123456789012345678901234567890Liebe_Gruesse_aus_Straubing123456789012345678901234567890123456789012345678901234567890.xml',
         Type => 'Attachment',
     },
     {
@@ -539,13 +550,6 @@ for my $Test (@Tests) {
         Filter    => $Test->{Filter},
         Recursive => $Test->{Recursive},
     );
-
-    # Mac OS will store all filenames as NFD internally.
-    if ( $^O eq 'darwin' ) {
-        for my $Index ( 0 .. $#UnicodeResults ) {
-            $UnicodeResults[$Index] = Unicode::Normalize::NFD( $UnicodeResults[$Index] );
-        }
-    }
 
     $Self->IsDeeply( \@Results, \@UnicodeResults, $Test->{Name} );
 }

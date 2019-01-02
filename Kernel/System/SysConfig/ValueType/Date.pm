@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 ## nofilter(TidyAll::Plugin::OTRS::Perl::LayoutObject)
 package Kernel::System::SysConfig::ValueType::Date;
@@ -54,7 +54,7 @@ sub new {
 
 Check if provided EffectiveValue matches structure defined in XMLContentParsed.
 
-    my %Result = $SysConfigObject->SettingEffectiveValueCheck(
+    my %Result = $ValueTypeObject->SettingEffectiveValueCheck(
         XMLContentParsed => {                           # (required)
             Value => [
                 {
@@ -321,7 +321,7 @@ sub SettingRender {
     if ( !$EffectiveValueCheck{Success} ) {
         my $Message = $LanguageObject->Translate("Value is not correct! Please, consider updating this field.");
 
-        $HTML .= "<div class='BadEffectiveValue'>\n";
+        $HTML .= $Param{IsValid} ? "<div class='BadEffectiveValue'>\n" : "<div>\n";
         $HTML .= "<p>* $Message</p>\n";
         $HTML .= "</div>\n";
     }
@@ -351,7 +351,7 @@ EOF
         pop @{ $LayoutObject->{_JSOnDocumentComplete} };
 
         if ( !$HasDatepicker ) {
-            my $VacationDays = $LayoutObject->DatepickerGetVacationDays();
+            my $VacationDays  = $LayoutObject->DatepickerGetVacationDays();
             my $TextDirection = $LanguageObject->{TextDirection} || '';
 
             my $JSONString = $Kernel::OM->Get('Kernel::System::JSON')->Encode(
@@ -491,10 +491,10 @@ sub AddItem {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Modules::AdminPackageManager;
@@ -99,7 +99,7 @@ sub Run {
             );
         }
         my %Structure = $PackageObject->PackageParse( String => $Package );
-        my $File = '';
+        my $File      = '';
         if ( ref $Structure{Filelist} eq 'ARRAY' ) {
             for my $Hash ( @{ $Structure{Filelist} } ) {
                 if ( $Hash->{Location} eq $Location ) {
@@ -538,7 +538,7 @@ sub Run {
     # view remote package
     # ------------------------------------------------------------ #
     if ( $Self->{Subaction} eq 'ViewRemote' ) {
-        my $File = $ParamObject->GetParam( Param => 'File' ) || '';
+        my $File     = $ParamObject->GetParam( Param => 'File' ) || '';
         my $Location = $ParamObject->GetParam( Param => 'Location' );
         my %Frontend;
 
@@ -951,6 +951,19 @@ sub Run {
                     Version   => $Structure{Version}->{Content},
                 },
             );
+
+            $LayoutObject->Block(
+                Name => 'IntroForm',
+                Data => {
+                    %Param,
+                    %Data,
+                    Subaction => $Self->{Subaction},
+                    Type      => 'IntroReinstallPre',
+                    Name      => $Structure{Name}->{Content},
+                    Version   => $Structure{Version}->{Content},
+                },
+            );
+
             $LayoutObject->Block(
                 Name => 'IntroCancel',
             );
@@ -1036,6 +1049,19 @@ sub Run {
                     Version   => $Version,
                 },
             );
+
+            $LayoutObject->Block(
+                Name => 'IntroForm',
+                Data => {
+                    %Param,
+                    %Data,
+                    Subaction => '',
+                    Type      => 'IntroReinstallPost',
+                    Name      => $Name,
+                    Version   => $Version,
+                },
+            );
+
             my $Output = $LayoutObject->Header();
             $Output .= $LayoutObject->NavigationBar();
             $Output .= $LayoutObject->Output(
@@ -1099,6 +1125,19 @@ sub Run {
                     Version   => $Structure{Version}->{Content},
                 },
             );
+
+            $LayoutObject->Block(
+                Name => 'IntroForm',
+                Data => {
+                    %Param,
+                    %Data,
+                    Subaction => $Self->{Subaction},
+                    Type      => 'IntroUninstallPre',
+                    Name      => $Structure{Name}->{Content},
+                    Version   => $Structure{Version}->{Content},
+                },
+            );
+
             $LayoutObject->Block(
                 Name => 'IntroCancel',
             );
@@ -1186,6 +1225,19 @@ sub Run {
                     Version   => $Version,
                 },
             );
+
+            $LayoutObject->Block(
+                Name => 'IntroForm',
+                Data => {
+                    %Param,
+                    %Data,
+                    Subaction => '',
+                    Type      => 'IntroUninstallPost',
+                    Name      => $Name,
+                    Version   => $Version,
+                },
+            );
+
             my $Output = $LayoutObject->Header();
             $Output .= $LayoutObject->NavigationBar();
             $Output .= $LayoutObject->Output(
@@ -1207,7 +1259,7 @@ sub Run {
         # challenge token check for write action
         $LayoutObject->ChallengeTokenCheck();
 
-        my $FormID = $ParamObject->GetParam( Param => 'FormID' ) || '';
+        my $FormID      = $ParamObject->GetParam( Param => 'FormID' ) || '';
         my %UploadStuff = $ParamObject->GetUploadAll(
             Param => 'FileUpload',
         );
@@ -1521,19 +1573,14 @@ sub Run {
         );
         if ( !@List ) {
             $OutputNotify .= $LayoutObject->Notify(
-                Priority => 'Error',
+                Priority => 'Warning',
+                Info     => Translatable('No packages found in selected repository. Please check log for more info!'),
+                Link     => $LayoutObject->{Baselink} . 'Action=AdminLog',
             );
-            if ( !$OutputNotify ) {
-                $OutputNotify .= $LayoutObject->Notify(
-                    Priority => 'Info',
-                    Info     => Translatable('No packages or no new packages found in selected repository.'),
-                );
-            }
             $LayoutObject->Block(
                 Name => 'NoDataFoundMsg',
                 Data => {},
             );
-
         }
 
         for my $Data (@List) {
@@ -1816,11 +1863,11 @@ sub Run {
             'Kernel::System::DateTime',
             ObjectParams => {
                 String => $SystemData{UpdateTime},
-                }
+            }
         );
         $TargetDateTimeObject->Add( Days => 1 );
         if ( $CurrentDateTimeObject > $TargetDateTimeObject ) {
-            $PackageObject->PackageUpgradeAllDataDelete()
+            $PackageObject->PackageUpgradeAllDataDelete();
         }
     }
 
@@ -2040,7 +2087,8 @@ sub _InstallHandling {
     # translate description
     if ( $LayoutObject->{LanguageObject} ) {
         $VerifyInfo{Description} = $LayoutObject->{LanguageObject}->Translate(
-            $VerifyInfo{Description}
+            $VerifyInfo{Description},
+            $VerifyInfo{PackageInstallPossible} ? '' : $LayoutObject->{Baselink},
         );
     }
 
@@ -2059,9 +2107,24 @@ sub _InstallHandling {
             },
         );
 
-        $LayoutObject->Block(
-            Name => 'IntroCancel',
-        );
+        if ( $VerifyInfo{PackageInstallPossible} ) {
+
+            $LayoutObject->Block(
+                Name => 'IntroForm',
+                Data => {
+                    %Param,
+                    %VerifyInfo,
+                    Subaction => $Self->{Subaction},
+                    Type      => 'IntroInstallVendor',
+                    Name      => $Structure{Name}->{Content},
+                    Version   => $Structure{Version}->{Content},
+                },
+            );
+
+            $LayoutObject->Block(
+                Name => 'IntroCancel',
+            );
+        }
 
         my $Output = $LayoutObject->Header();
         $Output .= $LayoutObject->NavigationBar();
@@ -2147,6 +2210,18 @@ sub _InstallHandling {
         }
 
         $LayoutObject->Block(
+            Name => 'IntroForm',
+            Data => {
+                %Param,
+                %Data,
+                Subaction => $Self->{Subaction},
+                Type      => 'IntroInstallPre',
+                Name      => $Structure{Name}->{Content},
+                Version   => $Structure{Version}->{Content},
+            },
+        );
+
+        $LayoutObject->Block(
             Name => 'IntroCancel',
         );
 
@@ -2179,6 +2254,18 @@ sub _InstallHandling {
         if (%Data) {
             $LayoutObject->Block(
                 Name => 'Intro',
+                Data => {
+                    %Param,
+                    %Data,
+                    Subaction => 'Install',
+                    Type      => 'IntroInstallPost',
+                    Name      => $Structure{Name}->{Content},
+                    Version   => $Structure{Version}->{Content},
+                },
+            );
+
+            $LayoutObject->Block(
+                Name => 'IntroForm',
                 Data => {
                     %Param,
                     %Data,
@@ -2290,6 +2377,19 @@ sub _UpgradeHandling {
                 Version   => $Structure{Version}->{Content},
             },
         );
+
+        $LayoutObject->Block(
+            Name => 'IntroForm',
+            Data => {
+                %Param,
+                %Data,
+                Subaction => $Self->{Subaction},
+                Type      => 'IntroUpgradePre',
+                Name      => $Structure{Name}->{Content},
+                Version   => $Structure{Version}->{Content},
+            },
+        );
+
         $LayoutObject->Block(
             Name => 'IntroCancel',
         );
@@ -2326,6 +2426,19 @@ sub _UpgradeHandling {
                     Version   => $Structure{Version}->{Content},
                 },
             );
+
+            $LayoutObject->Block(
+                Name => 'IntroForm',
+                Data => {
+                    %Param,
+                    %Data,
+                    Subaction => '',
+                    Type      => 'IntroUpgradePost',
+                    Name      => $Structure{Name}->{Content},
+                    Version   => $Structure{Version}->{Content},
+                },
+            );
+
             my $Output = $LayoutObject->Header();
             $Output .= $LayoutObject->NavigationBar();
             $Output .= $LayoutObject->Output(

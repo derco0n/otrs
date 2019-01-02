@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -148,13 +148,15 @@ $Selenium->RunTest(
             # Either clear next state field value or explicitly set it in order to test if ticket
             #   state will remain open (see bug#12516 for more information).
             if ( $Action->{EmptyState} ) {
-                $Selenium->execute_script(
-                    "\$('#NextStateID').val('').trigger('redraw.InputField').trigger('change');"
+                $Selenium->InputFieldValueSet(
+                    Element => '#NextStateID',
+                    Value   => '',
                 );
             }
             else {
-                $Selenium->execute_script(
-                    "\$('#NextStateID').val('4').trigger('redraw.InputField').trigger('change');"
+                $Selenium->InputFieldValueSet(
+                    Element => '#NextStateID',
+                    Value   => 4,
                 );
             }
 
@@ -175,6 +177,62 @@ $Selenium->RunTest(
                 'Ticket state remained open',
             );
         }
+
+        # Check if PendingDiffTime set to 0 submits phone inbound form if state not pending.
+        # See bug#13906 https://bugs.otrs.org/show_bug.cgi?id=13906.
+
+        # Setup 'PendingDiffTime' config to 0 seconds.
+        $Helper->ConfigSettingChange(
+            Valid => 1,
+            Key   => 'Ticket::Frontend::PendingDiffTime',
+            Value => 0,
+        );
+        $Helper->ConfigSettingChange(
+            Valid => 1,
+            Key   => 'Ticket::Frontend::AgentTicketPhoneInbound###State',
+        );
+
+        # Navigate to AgentTicketPhoneInbound screen.
+        $Selenium->VerifiedGet("${ScriptAlias}index.pl?Action=AgentTicketPhoneInbound;TicketID=$TicketID");
+
+        $Selenium->find_element( "#Subject",  'css' )->send_keys("Subject Test");
+        $Selenium->find_element( "#RichText", 'css' )->send_keys("RichText Test");
+
+        # Set next ticket state to pending reminder.
+        $Selenium->InputFieldValueSet(
+            Element => '#NextStateID',
+            Value   => 6,
+        );
+
+        $Selenium->find_element( "#submitRichText", 'css' )->click();
+
+        # Check if pending date has error class.
+        $Self->Is(
+            $Selenium->execute_script("return \$('#Day').hasClass('Error')"),
+            '1',
+            'Day has error class as it should.',
+        );
+
+        # Set next ticket state to open.
+        $Selenium->InputFieldValueSet(
+            Element => '#NextStateID',
+            Value   => 4,
+        );
+
+        $Selenium->WaitFor(
+            JavaScript => "return !\$('#Day.Validate_DateInFuture').length;"
+        );
+
+        $Selenium->find_element( "#submitRichText", 'css' )->VerifiedClick();
+
+        # Verify URL is redirected to AgentTicketZoom, successfully submitted AgentTicketPhoneInbound.
+        $Selenium->WaitFor(
+            JavaScript => "return typeof(\$) === 'function' &&  \$('#ArticleTree').length;"
+        );
+        $Self->True(
+            $Selenium->get_current_url() =~ /Action=AgentTicketZoom;TicketID=$TicketID/,
+            "Current URL after AgentTicketPhoneInbound 'Submit' button click is correct"
+        );
 
         # delete created test ticket
         my $Success = $TicketObject->TicketDelete(

@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::Crypt::PGP;
@@ -196,7 +196,7 @@ sub Decrypt {
     close $FH;
 
     my %PasswordHash = %{ $Kernel::OM->Get('Kernel::Config')->Get('PGP::Key::Password') };
-    my @Keys = $Self->_CryptedWithKey( File => $Filename );
+    my @Keys         = $Self->_CryptedWithKey( File => $Filename );
     my %Return;
 
     KEY:
@@ -726,7 +726,7 @@ returns public key in ascii
 sub PublicKeyGet {
     my ( $Self, %Param ) = @_;
 
-    my $QuotedKey = $Self->_QuoteShellArgument( $Param{Key} ) || '';
+    my $QuotedKey  = $Self->_QuoteShellArgument( $Param{Key} ) || '';
     my $LogMessage = qx{$Self->{GPGBin} --export --armor $QuotedKey 2>&1};
     my $PublicKey;
     if ( $LogMessage =~ /nothing exported/i ) {
@@ -1108,7 +1108,7 @@ sub _HandleLog {
         $ComputableLog{$Tag} = {
             Log => $LogDictionary->{$Tag} || $Line,
             MessageLong => $Line || $LogDictionary->{$Tag},
-            }
+        };
     }
 
     # get clean log lines
@@ -1141,7 +1141,7 @@ sub _ParseGPGKeyList {
         # individual fields are separated by a colon (':') - for a detailed description,
         # see the file doc/DETAILS in the gpg source distribution.
         my @Fields = split ':', $Line;
-        my $Type = $Fields[0];
+        my $Type   = $Fields[0];
 
         # 'sec' or 'pub' indicate the start of a info block for a specific key
         if ( $Type eq 'sec' || $Type eq 'pub' ) {
@@ -1224,7 +1224,7 @@ sub _ParseGPGKeyList {
             $Key{Bit} = $Fields[2];
 
             # only use last 8 chars of key-ID in order to be compatible with previous parser
-            $Key{Key} = substr( $Fields[4], -8, 8 );
+            $Key{Key}     = substr( $Fields[4], -8, 8 );
             $Key{Created} = $Fields[5];
         }
         elsif ( $Type eq 'sub' ) {
@@ -1306,7 +1306,7 @@ sub _CryptedWithKey {
     my @Keys;
     for my $Line (@GPGOutputLines) {
         if ( $Line =~ m{\sID\s((0x)?([0-9A-F]{8}){1,2})}i ) {
-            my $KeyID = $1;
+            my $KeyID  = $1;
             my @Result = $Self->PrivateKeySearch( Search => $KeyID );
             if (@Result) {
                 push( @Keys, ( $Result[-1]->{Key} || $KeyID ) );
@@ -1356,10 +1356,10 @@ sub _QuoteShellArgument {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

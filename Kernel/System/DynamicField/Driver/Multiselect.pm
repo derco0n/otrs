@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::DynamicField::Driver::Multiselect;
@@ -114,7 +114,7 @@ sub ValueGet {
     # extract real values
     my @ReturnData;
     for my $Item ( @{$DFValue} ) {
-        push @ReturnData, $Item->{ValueText}
+        push @ReturnData, $Item->{ValueText};
     }
 
     return \@ReturnData;
@@ -185,7 +185,7 @@ sub ValueIsDifferent {
         && !IsArrayRefWithData( $Param{Value2} )
         )
     {
-        return
+        return;
     }
     if (
         !defined $Param{Value2}
@@ -193,7 +193,7 @@ sub ValueIsDifferent {
         && !IsArrayRefWithData( $Param{Value1} )
         )
     {
-        return
+        return;
     }
 
     # compare the results
@@ -228,10 +228,49 @@ sub ValueValidate {
             UserID => $Param{UserID}
         );
 
-        return if !$Success
+        return if !$Success;
     }
 
     return $Success;
+}
+
+sub FieldValueValidate {
+    my ( $Self, %Param ) = @_;
+
+    # Check for valid possible values list.
+    if ( !IsHashRefWithData( $Param{DynamicFieldConfig}->{Config}->{PossibleValues} ) ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Need PossibleValues in Multiselect DynamicFieldConfig!",
+        );
+        return;
+    }
+
+    # Check for defined value.
+    if ( !defined $Param{Value} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Need Value in Multiselect DynamicField!",
+        );
+        return;
+    }
+
+    # Check if value parameter exists in possible values config.
+    if ( length $Param{Value} ) {
+        my @Values;
+        if ( ref $Param{Value} eq 'ARRAY' ) {
+            @Values = @{ $Param{Value} };
+        }
+        else {
+            push @Values, $Param{Value};
+        }
+
+        for my $Value (@Values) {
+            return if !defined $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{$Value};
+        }
+    }
+
+    return 1;
 }
 
 sub EditFieldRender {
@@ -312,8 +351,8 @@ sub EditFieldRender {
     );
 
     my $HTMLString = $Param{LayoutObject}->BuildSelection(
-        Data => $DataValues || {},
-        Name => $FieldName,
+        Data        => $DataValues || {},
+        Name        => $FieldName,
         SelectedID  => $SelectedValuesArrayRef,
         Translation => $FieldConfig->{TranslatableValues} || 0,
         Class       => $FieldClass,
@@ -479,7 +518,7 @@ sub EditFieldValueValidate {
 
         # overwrite possible values if PossibleValuesFilter
         if ( defined $Param{PossibleValuesFilter} ) {
-            $PossibleValues = $Param{PossibleValuesFilter}
+            $PossibleValues = $Param{PossibleValuesFilter};
         }
 
         # validate if value is in possible values list (but let pass empty values)
@@ -706,7 +745,7 @@ sub StatsFieldParameterBuild {
     # add historic values to current values (if they don't exist anymore)
     for my $Key ( sort keys %{$HistoricalValues} ) {
         if ( !$Values->{$Key} ) {
-            $Values->{$Key} = $HistoricalValues->{$Key}
+            $Values->{$Key} = $HistoricalValues->{$Key};
         }
     }
 
@@ -784,18 +823,18 @@ sub TemplateValueTypeGet {
     if ( $Param{FieldType} eq 'Edit' ) {
         return {
             $FieldName => $EditValueType,
-            }
+        };
     }
     elsif ( $Param{FieldType} eq 'Search' ) {
         return {
             'Search_' . $FieldName => $SearchValueType,
-            }
+        };
     }
     else {
         return {
             $FieldName             => $EditValueType,
             'Search_' . $FieldName => $SearchValueType,
-            }
+        };
     }
 }
 
@@ -1000,10 +1039,10 @@ sub BuildSelectionDataGet {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

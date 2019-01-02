@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::Modules::AdminSystemConfigurationDeployment;
@@ -72,9 +72,9 @@ sub Run {
         my $SysConfigObject = $Kernel::OM->Get('Kernel::System::SysConfig');
 
         my %DeploymentResult = $SysConfigObject->ConfigurationDeploy(
-            Comments    => $Comments,
-            UserID      => $Self->{UserID},
-            AllSettings => ($AdvancedMode) ? 1 : 0,
+            Comments      => $Comments,
+            UserID        => $Self->{UserID},
+            AllSettings   => ($AdvancedMode) ? 1 : 0,
             DirtySettings => $SelectedSettings || undef,
         );
 

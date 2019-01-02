@@ -1,15 +1,22 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 ## nofilter(TidyAll::Plugin::OTRS::TT::ScriptUsage)
 <head>
     <meta http-equiv="Content-type" content="text/html;charset=utf-8" />
-    <meta id="viewport" name="viewport" content="">
+[% IF Env('CGIHandle').substr(-9) == 'public.pl' %]
+    <meta name="robots" content="index,follow" />
+[% ELSE %]
+    <meta name="robots" content="noindex,nofollow" />
+[% END %]
+
+[% IF !Data.DisableResponsiveChecks -%]
 # set viewport for mobile mode, do not set viewport for DesktopMode
+    <meta id="viewport" name="viewport" content="">
     <script>
         (function(doc, win) {
             var viewport = doc.getElementById('viewport'),
@@ -23,6 +30,8 @@
             catch (Exception) {}
         }(document, window));
     </script>
+[% END -%]
+
 [% RenderBlockStart("MetaLink") %]
     <link rel="[% Data.Rel | html %]" type="[% Data.Type | html %]" title="[% Data.Title | html %]" href="[% Data.Href %]" />
 [% RenderBlockEnd("MetaLink") %]
@@ -54,6 +63,7 @@
 
     <link rel="stylesheet" type="text/css" href="[% Config("Frontend::WebPath") %]common/css/font-awesome.min.css" />
 
+[% IF !Data.DisableResponsiveChecks -%]
 # decide, if responsive CSS must be loaded
 # resposive CSS will not be loaded in "desktop mode" or if the document is within an iframe (customer overview in ticket phone overlay)
     <script>
@@ -75,6 +85,7 @@
           catch (Exception) {}
       }(document, window));
     </script>
+[% END -%]
 
     <title>[% Data.TitleArea | html %] [% Config("ProductName") %]</title>
 

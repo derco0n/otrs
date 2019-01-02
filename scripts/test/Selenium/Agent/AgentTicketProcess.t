@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -11,13 +11,15 @@ use warnings;
 use utf8;
 
 use vars (qw($Self));
+use Kernel::System::VariableCheck qw(IsHashRefWithData);
 
 my $Selenium = $Kernel::OM->Get('Kernel::System::UnitTest::Selenium');
 
 $Selenium->RunTest(
     sub {
 
-        my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+        my $Helper        = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+        my $ProcessObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Process');
 
         # Do not check RichText and Service.
         $Helper->ConfigSettingChange(
@@ -36,6 +38,34 @@ $Selenium->RunTest(
             Valid => 1,
             Key   => 'Ticket::Type',
             Value => 1
+        );
+
+        # Disable CheckEmailAddresses feature.
+        $Helper->ConfigSettingChange(
+            Valid => 1,
+            Key   => 'CheckEmailAddresses',
+            Value => 0
+        );
+
+        # Disable CheckMXRecord feature.
+        $Helper->ConfigSettingChange(
+            Valid => 1,
+            Key   => 'CheckMXRecord',
+            Value => 0
+        );
+
+        # Create test user.
+        my $TestUserLogin = $Helper->TestUserCreate(
+            Groups => [ 'admin', 'users' ],
+        ) || die "Did not get test user";
+
+        my $TestUserOwner = $Helper->TestUserCreate(
+            Groups => [ 'admin', 'users' ],
+        ) || die "Did not get test user";
+
+        # Get test user ID.
+        my $TestUserID = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
+            UserLogin => $TestUserLogin,
         );
 
         my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
@@ -85,16 +115,22 @@ $Selenium->RunTest(
         # Create test DynamicFields.
         for my $DynamicField (@DynamicFields) {
 
-            my $DynamicFieldID = $DynamicFieldObject->DynamicFieldAdd(
-                %{$DynamicField},
+            my $DynamicFieldGet = $DynamicFieldObject->DynamicFieldGet(
+                Name => $DynamicField->{Name},
             );
 
-            $Self->True(
-                $DynamicFieldID,
-                "Dynamic field $DynamicField->{Name} - ID $DynamicFieldID - created",
-            );
+            if ( !IsHashRefWithData($DynamicFieldGet) ) {
+                my $DynamicFieldID = $DynamicFieldObject->DynamicFieldAdd(
+                    %{$DynamicField},
+                );
 
-            push @DynamicFieldIDs, $DynamicFieldID;
+                $Self->True(
+                    $DynamicFieldID,
+                    "Dynamic field $DynamicField->{Name} - ID $DynamicFieldID - created",
+                );
+
+                push @DynamicFieldIDs, $DynamicFieldID;
+            }
         }
 
         my $RandomID = $Helper->GetRandomID();
@@ -116,10 +152,27 @@ $Selenium->RunTest(
             push @Types, {
                 ID   => $TypeID,
                 Name => $TypeName,
-                }
+            };
         }
 
         my $ACLObject = $Kernel::OM->Get('Kernel::System::ACL::DB::ACL');
+
+        # Set previous ACLs on invalid.
+        my $ACLList = $ACLObject->ACLList(
+            ValidIDs => ['1'],
+            UserID   => 1,
+        );
+
+        for my $Item ( sort keys %{$ACLList} ) {
+
+            $ACLObject->ACLUpdate(
+                ID   => $Item,
+                Name => $ACLList->{$Item},
+                ,
+                ValidID => 2,
+                UserID  => 1,
+            );
+        }
 
         my @ACLs = (
             {
@@ -222,10 +275,40 @@ $Selenium->RunTest(
             push @ACLIDs, $ACLID;
         }
 
-        # Create test user and login.
-        my $TestUserLogin = $Helper->TestUserCreate(
-            Groups => [ 'admin', 'users' ],
-        ) || die "Did not get test user";
+        # Get all processes.
+        my $ProcessList = $ProcessObject->ProcessListGet(
+            UserID => $TestUserID,
+        );
+
+        my @DeactivatedProcesses;
+        my $ProcessName = "TestProcess";
+        my $TestProcessExists;
+
+        # If there had been some active processes before testing, set them to inactive.
+        PROCESS:
+        for my $Process ( @{$ProcessList} ) {
+            if ( $Process->{State} eq 'Active' ) {
+
+                # Check if active test process already exists.
+                if ( $Process->{Name} eq $ProcessName ) {
+                    $TestProcessExists = 1;
+                    next PROCESS;
+                }
+
+                $ProcessObject->ProcessUpdate(
+                    ID            => $Process->{ID},
+                    EntityID      => $Process->{EntityID},
+                    Name          => $Process->{Name},
+                    StateEntityID => 'S2',
+                    Layout        => $Process->{Layout},
+                    Config        => $Process->{Config},
+                    UserID        => $TestUserID,
+                );
+
+                # Save process because of restoring on the end of test.
+                push @DeactivatedProcesses, $Process;
+            }
+        }
 
         $Selenium->Login(
             Type     => 'Agent',
@@ -240,39 +323,40 @@ $Selenium->RunTest(
         $Selenium->VerifiedGet("${ScriptAlias}index.pl?Action=AdminACL");
         $Selenium->find_element("//a[contains(\@href, 'Action=AdminACL;Subaction=ACLDeploy')]")->VerifiedClick();
 
-        # Navigate to AdminProcessManagement screen.
-        $Selenium->VerifiedGet("${ScriptAlias}index.pl?Action=AdminProcessManagement");
+        # Import test process if does not exist in the system.
+        if ( !$TestProcessExists ) {
+            $Selenium->VerifiedGet("${ScriptAlias}index.pl?Action=AdminProcessManagement");
+            $Selenium->WaitFor(
+                JavaScript => "return typeof(\$) === 'function' && \$('#OverwriteExistingEntitiesImport').length;"
+            );
 
-        # Import test Selenium Process.
-        my $Location = $ConfigObject->Get('Home') . "/scripts/test/sample/ProcessManagement/AgentTicketProcess.yml";
-        $Selenium->find_element( "#FileUpload",                      'css' )->send_keys($Location);
-        $Selenium->find_element( "#OverwriteExistingEntitiesImport", 'css' )->click();
-        $Selenium->WaitFor(
-            JavaScript => "return typeof(\$) === 'function' && !\$('#OverwriteExistingEntitiesImport:checked').length"
-        );
-        $Selenium->find_element("//button[\@value='Upload process configuration'][\@type='submit']")->VerifiedClick();
-        $Selenium->find_element("//a[contains(\@href, \'Subaction=ProcessSync' )]")->VerifiedClick();
+            # Import test Selenium Process.
+            my $Location = $ConfigObject->Get('Home') . "/scripts/test/sample/ProcessManagement/AgentTicketProcess.yml";
+            $Selenium->find_element( "#FileUpload",                      'css' )->send_keys($Location);
+            $Selenium->find_element( "#OverwriteExistingEntitiesImport", 'css' )->click();
+            $Selenium->WaitFor(
+                JavaScript => "return !\$('#OverwriteExistingEntitiesImport:checked').length;"
+            );
+            $Selenium->find_element("//button[\@value='Upload process configuration'][\@type='submit']")
+                ->VerifiedClick();
+            sleep 1;
+            $Selenium->find_element("//a[contains(\@href, \'Subaction=ProcessSync' )]")->VerifiedClick();
 
-        # We have to allow a 1 second delay for Apache2::Reload to pick up the changed Process cache.
-        sleep 1;
-
-        # Get test user ID.
-        my $TestUserID = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
-            UserLogin => $TestUserLogin,
-        );
+            # We have to allow a 1 second delay for Apache2::Reload to pick up the changed Process cache.
+            sleep 1;
+        }
 
         my @DeleteTicketIDs;
 
         # Get Process list.
-        my $ProcessObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Process');
-        my $List          = $ProcessObject->ProcessList(
-            UseEntities => 1,
-            UserID      => $TestUserID,
+        my $List = $ProcessObject->ProcessList(
+            UseEntities    => 1,
+            StateEntityIDs => ['S1'],
+            UserID         => $TestUserID,
         );
 
         # Get Process entity.
         my %ListReverse = reverse %{$List};
-        my $ProcessName = 'TestProcess';
 
         my $Process = $ProcessObject->ProcessGet(
             EntityID => $ListReverse{$ProcessName},
@@ -284,7 +368,7 @@ $Selenium->RunTest(
         $Selenium->VerifiedGet(
             "${ScriptAlias}index.pl?Action=AgentTicketProcess;ID=$ListReverse{$ProcessName};ActivityDialogEntityID=$Process->{Activities}->[0]"
         );
-        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && !$(".AJAXLoader:visible").length' );
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && !$(".AJAXLoader:visible").length;' );
 
         # Check pre-selected process is loaded correctly, see bug#12850 ( https://bugs.otrs.org/show_bug.cgi?id=12850 ).
         $Self->True(
@@ -296,8 +380,9 @@ $Selenium->RunTest(
         $Selenium->VerifiedGet("${ScriptAlias}index.pl?Action=AgentTicketProcess");
 
         # Create first scenario for test AgentTicketProcess.
-        $Selenium->execute_script(
-            "\$('#ProcessEntityID').val('$ListReverse{$ProcessName}').trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#ProcessEntityID',
+            Value   => $ListReverse{$ProcessName},
         );
 
         # Wait until form has loaded, if necessary.
@@ -310,8 +395,9 @@ $Selenium->RunTest(
             "All Types are visible before ACL"
         );
 
-        $Selenium->execute_script(
-            "\$('#DynamicField_TestDropdownACLProcess').val('c').trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#DynamicField_TestDropdownACLProcess',
+            Value   => 'c',
         );
         $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && !$(".AJAXLoader:visible").length' );
 
@@ -319,10 +405,11 @@ $Selenium->RunTest(
             $Selenium->execute_script("return \$('#TypeID option:contains(\"$Types[0]->{Name}\")').length;"),
             "DynamicField change - ACL restricted Types"
         );
-        $Selenium->execute_script(
-            "\$('#TypeID').val('$Types[1]->{ID}').trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#TypeID',
+            Value   => $Types[1]->{ID},
         );
-        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && !$(".AJAXLoader:visible").length' );
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && !$(".AJAXLoader:visible").length;' );
 
         # Check further ACLs before the normal process tests.
         $Self->Is(
@@ -331,8 +418,11 @@ $Selenium->RunTest(
             "DynamicField filtered options count",
         );
 
-        $Selenium->execute_script("\$('#QueueID').val('4').trigger('redraw.InputField').trigger('change');");
-        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && !$(".AJAXLoader:visible").length' );
+        $Selenium->InputFieldValueSet(
+            Element => '#QueueID',
+            Value   => 4,
+        );
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && !$(".AJAXLoader:visible").length;' );
 
         $Self->Is(
             $Selenium->execute_script("return \$('#DynamicField_TestDropdownACLProcess > option').length;"),
@@ -345,8 +435,11 @@ $Selenium->RunTest(
         $Selenium->find_element( "#Subject",  'css' )->send_keys($SubjectRandom);
         $Selenium->find_element( "#RichText", 'css' )->send_keys($ContentRandom);
 
-        $Selenium->execute_script("\$('#QueueID').val('2').trigger('redraw.InputField').trigger('change');");
-        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && !$(".AJAXLoader:visible").length' );
+        $Selenium->InputFieldValueSet(
+            Element => '#QueueID',
+            Value   => 2,
+        );
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && !$(".AJAXLoader:visible").length;' );
 
         $Selenium->find_element("//button[\@value='Submit'][\@type='submit']")->VerifiedClick();
 
@@ -368,22 +461,22 @@ $Selenium->RunTest(
         my @TicketID = split( 'TicketID=', $Selenium->get_current_url() );
         push @DeleteTicketIDs, $TicketID[1];
 
-        # Click on next step in Process ticket.
-        $Selenium->find_element("//a[contains(\@href, \'ProcessEntityID=$ListReverse{$ProcessName}' )]")->click();
-        $Selenium->WaitFor( WindowCount => 2 );
-        my $Handles = $Selenium->get_window_handles();
-        $Selenium->switch_to_window( $Handles->[1] );
+        # Go on next step in Process ticket.
+        my $URLNextAction = $Selenium->execute_script("return \$('#DynamicFieldsWidget .Actions a').attr('href');");
+        $URLNextAction =~ s/^\///s;
+        $Selenium->VerifiedGet($URLNextAction);
 
         # Wait until form has loaded, if necessary.
         $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("#Subject").length;' );
 
         # For test scenario to complete, in next step we set ticket Priority to 5 very high.
-        $Selenium->execute_script("\$('#PriorityID').val('5').trigger('redraw.InputField').trigger('change');");
+        $Selenium->InputFieldValueSet(
+            Element => '#PriorityID',
+            Value   => 5,
+        );
         $Selenium->find_element("//button[\@value='Submit'][\@type='submit']")->click();
 
-        # Return to main window.
-        $Selenium->WaitFor( WindowCount => 1 );
-        $Selenium->switch_to_window( $Handles->[0] );
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("#DynamicFieldsWidget").length;' );
 
         # Check for inputed values as final step in first scenario.
         $Self->True(
@@ -411,18 +504,23 @@ $Selenium->RunTest(
 
         # Create second scenario for test AgentTicketProcess.
         $Selenium->VerifiedGet("${ScriptAlias}index.pl?Action=AgentTicketProcess");
-        $Selenium->execute_script(
-            "\$('#ProcessEntityID').val('$ListReverse{$ProcessName}').trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#ProcessEntityID',
+            Value   => $ListReverse{$ProcessName},
         );
 
         # Wait until form has loaded, if necessary.
         $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && $("#Subject").length;' );
 
         # In this scenario we just set ticket queue to junk to finish test.
-        $Selenium->execute_script("\$('#QueueID').val('3').trigger('redraw.InputField').trigger('change');");
-        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && !$(".AJAXLoader:visible").length' );
-        $Selenium->execute_script(
-            "\$('#TypeID').val('$Types[1]->{ID}').trigger('redraw.InputField').trigger('change');"
+        $Selenium->InputFieldValueSet(
+            Element => '#QueueID',
+            Value   => 3,
+        );
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && !$(".AJAXLoader:visible").length;' );
+        $Selenium->InputFieldValueSet(
+            Element => '#TypeID',
+            Value   => $Types[1]->{ID},
         );
         $Selenium->find_element("//button[\@value='Submit'][\@type='submit']")->VerifiedClick();
 
@@ -440,11 +538,145 @@ $Selenium->RunTest(
         @TicketID = split( 'TicketID=', $Selenium->get_current_url() );
         push @DeleteTicketIDs, $TicketID[1];
 
+        # Check if NotificationOwnerUpdate is trigger for owner update on AgentTicketProcess. See bug#13930.
+        # Add NotificationEvent.
+        my $NotificationEventObject = $Kernel::OM->Get('Kernel::System::NotificationEvent');
+        my $NotificationName        = "OwnerUpdate$RandomID";
+        my $NotificationID          = $NotificationEventObject->NotificationAdd(
+            Name => $NotificationName,
+            Data => {
+                Events     => ['NotificationOwnerUpdate'],
+                Recipients => ['AgentOwner'],
+                Transports => ['Email'],
+            },
+            Message => {
+                en => {
+                    Subject     => 'JobName',
+                    Body        => 'JobName',
+                    ContentType => 'text/plain',
+                },
+                de => {
+                    Subject     => 'JobName',
+                    Body        => 'JobName',
+                    ContentType => 'text/plain',
+                },
+            },
+            ValidID => 1,
+            UserID  => 1,
+        );
+        $Self->True(
+            $NotificationID,
+            "NotificationID $NotificationID is created",
+        );
+
+        my $ActivityDialogObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::ActivityDialog');
+        $List = $ActivityDialogObject->ActivityDialogListGet(
+            UserID => 1,
+        );
+
+        my %Test;
+        for my $Item ( @{$List} ) {
+            if ( $Item->{Name} eq 'Make order' ) {
+                %Test = (
+                    EntityID => $Item->{EntityID},
+                    ID       => $Item->{ID},
+                    Name     => $Item->{Name},
+                );
+            }
+        }
+
+        # Add owner to activity dialog.
+        my $Success = $ActivityDialogObject->ActivityDialogUpdate(
+            %Test,
+            UserID => 1,
+            Config => {
+                DescriptionLong  => '',
+                DescriptionShort => 'Make order',
+                FieldOrder       => [
+                    'Article',
+                    'Owner',
+                ],
+                Fields => {
+                    Article => {
+                        DefaultValue     => '',
+                        DescriptionLong  => '',
+                        DescriptionShort => '',
+                        Display          => 1,
+                    },
+                    Owner => {
+                        DefaultValue     => '',
+                        DescriptionLong  => '',
+                        DescriptionShort => '',
+                        Display          => 1,
+                    },
+                },
+                Interface => [
+                    'AgentInterface',
+                    'CustomerInterface'
+                ],
+                Permission       => '',
+                RequiredLock     => 0,
+                SubmitAdviceText => '',
+                SubmitButtonText => ''
+            },
+
+        );
+        $Self->True(
+            $Success,
+            "Activity Dialog Update is successful",
+        );
+
+        $Selenium->VerifiedGet("${ScriptAlias}index.pl?Action=AdminProcessManagement;Subaction=ProcessSync");
+
+        # Navigate to AgentTicketProcess screen.
+        $Selenium->VerifiedGet("${ScriptAlias}index.pl?Action=AgentTicketProcess");
+
+        $Selenium->InputFieldValueSet(
+            Element => '#ProcessEntityID',
+            Value   => $ListReverse{$ProcessName},
+        );
+
+        $Selenium->find_element( "#Subject",              'css' )->send_keys($SubjectRandom);
+        $Selenium->find_element( "#RichText",             'css' )->send_keys($ContentRandom);
+        $Selenium->find_element( "#OwnerSelectionGetAll", 'css' )->click();
+        $Selenium->WaitFor( JavaScript => 'return typeof($) === "function" && !$(".AJAXLoader:visible").length;' );
+
+        my $UserObject       = $Kernel::OM->Get('Kernel::System::User');
+        my $TestUserOwnwerID = $UserObject->UserLookup( UserLogin => $TestUserOwner );
+
+        $Selenium->InputFieldValueSet(
+            Element => '#OwnerID',
+            Value   => $TestUserOwnwerID,
+        );
+
+        $Selenium->find_element("//button[\@value='Submit'][\@type='submit']")->VerifiedClick();
+
+        my @TicketOwnerID = split( 'TicketID=', $Selenium->get_current_url() );
+        push @DeleteTicketIDs, $TicketOwnerID[1];
+
+        # Go to ticket history.
+        $Selenium->VerifiedGet("${ScriptAlias}index.pl?Action=AgentTicketHistory;TicketID=$TicketOwnerID[1]");
+
+        # Check if ticket history has notification send.
+        my $OwnerMsg = 'Sent "'
+            . $NotificationName
+            . '" notification to "'
+            . $TestUserOwner
+            . '" via "Email". (SendAgentNotification)';
+        $Self->True(
+            index( $Selenium->get_page_source(), $OwnerMsg ) > -1,
+            "Ticket owner notification action completed",
+        );
+
+        # Delete notification.
+        $NotificationEventObject->NotificationDelete(
+            ID     => $NotificationID,
+            UserID => 1,
+        );
+
         my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
-        my $Success;
         for my $TicketID (@DeleteTicketIDs) {
-
             $Success = $TicketObject->TicketDelete(
                 TicketID => $TicketID,
                 UserID   => $TestUserID,
@@ -465,8 +697,8 @@ $Selenium->RunTest(
         }
 
         # Clean up activities.
-        my $ActivityObject       = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Activity');
-        my $ActivityDialogObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::ActivityDialog');
+        my $ActivityObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Activity');
+
         for my $Item ( @{ $Process->{Activities} } ) {
             my $Activity = $ActivityObject->ActivityGet(
                 EntityID            => $Item,
@@ -605,6 +837,19 @@ $Selenium->RunTest(
             $Self->True(
                 $Success,
                 "DynamicFieldID $DynamicFieldID is deleted",
+            );
+        }
+
+        # Restore state of process.
+        for my $Process (@DeactivatedProcesses) {
+            $ProcessObject->ProcessUpdate(
+                ID            => $Process->{ID},
+                EntityID      => $Process->{EntityID},
+                Name          => $Process->{Name},
+                StateEntityID => 'S1',
+                Layout        => $Process->{Layout},
+                Config        => $Process->{Config},
+                UserID        => $TestUserID,
             );
         }
 

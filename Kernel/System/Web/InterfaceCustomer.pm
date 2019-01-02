@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::Web::InterfaceCustomer;
@@ -232,7 +232,7 @@ sub Run {
 
         # get params
         my $PostUser = $ParamObject->GetParam( Param => 'User' ) || '';
-        my $PostPw = $ParamObject->GetParam(
+        my $PostPw   = $ParamObject->GetParam(
             Param => 'Password',
             Raw   => 1
         ) || '';
@@ -527,8 +527,7 @@ sub Run {
         # redirect to alternate login
         if ( $ConfigObject->Get('CustomerPanelLogoutURL') ) {
             print $LayoutObject->Redirect(
-                ExtURL => $ConfigObject->Get('CustomerPanelLogoutURL')
-                    . "?Reason=Logout",
+                ExtURL => $ConfigObject->Get('CustomerPanelLogoutURL'),
             );
         }
 
@@ -592,7 +591,7 @@ sub Run {
         my %UserData = $UserObject->CustomerUserDataGet( User => $User );
 
         # verify customer user is valid when requesting password reset
-        my @ValidIDs = $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet();
+        my @ValidIDs    = $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet();
         my $UserIsValid = grep { $UserData{ValidID} && $UserData{ValidID} == $_ } @ValidIDs;
         if ( !$UserData{UserID} || !$UserIsValid ) {
 
@@ -1003,7 +1002,7 @@ sub Run {
                         ),
                     },
                     %Param,
-                    }
+                }
             );
 
             $Kernel::OM->ObjectsDiscard( Objects => ['Kernel::Output::HTML::Layout'] );
@@ -1461,10 +1460,10 @@ sub DESTROY {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is part of the OTRS project (L<https://otrs.org/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+the enclosed file COPYING for license information (GPL). If you
+did not receive this file, see L<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

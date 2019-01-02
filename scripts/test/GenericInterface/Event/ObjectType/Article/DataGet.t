@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 ## no critic (Modules::RequireExplicitPackage)
@@ -31,7 +31,8 @@ $ConfigObject->Set(
     Value => 0,
 );
 
-my $TicketID = $Kernel::OM->Get('Kernel::System::Ticket')->TicketCreate(
+my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+my $TicketID     = $TicketObject->TicketCreate(
     Title        => 'Some Ticket_Title',
     Queue        => 'Raw',
     Lock         => 'unlock',
@@ -70,13 +71,21 @@ $Self->True(
     'ArticleCreate()',
 );
 
-my %ExpectedDataRaw = $ArticleBackendObject->ArticleGet(
+my %ExpectedDataTicket = $TicketObject->TicketGet(
+    TicketID      => $TicketID,
+    DynamicFields => 1,
+    UserID        => 1,
+);
+
+my %ExpectedDataArticle = $ArticleBackendObject->ArticleGet(
     ArticleID     => $ArticleID,
     TicketID      => $TicketID,
     DynamicFields => 1,
     RealNames     => 1,
     UserID        => 1,
 );
+
+my %ExpectedDataRaw = ( %ExpectedDataTicket, %ExpectedDataArticle );
 
 my @Tests = (
     {

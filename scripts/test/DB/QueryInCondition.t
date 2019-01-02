@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -135,7 +135,7 @@ my @Tests = (
             BindMode  => 1,
         },
         ReferenceData => {
-            SQL => 't.id IN (' . ( join ', ', ('?') x 1000 ) . ')',
+            SQL    => 't.id IN (' . ( join ', ', ('?') x 1000 ) . ')',
             Values => [ 1 .. 1000 ],
         },
     },
@@ -147,7 +147,7 @@ my @Tests = (
             QuoteType => 'Integer',
             BindMode  => 0,
         },
-        ReferenceData => 't.id IN (' . ( join ', ', 1 .. 1200 ) . ')',
+        ReferenceData       => 't.id IN (' . ( join ', ', 1 .. 1200 ) . ')',
         ReferenceDataOracle => '( t.id IN ('
             . ( join ', ', 1 .. 1000 )
             . ') OR t.id IN ('
@@ -162,7 +162,7 @@ my @Tests = (
             BindMode  => 1,
         },
         ReferenceData => {
-            SQL => 't.id IN (' . ( join ', ', ('?') x 1200 ) . ')',
+            SQL    => 't.id IN (' . ( join ', ', ('?') x 1200 ) . ')',
             Values => [ 1 .. 1200 ],
         },
         ReferenceDataOracle => {
@@ -178,7 +178,7 @@ my @Tests = (
             QuoteType => 'Integer',
             BindMode  => 0,
         },
-        ReferenceData => 't.id IN (' . ( join ', ', 1 .. 2001 ) . ')',
+        ReferenceData       => 't.id IN (' . ( join ', ', 1 .. 2001 ) . ')',
         ReferenceDataOracle => '( t.id IN ('
             . ( join ', ', 1 .. 1000 )
             . ') OR t.id IN ('
@@ -222,7 +222,7 @@ my @Tests = (
             BindMode  => 0,
             Negate    => 1,
         },
-        ReferenceData => 't.id NOT IN (' . ( join ', ', 1 .. 1200 ) . ')',
+        ReferenceData       => 't.id NOT IN (' . ( join ', ', 1 .. 1200 ) . ')',
         ReferenceDataOracle => '( t.id NOT IN ('
             . ( join ', ', 1 .. 1000 )
             . ') AND t.id NOT IN ('
@@ -238,7 +238,7 @@ my @Tests = (
             Negate    => 1,
         },
         ReferenceData => {
-            SQL => 't.id NOT IN (' . ( join ', ', ('?') x 1200 ) . ')',
+            SQL    => 't.id NOT IN (' . ( join ', ', ('?') x 1200 ) . ')',
             Values => [ 1 .. 1200 ],
         },
         ReferenceDataOracle => {

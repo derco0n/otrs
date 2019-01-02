@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -95,6 +95,7 @@ $Selenium->RunTest(
             "Stats is updated - ID $TestStatID",
         );
 
+        $TestStatID = sprintf( "%02d", $TestStatID );
         my $StatsWidgetID = "10$TestStatID-Stats";
 
         # Store invalid old-style time zone offset in user preferences for imported statistic.
@@ -117,12 +118,15 @@ $Selenium->RunTest(
 
         # Enable stats widget on dashboard.
         my $StatsInSettings = "Settings10" . $TestStatID . "-Stats";
-        $Selenium->find_element( ".SettingsWidget .Header a", "css" )->click();
+        $Selenium->execute_script("\$('.SettingsWidget .Header a').click();");
         $Selenium->WaitFor(
             JavaScript => "return typeof(\$) === 'function' && \$('.SettingsWidget.Expanded').length;"
         );
+        $Selenium->WaitFor(
+            JavaScript => "return typeof(\$) === 'function' && \$('#$StatsInSettings:visible').length;"
+        );
 
-        $Selenium->find_element( "#$StatsInSettings", 'css' )->click();
+        $Selenium->execute_script("\$('#$StatsInSettings').click();");
         $Selenium->WaitFor(
             JavaScript => "return \$('#$StatsInSettings:checked').length;"
         );
@@ -131,10 +135,17 @@ $Selenium->RunTest(
 
         my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Maint::Stats::Dashboard::Generate');
         my $ExitCode      = $CommandObject->Execute();
+        sleep 2;
         $Selenium->VerifiedRefresh();
+        $Selenium->WaitFor(
+            JavaScript => "return !\$('#Dashboard$TestStatID-Stats i').hasClass('fa-signal')",
+        );
+        $Selenium->WaitFor(
+            JavaScript => "return \$('#GraphWidgetContainer10$TestStatID-Stats svg').length;",
+        );
 
         $Self->Is(
-            $Selenium->execute_script('return $(".nv-legend-text:contains(Misc)").length'),
+            $Selenium->execute_script('return $(".nv-legend-text:contains(Misc)").length;'),
             1,
             "Legend entry for Misc queue found.",
         );
@@ -151,16 +162,25 @@ $Selenium->RunTest(
         );
 
         # Exchange axis and check if it works.
-        $Selenium->execute_script("\$('#ExchangeAxis').val('1').trigger('redraw.InputField').trigger('change');");
+        $Selenium->InputFieldValueSet(
+            Element => '#ExchangeAxis',
+            Value   => '1',
+        );
         $Selenium->execute_script( "\$('#Dashboard$StatsWidgetID" . "_submit').trigger('click');" );
-
         sleep 1;
 
         $ExitCode = $CommandObject->Execute();
+        sleep 2;
         $Selenium->VerifiedRefresh();
+        $Selenium->WaitFor(
+            JavaScript => "return !\$('#Dashboard$TestStatID-Stats i').hasClass('fa-signal')",
+        );
+        $Selenium->WaitFor(
+            JavaScript => "return \$('#GraphWidgetContainer10$TestStatID-Stats svg').length;",
+        );
 
         $Self->Is(
-            $Selenium->execute_script('return $(".nv-legend-text:contains(open)").length'),
+            $Selenium->execute_script('return $(".nv-legend-text:contains(open)").length;'),
             1,
             "Legend entry for open state found.",
         );
@@ -171,12 +191,20 @@ $Selenium->RunTest(
             Key    => 'UserLanguage',
             Value  => 'de',
         );
+        sleep 1;
 
         $ExitCode = $CommandObject->Execute();
+        sleep 2;
         $Selenium->VerifiedRefresh();
+        $Selenium->WaitFor(
+            JavaScript => "return !\$('#Dashboard$TestStatID-Stats i').hasClass('fa-signal');",
+        );
+        $Selenium->WaitFor(
+            JavaScript => "return \$('#GraphWidgetContainer10$TestStatID-Stats svg').length;",
+        );
 
         $Self->Is(
-            $Selenium->execute_script('return $(".nv-legend-text:contains(offen)").length'),
+            $Selenium->execute_script('return $(".nv-legend-text:contains(offen)").length;'),
             1,
             "Legend entry for open state found.",
         );

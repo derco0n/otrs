@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 ## no critic (Modules::RequireExplicitPackage)
@@ -46,10 +46,10 @@ my $UpdateFile = sub {
     my $Content = ${ $ContentSCALARRef || \'' };
 
     if ( defined $Param{Value} ) {
-        $Content =~ s{ ({'CurrentDeploymentID'} [ ] = [ ] ')\d+(') }{$1$Param{Value}$2}msx;
+        $Content =~ s{ (\{'CurrentDeploymentID'\} [ ] = [ ] ')\d+(') }{$1$Param{Value}$2}msx;
     }
     if ( defined $Param{Remove} ) {
-        $Content =~ s{ ({'CurrentDeploymentID)('})  }{$1Invalid$2}msx;
+        $Content =~ s{ (\{'CurrentDeploymentID)('\})  }{$1Invalid$2}msx;
     }
 
     my $FileLocation = $MainObject->FileWrite(
@@ -80,7 +80,7 @@ my $ReadDeploymentID = sub {
     my $Content = ${$ContentSCALARRef};
 
     my $CurrentDeploymentID;
-    if ( $Content =~ m{ {'CurrentDeploymentID'} [ ] = [ ] '(-?\d+)' }msx ) {
+    if ( $Content =~ m{ \{'CurrentDeploymentID'\} [ ] = [ ] '(-?\d+)' }msx ) {
         $CurrentDeploymentID = $1;
     }
 
