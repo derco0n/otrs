@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
+# Copyright (C) 2001-2019 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (GPL). If you
@@ -932,7 +932,7 @@ sub ValueGet {
     {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => "Either ObjectID or ObjectName hast tob be given!"
+            Message  => "Either ObjectID or ObjectName has to be given!"
         );
         return;
     }
@@ -2137,6 +2137,8 @@ checks if the dynamic field as an specified behavior
                                                          # 'IsCustomerInterfaceCapable' to make
                                                          #     the field usable in the customer
                                                          #     interface
+                                                         # 'IsHTMLContent' to indicate that there is                                                        # 'IsCustomerInterfaceCapable' to make
+                                                         #     HTML content (avoid duble cnversion to HTML)
     );
 
     Returns:

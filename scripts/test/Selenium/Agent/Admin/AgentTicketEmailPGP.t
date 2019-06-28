@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
+# Copyright (C) 2001-2019 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (GPL). If you
@@ -42,7 +42,7 @@ $Selenium->RunTest(
         my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
 
         # Create test PGP path and set it in sysConfig.
-        my $PGPPath = $ConfigObject->Get('Home') . "/var/tmp/pgp";
+        my $PGPPath = $ConfigObject->Get('Home') . "/var/tmp/pgp" . $Helper->GetRandomID();
         mkpath( [$PGPPath], 0, 0770 );    ## no critic
 
         my $ScriptAlias = $ConfigObject->Get('ScriptAlias');
@@ -197,9 +197,18 @@ $Selenium->RunTest(
             "return \$('#SignKeyID option:selected').text();"
         );
 
+        $Self->False(
+            index( $Option, 'WARNING: EXPIRED KEY' ) > -1,
+            "Selected signing key is not expired",
+        );
+
+        $Option = $Selenium->execute_script(
+            "return \$('#SignKeyID option:eq(2)').text();"
+        );
+
         $Self->True(
-            $Option =~ m/WARNING: EXPIRED KEY/,
-            "Selected signing key is expired",
+            index( $Option, 'WARNING: EXPIRED KEY' ) > -1,
+            "There is another signing, that is expired",
         );
 
         # Set test PGP in config so we can delete them.

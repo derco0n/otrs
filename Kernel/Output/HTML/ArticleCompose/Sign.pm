@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
+# Copyright (C) 2001-2019 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (GPL). If you
@@ -54,15 +54,19 @@ sub Run {
     my $InvalidMessage           = '';
     my $Class                    = '';
     if ( IsArrayRefWithData($UniqueSignKeyIDsToRemove) ) {
+        UNIQUEKEY:
         for my $UniqueSignKeyIDToRemove ( @{$UniqueSignKeyIDsToRemove} ) {
-            if ( $KeyList{$UniqueSignKeyIDToRemove} =~ m/WARNING: EXPIRED KEY.*\[\d.*\](.*)/ ) {
+
+            next UNIQUEKEY if !defined $KeyList{$UniqueSignKeyIDToRemove};
+
+            if ( $KeyList{$UniqueSignKeyIDToRemove} =~ m/WARNING: EXPIRED KEY].*\] (.*)/ ) {
                 $InvalidMessage .= $LayoutObject->{LanguageObject}->Translate(
                     "Cannot use expired signing key: '%s'. ", $1
                 );
                 $Self->{Error}->{InvalidKey} = 1;
                 $Class .= ' ServerError';
             }
-            elsif ( $KeyList{$UniqueSignKeyIDToRemove} =~ m/WARNING: REVOKED KEY.*\[\d.*\](.*)/ ) {
+            elsif ( $KeyList{$UniqueSignKeyIDToRemove} =~ m/WARNING: REVOKED KEY].*\] (.*)/ ) {
                 $InvalidMessage .= $LayoutObject->{LanguageObject}->Translate(
                     "Cannot use revoked signing key: '%s'. ", $1
                 );
@@ -116,10 +120,9 @@ sub Run {
     }
 
     # Check if selected signing keys are expired.
-    if ( defined $Param{SignKeyID} && !$Self->{Error}->{InvalidKey} ) {
-        my ( $Type, $Key ) = split /::/, $Param{SignKeyID};
+    if ( defined $Param{SignKeyID} && defined $KeyList{ $Param{SignKeyID} } && !$Self->{Error}->{InvalidKey} ) {
 
-        if ( $KeyList{ $Param{SignKeyID} } =~ m/WARNING: EXPIRED KEY.*\[\d.*\](.*)/ ) {
+        if ( $KeyList{ $Param{SignKeyID} } =~ m/WARNING: EXPIRED KEY].*] (.*)/ ) {
             $InvalidMessage .= $LayoutObject->{LanguageObject}->Translate(
                 "Cannot use expired signing key: '%s'. ",
                 join ', ', $1
@@ -127,7 +130,7 @@ sub Run {
             $Self->{Error}->{InvalidKey} = 1;
             $Class .= ' ServerError';
         }
-        elsif ( $KeyList{ $Param{SignKeyID} } =~ m/WARNING: REVOKED KEY.*\[\d.*\](.*)/ ) {
+        elsif ( $KeyList{ $Param{SignKeyID} } =~ m/WARNING: REVOKED KEY].*\] (.*)/ ) {
             $InvalidMessage .= $LayoutObject->{LanguageObject}->Translate(
                 "Cannot use revoked signing key: '%s'. ", $1
             );
@@ -208,8 +211,7 @@ sub Data {
                     $Expires = "[$DataRef->{Expires}]";
                 }
 
-                my $Status = '';
-                $Status = '[' . $DataRef->{Status} . ']';
+                my $Status = '[' . $DataRef->{Status} . ']';
                 if ( $DataRef->{Status} eq 'expired' ) {
                     $Status = '[WARNING: EXPIRED KEY]';
                 }
@@ -233,8 +235,14 @@ sub Data {
             Search => $SearchAddress[0]->address(),
         );
         for my $DataRef (@PrivateKeys) {
-            $KeyList{"SMIME::$DataRef->{Filename}"}
-                = "SMIME: $DataRef->{Filename} [$DataRef->{EndDate}] $DataRef->{Email}";
+            my $Expired = '';
+            my $EndDate = ( defined $DataRef->{EndDate} ) ? "[$DataRef->{EndDate}]" : '';
+
+            if ( defined $DataRef->{EndDate} && $SMIMEObject->KeyExpiredCheck( EndDate => $DataRef->{EndDate} ) ) {
+                $Expired = ' [WARNING: EXPIRED KEY]';
+            }
+
+            $KeyList{"SMIME::$DataRef->{Filename}"} = "SMIME:$Expired $DataRef->{Filename} $EndDate $DataRef->{Email}";
         }
     }
 
@@ -384,7 +392,11 @@ sub _PickSignKeyID {
     return if !%KeyList;
 
     # Check if signing key is still valid for the selected backend.
-    if ( $Param{SignKeyID} && $KeyList{ $Param{SignKeyID} } ) {
+    if (
+        $Param{SignKeyID}
+        && $KeyList{ $Param{SignKeyID} } && $KeyList{ $Param{SignKeyID} } !~ m/WARNING: EXPIRED KEY/
+        )
+    {
         return $Param{SignKeyID};
     }
 
@@ -403,7 +415,7 @@ sub _PickSignKeyID {
     }
 
     # if there is a preselected key from the queue, use it.
-    if ( $SignKeyID && $KeyList{$SignKeyID} ) {
+    if ( $SignKeyID && $KeyList{$SignKeyID} && $KeyList{$SignKeyID} !~ m/WARNING: EXPIRED KEY/ ) {
         return $SignKeyID;
     }
 
@@ -428,10 +440,13 @@ sub _PickSignKeyID {
         @PrivateKeys = $EncryptObject->PrivateKeySearch(
             Search => $SearchAddress[0]->address(),
         );
+
+        @PrivateKeys = grep { $_->{Status} eq 'good' } @PrivateKeys;
     }
     else {
         @PrivateKeys = $EncryptObject->PrivateSearch(
             Search => $SearchAddress[0]->address(),
+            Valid  => 1,
         );
     }
 

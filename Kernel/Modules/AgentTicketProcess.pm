@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
+# Copyright (C) 2001-2019 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (GPL). If you
@@ -2650,8 +2650,8 @@ sub _RenderTitle {
 sub _RenderArticle {
     my ( $Self, %Param ) = @_;
 
-    # get layout object
     my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
+    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
 
     for my $Needed (qw(FormID Ticket)) {
         if ( !$Param{$Needed} ) {
@@ -2690,6 +2690,15 @@ sub _RenderArticle {
             UploadCacheObject  => $Kernel::OM->Get('Kernel::System::Web::UploadCache'),
             AttachmentsInclude => 1,
         );
+
+        # Strip out external content if BlockLoadingRemoteContent is enabled.
+        if ( $ConfigObject->Get('Ticket::Frontend::BlockLoadingRemoteContent') ) {
+            my %SafetyCheckResult = $Kernel::OM->Get('Kernel::System::HTMLUtils')->Safety(
+                String       => $Param{GetParam}->{Body},
+                NoExtSrcLoad => 1,
+            );
+            $Param{GetParam}->{Body} = $SafetyCheckResult{String};
+        }
     }
 
     # get all attachments meta data
@@ -2799,7 +2808,7 @@ sub _RenderArticle {
         my $GID = $Kernel::OM->Get('Kernel::System::Queue')->GetQueueGroupID( QueueID => $Param{Ticket}->{QueueID} );
         my %MemberList = $Kernel::OM->Get('Kernel::System::Group')->PermissionGroupGet(
             GroupID => $GID,
-            Type    => 'note',
+            Type    => 'ro',
         );
         for my $UserID ( sort keys %MemberList ) {
             $ShownUsers{$UserID} = $AllGroupsMembers{$UserID};
@@ -2822,9 +2831,6 @@ sub _RenderArticle {
     if ( IsHashRefWithData( $Param{Error} ) && $Param{Error}->{'TimeUnits'} ) {
         $Param{TimeUnitsInvalid} = 'ServerError';
     }
-
-    # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
 
     # show time units
     if (
@@ -2981,6 +2987,10 @@ sub _RenderCustomer {
         Value => $Param{AJAXUpdatableFields},
     );
 
+    if ( $Param{DescriptionShort} ) {
+        $Data{DescriptionShort} = $Param{DescriptionShort};
+    }
+
     $LayoutObject->Block(
         Name => $Param{ActivityDialogField}->{LayoutBlock} || 'rw:Customer',
         Data => \%Data,
@@ -2991,15 +3001,6 @@ sub _RenderCustomer {
         $LayoutObject->Block(
             Name => 'LabelSpanCustomerUser',
             Data => {},
-        );
-    }
-
-    if ( $Param{DescriptionShort} ) {
-        $LayoutObject->Block(
-            Name => $Param{ActivityDialogField}->{LayoutBlock} || 'rw:Customer:DescriptionShort',
-            Data => {
-                DescriptionShort => $Param{DescriptionShort},
-            },
         );
     }
 
@@ -4720,6 +4721,7 @@ sub _StoreActivityDialog {
     my @Notify;
 
     my $NewTicketID;
+    my $NewOwnerID;
     if ( !$TicketID ) {
 
         $ProcessEntityID = $Param{GetParam}->{ProcessEntityID};
@@ -4778,10 +4780,12 @@ sub _StoreActivityDialog {
 
             $TicketParam{UserID} = $Self->{UserID};
 
-            if ( !$TicketParam{OwnerID} ) {
-
-                $TicketParam{OwnerID} = $Param{GetParam}->{OwnerID} || 1;
+            if ( $TicketParam{OwnerID} ) {
+                $NewOwnerID = $TicketParam{OwnerID};
             }
+
+            # Set OwnerID to 1 on TicketCreate. This will be updated later on, so events can be triggered.
+            $TicketParam{OwnerID} = 1;
 
             # if StartActivityDialog does not provide a ticket title set a default value
             if ( !$TicketParam{Title} ) {
@@ -4799,7 +4803,6 @@ sub _StoreActivityDialog {
             }
 
             # create a new ticket
-            $TicketParam{OwnerID} = 1;
             $TicketID = $TicketObject->TicketCreate(%TicketParam);
 
             if ( !$TicketID ) {
@@ -5501,18 +5504,11 @@ sub _StoreActivityDialog {
         );
     }
 
-    if ( $Param{GetParam}->{OwnerID} ) {
+    if ($NewOwnerID) {
         $TicketObject->TicketOwnerSet(
             TicketID  => $TicketID,
-            NewUserID => $Param{GetParam}->{OwnerID},
+            NewUserID => $NewOwnerID,
             UserID    => $Self->{UserID},
-        );
-
-        # set lock
-        $TicketObject->TicketLockSet(
-            TicketID => $TicketID,
-            Lock     => 'lock',
-            UserID   => $Self->{UserID},
         );
     }
 

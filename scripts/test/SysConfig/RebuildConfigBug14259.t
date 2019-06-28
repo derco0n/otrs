@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
+# Copyright (C) 2001-2019 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (GPL). If you
@@ -26,6 +26,11 @@ for my $ChildIndex ( 1 .. $ChildCount ) {
     # Disconnect database before fork.
     $DBObject->Disconnect();
 
+    # WORKAROUND: When forking on fast systems, Maint::Config::Rebuild fails due to the issue in PIDCreate().
+    # Sometimes it can happen that there are 2 processes with same name at the same time (usually on Postgres).
+    # It should be fixed in the next major release (requires DB modification).
+    Time::HiRes::sleep(0.2);
+
     # Create a fork of the current process
     #   parent gets the PID of the child
     #   child gets PID = 0
@@ -35,7 +40,9 @@ for my $ChildIndex ( 1 .. $ChildCount ) {
         # Destroy objects.
         $Kernel::OM->ObjectsDiscard();
 
-        my $ExitCode = $Kernel::OM->Get('Kernel::System::Console::Command::Maint::Config::Rebuild')->Execute();
+        # Execute console command.
+        `$^X bin/otrs.Console.pl Maint::Config::Rebuild --time 180`;
+        my $ExitCode = $? >> 8;
 
         $Kernel::OM->Get('Kernel::System::Cache')->Set(
             Type  => $CacheType,
@@ -90,11 +97,12 @@ for my $ChildIndex ( 1 .. $ChildCount ) {
     my %Data = %{ $ChildData{$ChildIndex} };
 
     $Self->Is(
-        $ChildData{$ChildIndex}->{ExitCode},
+        $Data{ExitCode},
         0,
         "RebuildConfig from child $ChildIndex exit correctly",
     );
 }
+
 $CacheObject->CleanUp(
     Type => $CacheType,
 );

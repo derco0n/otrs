@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
+# Copyright (C) 2001-2019 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (GPL). If you
@@ -161,6 +161,12 @@ $Selenium->RunTest(
                 Element => '#UserLanguage',
                 Value   => $Language,
             );
+
+            $Selenium->WaitForjQueryEventBound(
+                CSSSelector =>
+                    "form:has(input[type=hidden][name=Group][value=Language]) .WidgetSimple .SettingUpdateBox button",
+            );
+
             $Selenium->execute_script(
                 "\$('#UserLanguage').closest('.WidgetSimple').find('.SettingUpdateBox').find('button').trigger('click');"
             );
@@ -217,6 +223,12 @@ $Selenium->RunTest(
 
         # try updating the UserGoogleAuthenticatorSecret (which has a regex validation configured)
         $Selenium->find_element( "#UserGoogleAuthenticatorSecretKey", 'css' )->send_keys('Invalid Key');
+
+        $Selenium->WaitForjQueryEventBound(
+            CSSSelector =>
+                "form:has(input[type=hidden][name=Group][value=GoogleAuthenticatorSecretKey]) .WidgetSimple .SettingUpdateBox button",
+        );
+
         $Selenium->execute_script(
             "\$('#UserGoogleAuthenticatorSecretKey').closest('.WidgetSimple').find('.SettingUpdateBox').find('button').trigger('click');"
         );
@@ -290,6 +302,12 @@ $Selenium->RunTest(
                 })
             ).val('$MaliciousCode').trigger('redraw.InputField').trigger('change');"
         );
+
+        $Selenium->WaitForjQueryEventBound(
+            CSSSelector =>
+                "form:has(input[type=hidden][name=Group][value=Language]) .WidgetSimple .SettingUpdateBox button",
+        );
+
         $Selenium->execute_script(
             "\$('#UserLanguage').closest('.WidgetSimple').find('.SettingUpdateBox').find('button').trigger('click');"
         );
@@ -447,6 +465,12 @@ JAVASCRIPT
             Element => '#UserSkin',
             Value   => 'ivory',
         );
+
+        $Selenium->WaitForjQueryEventBound(
+            CSSSelector =>
+                "form:has(input[type=hidden][name=Group][value=Skin]) .WidgetSimple .SettingUpdateBox button",
+        );
+
         $Selenium->execute_script(
             "\$('#UserSkin').closest('.WidgetSimple').find('.SettingUpdateBox').find('button').trigger('click');"
         );
@@ -465,6 +489,13 @@ JAVASCRIPT
                 "return !\$('#UserSkin').closest('.WidgetSimple').hasClass('HasOverlay')"
         );
 
+        $Self->True(
+            $Selenium->find_element(
+                "//div[contains(\@class, 'MessageBox Notice' )]//a[contains(\@href, 'Action=AgentPreferences;Subaction=Group;Group=Miscellaneous' )]"
+            ),
+            "Notification contains user miscellaneous group link"
+        );
+
         # check, if reload notification is shown
         $LanguageObject = Kernel::Language->new(
             UserLanguage => "en",
@@ -477,6 +508,13 @@ JAVASCRIPT
         $Selenium->WaitFor(
             JavaScript =>
                 "return \$('div.MessageBox.Notice:contains(\"" . $NotificationTranslation . "\")').length"
+        );
+
+        $Self->True(
+            $Selenium->find_element(
+                "//div[contains(\@class, 'MessageBox Notice' )]//a[contains(\@href, 'Action=AgentPreferences;Subaction=Group;Group=UserProfile' )]"
+            ),
+            "Notification contains user profile group link"
         );
 
         # reload the screen

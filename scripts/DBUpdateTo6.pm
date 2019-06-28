@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
+# Copyright (C) 2001-2019 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (GPL). If you
@@ -210,6 +210,10 @@ sub _TasksGet {
             Module  => 'PerlModulesCheck',
         },
         {
+            Message => 'Check installed CPAN modules for known vulnerabilities',
+            Module  => 'CPANAuditCheck',
+        },
+        {
             Message => 'Check if database has been backed up',
             Module  => 'DatabaseBackupCheck',
         },
@@ -252,6 +256,10 @@ sub _TasksGet {
         {
             Message => 'Migrating time zone configuration',
             Module  => 'MigrateTimeZoneConfiguration',
+        },
+        {
+            Message => 'Migrating modified settings',
+            Module  => 'MigrateModifiedSettings',
         },
         {
             Message => 'Create appointment calendar tables',

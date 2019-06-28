@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
+# Copyright (C) 2001-2019 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (GPL). If you
@@ -764,10 +764,11 @@ sub _GroupSelectionGet {
     );
 
     my $GroupSelection = $Kernel::OM->Get('Kernel::Output::HTML::Layout')->BuildSelection(
-        Data       => \%GroupList,
-        Name       => 'GroupID',
-        SelectedID => $Param{GroupID} || '',
-        Class      => 'Modernize Validate_Required',
+        Data        => \%GroupList,
+        Name        => 'GroupID',
+        SelectedID  => $Param{GroupID} || '',
+        Translation => 0,
+        Class       => 'Modernize Validate_Required',
     );
 
     return $GroupSelection;
