@@ -83,6 +83,10 @@ sub new {
     $Self->{DSN}  = $Param{DatabaseDSN}  || $ConfigObject->Get('DatabaseDSN');
     $Self->{USER} = $Param{DatabaseUser} || $ConfigObject->Get('DatabaseUser');
     $Self->{PW}   = $Param{DatabasePw}   || $ConfigObject->Get('DatabasePw');
+    
+    ## hinzugefuegt: DB-Zeichensatz-Konfiguration lesen
+#    $Self->{Charset} = $Param{'DatabaseCharset'} || $Self->{ConfigObject}->Get('DatabaseCharset') || undef;
+    $Self->{Charset} = $Param{'DatabaseCharset'} || undef;
 
     $Self->{IsSlaveDB} = $Param{IsSlaveDB};
 
@@ -214,7 +218,22 @@ sub Connect {
             Message  => $DBI::errstr,
         );
         return;
-    }
+   }
+
+
+## hinzugefuegt: DB-Verbindungs-Zeichensatz setzen
+   if (defined $Self->{'Charset'}) {
+        if (!($Self->{dbh}->do("SET NAMES " . $Self->{'Charset'}))) {
+                $Self->{LogObject}->Log(
+                  Caller => 1,
+                  Priority => 'Error',
+                  Message => $DBI::errstr,
+                  );
+             }
+      }
+   return $Self->{dbh};
+#   }
+
 
     if ( $Self->{Backend}->{'DB::Connect'} ) {
         $Self->Do( SQL => $Self->{Backend}->{'DB::Connect'} );
