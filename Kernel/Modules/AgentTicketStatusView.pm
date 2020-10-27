@@ -196,7 +196,7 @@ sub Run {
     }
 
     # do shown tickets lookup
-    my $Limit = 10_000;
+    my $Limit = 100_000;
 
     my $ElementChanged = $ParamObject->GetParam( Param => 'ElementChanged' ) || '';
     my $HeaderColumn = $ElementChanged;
